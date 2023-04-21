@@ -27,6 +27,10 @@ class LoginViewModel {
     self.authManager = authManager
   }
   
+  deinit {
+    print("Login View Model deinit")
+  }
+  
   func logInUser(email: String, password: String) {
     isLoading = true
     authManager.logInUser(email: email, password: password) { [weak self] user, error in

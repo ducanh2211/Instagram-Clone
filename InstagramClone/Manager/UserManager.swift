@@ -14,6 +14,8 @@ class UserManager {
   
   init(db: Firestore = .firestore(),
        queue: DispatchQueue = .init(label: "my.concurrent.queue")) {
+//       queue: DispatchQueue = .main) {
+    
     self.db = db
     let setting = FirestoreSettings()
     setting.dispatchQueue = queue
@@ -46,14 +48,18 @@ class UserManager {
     db.collection(Constants.Firebase.USER_REF)
       .document(uid)
       .getDocument { documentSnapshot, error in
-        print(Thread.current)
+        print("Fetch user thread: \(Thread.current)")
         guard error == nil else {
           completion(nil)
           return
         }
-        guard let dictionary = documentSnapshot!.data() else { return }
+        guard let dictionary = documentSnapshot!.data() else {
+          completion(nil)
+          return
+        }
         let user = User(dictionary: dictionary)
         DispatchQueue.main.async {
+          print("DEBUG: completion with USER")
           completion(user)
         }
       }

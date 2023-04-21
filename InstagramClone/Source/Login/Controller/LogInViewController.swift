@@ -56,7 +56,7 @@ class LogInViewController: UIViewController {
     button.setTitleColor(UIColor.white, for: .normal)
     button.titleLabel?.font = .systemFont(ofSize: 17, weight: .semibold)
     button.backgroundColor = .systemBlue
-    button.alpha = 0.4
+    button.alpha = 0.5
     button.isEnabled = false
     button.layer.cornerRadius = 5
     button.translatesAutoresizingMaskIntoConstraints = false
@@ -121,8 +121,9 @@ class LogInViewController: UIViewController {
       guard let self = self else { return }
       guard let tabBarController = UIApplication
         .shared.keyWindow?.rootViewController as? TabBarViewController else { return }
+      tabBarController.viewModel.user = self.viewModel.user
       tabBarController.validateUser()
-      tabBarController.user = self.viewModel.user
+//      tabBarController.user = self.viewModel.user
       self.errorLabel.isHidden = true
       self.dismiss(animated: true)
     }
@@ -151,7 +152,7 @@ class LogInViewController: UIViewController {
   // MARK: - Helpers
   private func disableSignUpButton() {
     loginButton.isEnabled = false
-    loginButton.alpha = 0.4
+    loginButton.alpha = 0.5
   }
   
   private func enableSignUpButton() {

@@ -72,3 +72,16 @@ extension UIView {
     layer.rasterizationScale = scale ? UIScreen.main.scale : 1
   }
 }
+
+extension UIColor {
+  convenience init(red: Int, green: Int, blue: Int, alpha: CGFloat) {
+    self.init(red: CGFloat(red/255),
+              green: CGFloat(green/255),
+              blue: CGFloat(blue/255),
+              alpha: alpha)
+  }
+}
+
+extension Notification.Name {
+  static let textViewTextDidChange = Notification.Name("textViewTextDidChange")
+}

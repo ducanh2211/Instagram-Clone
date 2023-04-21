@@ -68,7 +68,7 @@ class SignUpViewController: UIViewController {
     button.setTitleColor(UIColor.white, for: .normal)
     button.titleLabel?.font = .systemFont(ofSize: 17, weight: .semibold)
     button.backgroundColor = .systemBlue
-    button.alpha = 0.4
+    button.alpha = 0.5
     button.isEnabled = false
     button.layer.cornerRadius = 5
     button.translatesAutoresizingMaskIntoConstraints = false
@@ -123,8 +123,8 @@ class SignUpViewController: UIViewController {
       guard let self = self else { return }
       guard let tabBarController = UIApplication
         .shared.keyWindow?.rootViewController as? TabBarViewController else { return }
+      
       tabBarController.validateUser()
-      tabBarController.user = self.viewModel.user
       self.errorLabel.isHidden = true
       self.dismiss(animated: true)
     }
@@ -155,7 +155,7 @@ class SignUpViewController: UIViewController {
   // MARK: - Helpers
   private func disableSignUpButton() {
     signUpButton.isEnabled = false
-    signUpButton.alpha = 0.4
+    signUpButton.alpha = 0.5
   }
   
   private func enableSignUpButton() {

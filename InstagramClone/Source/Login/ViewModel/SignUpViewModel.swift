@@ -27,6 +27,10 @@ class SignUpViewModel {
     self.authManager = authManager
   }
   
+  deinit {
+    print("Signup View Model deinit")
+  }
+  
   func signUpUser(email: String, password: String,
                   fullName: String, username: String) {
     

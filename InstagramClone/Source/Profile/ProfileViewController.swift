@@ -6,6 +6,7 @@
 //
 
 import UIKit
+import AVFoundation
 
 class ProfileViewController: UIViewController {
   
@@ -13,17 +14,47 @@ class ProfileViewController: UIViewController {
     super.viewDidLoad()
     
     view.backgroundColor = .systemBackground
+    
+    let cameraAuthorizationStatus = AVCaptureDevice.authorizationStatus(for: .video)
+    
+    switch cameraAuthorizationStatus {
+      case .notDetermined: requestCameraPermission()
+      case .authorized: presentCamera()
+      case .restricted, .denied: alertCameraAccessNeeded()
+      @unknown default: break
+    }
   }
   
+  func requestCameraPermission() {
+    AVCaptureDevice.requestAccess(for: AVMediaType.video) { granted in
+      guard granted == true else { return }
+      self.presentCamera()
+    }
+  }
   
-  /*
-   // MARK: - Navigation
-   
-   // In a storyboard-based application, you will often want to do a little preparation before navigation
-   override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
-   // Get the new view controller using segue.destination.
-   // Pass the selected object to the new view controller.
-   }
-   */
+  func presentCamera() {
+    let photoPicker = UIImagePickerController()
+    photoPicker.sourceType = .camera
+    photoPicker.delegate = self as? UIImagePickerControllerDelegate & UINavigationControllerDelegate
+    
+    self.present(photoPicker, animated: true, completion: nil)
+  }
+  
+  func alertCameraAccessNeeded() {
+    let settingsAppURL = URL(string: UIApplication.openSettingsURLString)!
+    
+    let alert = UIAlertController(
+      title: "Need Camera Access",
+      message: "Camera access is required to make full use of this app.",
+      preferredStyle: UIAlertController.Style.alert
+    )
+    
+    alert.addAction(UIAlertAction(title: "Cancel", style: .default, handler: nil))
+    alert.addAction(UIAlertAction(title: "Allow Camera", style: .cancel, handler: { (alert) -> Void in
+      UIApplication.shared.open(settingsAppURL, options: [:], completionHandler: nil)
+    }))
+    
+    present(alert, animated: true, completion: nil)
+  }
   
 }

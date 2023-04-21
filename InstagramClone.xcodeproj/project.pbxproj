@@ -11,6 +11,9 @@
 		576F57C929EAD014002F2A6E /* LoginViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 576F57C829EAD014002F2A6E /* LoginViewModel.swift */; };
 		576F57CF29EAEBBA002F2A6E /* ProgressHUD.swift in Sources */ = {isa = PBXBuildFile; fileRef = 576F57CE29EAEBBA002F2A6E /* ProgressHUD.swift */; };
 		576F57D129EAFC4F002F2A6E /* UserManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 576F57D029EAFC4F002F2A6E /* UserManager.swift */; };
+		576F57D529EBB065002F2A6E /* DataPersistenceManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 576F57D429EBB065002F2A6E /* DataPersistenceManager.swift */; };
+		576F57D729EBB8B5002F2A6E /* TabBarViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 576F57D629EBB8B5002F2A6E /* TabBarViewModel.swift */; };
+		576F57D929EC06A0002F2A6E /* FeedViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 576F57D829EC06A0002F2A6E /* FeedViewModel.swift */; };
 		57ABFC4829E998FD00FF1BEB /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 57ABFC4729E998FD00FF1BEB /* AppDelegate.swift */; };
 		57ABFC4A29E998FD00FF1BEB /* SceneDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 57ABFC4929E998FD00FF1BEB /* SceneDelegate.swift */; };
 		57ABFC5429E998FE00FF1BEB /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 57ABFC5229E998FE00FF1BEB /* LaunchScreen.storyboard */; };
@@ -31,6 +34,9 @@
 		57ABFC8829EA690D00FF1BEB /* Constants.swift in Sources */ = {isa = PBXBuildFile; fileRef = 57ABFC8729EA690D00FF1BEB /* Constants.swift */; };
 		57ABFC8A29EA748400FF1BEB /* StorageManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 57ABFC8929EA748400FF1BEB /* StorageManager.swift */; };
 		57ABFC8C29EA7AB900FF1BEB /* SignUpViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 57ABFC8B29EA7AB900FF1BEB /* SignUpViewModel.swift */; };
+		57ED8BE629EEEFB400E5AD93 /* PhotoSelectorCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 57ED8BE529EEEFB400E5AD93 /* PhotoSelectorCell.swift */; };
+		57F6AC5F29EEA8FC003F1BA9 /* PlaceholderTextView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 57F6AC5E29EEA8FC003F1BA9 /* PlaceholderTextView.swift */; };
+		57F6AC6229EEAD33003F1BA9 /* PhotoSelectorViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 57F6AC6129EEAD33003F1BA9 /* PhotoSelectorViewController.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -38,6 +44,9 @@
 		576F57C829EAD014002F2A6E /* LoginViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LoginViewModel.swift; sourceTree = "<group>"; };
 		576F57CE29EAEBBA002F2A6E /* ProgressHUD.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProgressHUD.swift; sourceTree = "<group>"; };
 		576F57D029EAFC4F002F2A6E /* UserManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UserManager.swift; sourceTree = "<group>"; };
+		576F57D429EBB065002F2A6E /* DataPersistenceManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DataPersistenceManager.swift; sourceTree = "<group>"; };
+		576F57D629EBB8B5002F2A6E /* TabBarViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TabBarViewModel.swift; sourceTree = "<group>"; };
+		576F57D829EC06A0002F2A6E /* FeedViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FeedViewModel.swift; sourceTree = "<group>"; };
 		57ABFC4429E998FD00FF1BEB /* InstagramClone.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = InstagramClone.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		57ABFC4729E998FD00FF1BEB /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		57ABFC4929E998FD00FF1BEB /* SceneDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SceneDelegate.swift; sourceTree = "<group>"; };
@@ -60,6 +69,9 @@
 		57ABFC8729EA690D00FF1BEB /* Constants.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Constants.swift; sourceTree = "<group>"; };
 		57ABFC8929EA748400FF1BEB /* StorageManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StorageManager.swift; sourceTree = "<group>"; };
 		57ABFC8B29EA7AB900FF1BEB /* SignUpViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SignUpViewModel.swift; sourceTree = "<group>"; };
+		57ED8BE529EEEFB400E5AD93 /* PhotoSelectorCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PhotoSelectorCell.swift; sourceTree = "<group>"; };
+		57F6AC5E29EEA8FC003F1BA9 /* PlaceholderTextView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PlaceholderTextView.swift; sourceTree = "<group>"; };
+		57F6AC6129EEAD33003F1BA9 /* PhotoSelectorViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PhotoSelectorViewController.swift; sourceTree = "<group>"; };
 		93C2667D5D8E9DDDE5CBCC9E /* Pods_InstagramClone.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_InstagramClone.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		ECEC73533383A4AE055852A1 /* Pods-InstagramClone.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-InstagramClone.release.xcconfig"; path = "Target Support Files/Pods-InstagramClone/Pods-InstagramClone.release.xcconfig"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
@@ -83,6 +95,22 @@
 				ECEC73533383A4AE055852A1 /* Pods-InstagramClone.release.xcconfig */,
 			);
 			path = Pods;
+			sourceTree = "<group>";
+		};
+		576F57D229EB0EC3002F2A6E /* Controller */ = {
+			isa = PBXGroup;
+			children = (
+				57ABFC6C29E9A7A900FF1BEB /* FeedViewController.swift */,
+			);
+			path = Controller;
+			sourceTree = "<group>";
+		};
+		576F57D329EB0ECF002F2A6E /* ViewModel */ = {
+			isa = PBXGroup;
+			children = (
+				576F57D829EC06A0002F2A6E /* FeedViewModel.swift */,
+			);
+			path = ViewModel;
 			sourceTree = "<group>";
 		};
 		57ABFC3B29E998FD00FF1BEB = {
@@ -145,8 +173,8 @@
 		57ABFC6129E9A5C500FF1BEB /* Controller */ = {
 			isa = PBXGroup;
 			children = (
-				57ABFC6229E9A64600FF1BEB /* LogInViewController.swift */,
 				57ABFC6429E9A65C00FF1BEB /* SignUpViewController.swift */,
+				57ABFC6229E9A64600FF1BEB /* LogInViewController.swift */,
 			);
 			path = Controller;
 			sourceTree = "<group>";
@@ -164,6 +192,7 @@
 			isa = PBXGroup;
 			children = (
 				57ABFC5D29E9A53A00FF1BEB /* TabBarViewController.swift */,
+				576F57D629EBB8B5002F2A6E /* TabBarViewModel.swift */,
 			);
 			path = MainTabBar;
 			sourceTree = "<group>";
@@ -171,7 +200,8 @@
 		57ABFC6829E9A6E700FF1BEB /* Feed */ = {
 			isa = PBXGroup;
 			children = (
-				57ABFC6C29E9A7A900FF1BEB /* FeedViewController.swift */,
+				576F57D329EB0ECF002F2A6E /* ViewModel */,
+				576F57D229EB0EC3002F2A6E /* Controller */,
 			);
 			path = Feed;
 			sourceTree = "<group>";
@@ -195,7 +225,8 @@
 		57ABFC6B29E9A78300FF1BEB /* Post */ = {
 			isa = PBXGroup;
 			children = (
-				57ABFC7229E9A7DC00FF1BEB /* PostViewController.swift */,
+				57ED8BE429EEEB1F00E5AD93 /* View */,
+				57F6AC6029EEAD00003F1BA9 /* Controller */,
 			);
 			path = Post;
 			sourceTree = "<group>";
@@ -213,6 +244,7 @@
 			children = (
 				57ABFC7B29EA507C00FF1BEB /* StatusView.swift */,
 				576F57CE29EAEBBA002F2A6E /* ProgressHUD.swift */,
+				57F6AC5E29EEA8FC003F1BA9 /* PlaceholderTextView.swift */,
 			);
 			path = CommonView;
 			sourceTree = "<group>";
@@ -233,6 +265,7 @@
 				57ABFC7F29EA627000FF1BEB /* AuthManager.swift */,
 				57ABFC8929EA748400FF1BEB /* StorageManager.swift */,
 				576F57D029EAFC4F002F2A6E /* UserManager.swift */,
+				576F57D429EBB065002F2A6E /* DataPersistenceManager.swift */,
 			);
 			path = Manager;
 			sourceTree = "<group>";
@@ -252,6 +285,23 @@
 				57ABFC8729EA690D00FF1BEB /* Constants.swift */,
 			);
 			path = Constant;
+			sourceTree = "<group>";
+		};
+		57ED8BE429EEEB1F00E5AD93 /* View */ = {
+			isa = PBXGroup;
+			children = (
+				57ED8BE529EEEFB400E5AD93 /* PhotoSelectorCell.swift */,
+			);
+			path = View;
+			sourceTree = "<group>";
+		};
+		57F6AC6029EEAD00003F1BA9 /* Controller */ = {
+			isa = PBXGroup;
+			children = (
+				57ABFC7229E9A7DC00FF1BEB /* PostViewController.swift */,
+				57F6AC6129EEAD33003F1BA9 /* PhotoSelectorViewController.swift */,
+			);
+			path = Controller;
 			sourceTree = "<group>";
 		};
 		69755729FB3D6885AA978A72 /* Frameworks */ = {
@@ -380,22 +430,28 @@
 				57ABFC8529EA64EA00FF1BEB /* FirebaseModel.swift in Sources */,
 				57ABFC8C29EA7AB900FF1BEB /* SignUpViewModel.swift in Sources */,
 				57ABFC8329EA647300FF1BEB /* User.swift in Sources */,
+				576F57D529EBB065002F2A6E /* DataPersistenceManager.swift in Sources */,
 				57ABFC7929E9BDA300FF1BEB /* Extentsion.swift in Sources */,
 				57ABFC8029EA627000FF1BEB /* AuthManager.swift in Sources */,
+				576F57D929EC06A0002F2A6E /* FeedViewModel.swift in Sources */,
 				57ABFC5E29E9A53A00FF1BEB /* TabBarViewController.swift in Sources */,
 				57ABFC8829EA690D00FF1BEB /* Constants.swift in Sources */,
+				57ED8BE629EEEFB400E5AD93 /* PhotoSelectorCell.swift in Sources */,
 				57ABFC7C29EA507C00FF1BEB /* StatusView.swift in Sources */,
 				576F57C929EAD014002F2A6E /* LoginViewModel.swift in Sources */,
+				57F6AC6229EEAD33003F1BA9 /* PhotoSelectorViewController.swift in Sources */,
 				57ABFC6529E9A65C00FF1BEB /* SignUpViewController.swift in Sources */,
 				57ABFC7129E9A7C400FF1BEB /* SearchViewController.swift in Sources */,
 				57ABFC7329E9A7DC00FF1BEB /* PostViewController.swift in Sources */,
 				57ABFC4829E998FD00FF1BEB /* AppDelegate.swift in Sources */,
+				57F6AC5F29EEA8FC003F1BA9 /* PlaceholderTextView.swift in Sources */,
 				57ABFC6329E9A64600FF1BEB /* LogInViewController.swift in Sources */,
 				57ABFC4A29E998FD00FF1BEB /* SceneDelegate.swift in Sources */,
 				57ABFC6F29E9A7BB00FF1BEB /* ProfileViewController.swift in Sources */,
 				57ABFC6D29E9A7A900FF1BEB /* FeedViewController.swift in Sources */,
 				57ABFC8A29EA748400FF1BEB /* StorageManager.swift in Sources */,
 				576F57D129EAFC4F002F2A6E /* UserManager.swift in Sources */,
+				576F57D729EBB8B5002F2A6E /* TabBarViewModel.swift in Sources */,
 				576F57CF29EAEBBA002F2A6E /* ProgressHUD.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
