@@ -8,6 +8,7 @@
 import Foundation
 
 class LoginViewModel {
+  
   var user: User? {
     didSet { success?() }
   }

@@ -21,13 +21,21 @@ class PlaceholderTextView: UITextView {
   override init(frame: CGRect, textContainer: NSTextContainer?) {
     super.init(frame: frame, textContainer: textContainer)
     
+    font = UIFont.systemFont(ofSize: 17)
+    
     addSubview(placeholderLabel)
     NSLayoutConstraint.activate([
       placeholderLabel.leftAnchor.constraint(equalTo: leftAnchor),
       placeholderLabel.topAnchor.constraint(equalTo: topAnchor)
     ])
     
-    NotificationCenter.default.addObserver(self, selector: #selector(textDidChange), name: .textViewTextDidChange, object: nil)
+    NotificationCenter.default.addObserver(self, selector: #selector(textDidChange), name: UITextView.textDidChangeNotification, object: nil)
+  }
+  
+  override func layoutSubviews() {
+    super.layoutSubviews()
+    textContainer.lineFragmentPadding = 0
+    textContainerInset = .zero
   }
   
   required init?(coder: NSCoder) {
@@ -35,7 +43,7 @@ class PlaceholderTextView: UITextView {
   }
   
   deinit {
-    NotificationCenter.default.removeObserver(self, name: .textViewTextDidChange, object: nil)
+    NotificationCenter.default.removeObserver(self, name: UITextView.textDidChangeNotification, object: nil)
   }
   
   @objc private func textDidChange() {

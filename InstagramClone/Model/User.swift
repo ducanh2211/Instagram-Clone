@@ -22,12 +22,12 @@ extension User: FirebaseModel {
   init?(dictionary: [String : Any]) {
     guard let uid = dictionary["uid"] as? String,
           let email = dictionary["email"] as? String,
-          let fullName = dictionary["fullName"] as? String,
-          let userName = dictionary["userName"] as? String,
-          let avatarUrl = dictionary["avatarUrl"] as? String,
-          let postsCount = dictionary["postsCount"] as? Int,
-          let followersCount = dictionary["followersCount"] as? Int,
-          let followingCount = dictionary["followingCount"] as? Int
+          let fullName = dictionary["full_name"] as? String,
+          let userName = dictionary["user_name"] as? String,
+          let avatarUrl = dictionary["avatar_url"] as? String,
+          let postsCount = dictionary["posts_count"] as? Int,
+          let followersCount = dictionary["followers_count"] as? Int,
+          let followingCount = dictionary["following_count"] as? Int
     else {
       return nil
     }
@@ -42,12 +42,12 @@ extension User: FirebaseModel {
     return [
       "uid": uid,
       "email": email,
-      "fullName": fullName,
-      "userName": userName,
-      "avatarUrl": avatarUrl,
-      "postsCount": postsCount,
-      "followersCount": followersCount,
-      "followingCount": followingCount
+      "full_name": fullName,
+      "user_name": userName,
+      "avatar_url": avatarUrl,
+      "posts_count": postsCount,
+      "followers_count": followersCount,
+      "following_count": followingCount
     ]
   }
 }

@@ -37,13 +37,15 @@ class AuthManager {
   }
   
   init(auth: Auth = .auth(),
-       userManager: UserManager = .init(),
-       storageManager: StorageManager = .init()) {
+       userManager: UserManager = UserManager(),
+       storageManager: StorageManager = StorageManager()) {
+    
     self.auth = auth
     self.userManager = userManager
     self.storageManager = storageManager
   }
   
+  // MARK: - Public funtions
   func createUser(email: String, password: String,
                   fullName: String, userName: String,
                   completion: @escaping (User?, AuthError?) -> Void) {
@@ -60,22 +62,33 @@ class AuthManager {
     auth.createUser(withEmail: email, password: password) { [weak self] auth, error in
       guard let self = self else { return }
 
-      guard error == nil else {
-        completion(nil, .otherError(error!))
+      if let error = error {
+        completion(nil, .otherError(error))
         return
       }
-      let avatarImage = self.defaultAvatar()
+      
+      guard let avatarImageData = self.defaultAvatar().jpegData(compressionQuality: 0.3) else { return }
       let uid = auth!.user.uid
       
-      self.storageManager.uploadUserAvatar(avatarImage) { avatarUrl in
-        guard let avatarUrl = avatarUrl else { return }
-        let userData = User(uid: uid, email: email, fullName: fullName,
-                            userName: userName, avatarUrl: avatarUrl)
+      self.storageManager.uploadUserAvatar(avatarImageData, folderName: uid) { imageUrl, error in
+        if let error = error {
+          completion(nil, .otherError(error))
+          return
+        }
         
-        self.userManager.uploadUser(userData, email: email, fullName: fullName, userName: userName, avatarUrl: avatarUrl, completion: completion)
-//        self.uploadUser(userData, email: email,
-//                        fullName: fullName, userName: userName,
-//                        avatarUrl: avatarUrl, completion: completion)
+        let userData = User(uid: uid, email: email, fullName: fullName,
+                            userName: userName, avatarUrl: imageUrl!)
+        
+        self.userManager.uploadUser(userData, email: email,
+                                    fullName: fullName, userName: userName,
+                                    avatarUrl: imageUrl!) { user, error in
+          if let error = error {
+            completion(nil, .otherError(error))
+            return
+          }
+          
+          completion(user, nil)
+        }
       }
     }
   }
@@ -83,51 +96,28 @@ class AuthManager {
   func logInUser(email: String, password: String,
                   completion: @escaping (User?, AuthError?) -> Void) {
     
-    auth.signIn(withEmail: email, password: password) { auth, error in
-      guard error == nil else {
-        completion(nil, .otherError(error!))
+    auth.signIn(withEmail: email, password: password) { [weak self] auth, error in
+      guard let self = self else { return }
+      
+      if let error = error {
+        completion(nil, .otherError(error))
         return
       }
+      
       let uid = auth!.user.uid
-      self.userManager.fetchUser(withUid: uid) { user in
+      
+      self.userManager.fetchUser(withUid: uid) { user, error in
+        if let error = error {
+          completion(nil, .otherError(error))
+          return
+        }
+        
         completion(user, nil)
       }
-//      self.fetchUser() {}
     }
   }
   
   // MARK: - Private functions
-//  private func uploadUser(_ user: User, email: String,
-//                          fullName: String, userName: String,
-//                          avatarUrl: String, completion: @escaping (User?, AuthError?) -> Void) {
-//
-//    db.collection(Constants.Firebase.USER_REF)
-//      .document(user.uid)
-//      .setData(user.description) { error in
-//        guard error == nil else {
-//          completion(nil, .otherError(error!))
-//          return
-//        }
-//        completion(user, nil)
-//      }
-//  }
-//
-//  private func fetchUser(withUid uid: String,
-//                         completion: @escaping (User?) -> Void) {
-//
-//    db.collection(Constants.Firebase.USER_REF)
-//      .document(uid)
-//      .getDocument { documentSnapshot, error in
-//        guard error == nil else {
-//          completion(nil)
-//          return
-//        }
-//        guard let dictionary = documentSnapshot!.data() else { return }
-//        let user = User(dictionary: dictionary)
-//        completion(user)
-//      }
-//  }
-  
   private func defaultAvatar() -> UIImage {
     return UIImage(systemName: "person.fill")!
   }

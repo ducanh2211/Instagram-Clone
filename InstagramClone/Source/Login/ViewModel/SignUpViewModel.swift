@@ -8,6 +8,7 @@
 import Foundation
 
 class SignUpViewModel {
+  
   var user: User? {
     didSet { success?() }
   }

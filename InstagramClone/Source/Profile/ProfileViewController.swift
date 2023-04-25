@@ -15,14 +15,14 @@ class ProfileViewController: UIViewController {
     
     view.backgroundColor = .systemBackground
     
-    let cameraAuthorizationStatus = AVCaptureDevice.authorizationStatus(for: .video)
-    
-    switch cameraAuthorizationStatus {
-      case .notDetermined: requestCameraPermission()
-      case .authorized: presentCamera()
-      case .restricted, .denied: alertCameraAccessNeeded()
-      @unknown default: break
-    }
+//    let cameraAuthorizationStatus = AVCaptureDevice.authorizationStatus(for: .video)
+//
+//    switch cameraAuthorizationStatus {
+//      case .notDetermined: requestCameraPermission()
+//      case .authorized: presentCamera()
+//      case .restricted, .denied: alertCameraAccessNeeded()
+//      @unknown default: break
+//    }
   }
   
   func requestCameraPermission() {

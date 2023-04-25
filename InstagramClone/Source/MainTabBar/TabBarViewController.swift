@@ -23,6 +23,7 @@ class TabBarViewController: UITabBarController {
     self.view.backgroundColor = .systemBackground
     self.tabBar.isTranslucent = false
     self.tabBar.tintColor = .label
+    self.delegate = self
 //        logout()
     bindViewModel()
     validateUser()
@@ -84,7 +85,7 @@ extension TabBarViewController {
       unselectedImage: UIImage(systemName: "magnifyingglass.circle")
     )
     let postNav = self.createController(
-      self.postVC,
+      PhotoSelectorViewController(),
       selectedImage: UIImage(systemName: "plus.app.fill"),
       unselectedImage: UIImage(systemName: "plus.app")
     )
@@ -105,5 +106,22 @@ extension TabBarViewController {
     nav.tabBarItem.selectedImage = selectedImage
     nav.tabBarItem.image = unselectedImage
     return nav
+  }
+}
+
+// MARK: -
+extension TabBarViewController: UITabBarControllerDelegate {
+  func tabBarController(_ tabBarController: UITabBarController, shouldSelect viewController: UIViewController) -> Bool {
+    guard let index = tabBarController.viewControllers?.firstIndex(of: viewController) else { return true }
+    
+    if index == 2 {
+      let vc = PhotoSelectorViewController()
+      let nav = UINavigationController(rootViewController: vc)
+      nav.modalPresentationStyle = .fullScreen
+      self.present(nav, animated: false)
+      return false
+    }
+    
+    return true
   }
 }

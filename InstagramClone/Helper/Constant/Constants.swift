@@ -11,7 +11,14 @@ import UIKit
 enum Constants {
   enum Firebase {
     static let USER_REF = "users"
-    static let AVATAR_REF = "profileImages"
+    static let USER_POST_REF = "user-posts"
+    static let USER_FOLLOWING_REF = "user-following"
+    static let USER_FOLLOWERS_REF = "user-followers"
+    static let POST_REF = "posts"
+    static let POST_LIKES_REF = "post-likes"
+    static let POST_COMMENTS_REF = "post-comments"
+    static let AVATAR_REF = "profile-images"
+    static let POST_IMAGES_REF = "post-images"
   }
   
   enum Color {

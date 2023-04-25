@@ -10,16 +10,21 @@ import FirebaseFirestore
 import FirebaseCore
 
 class UserManager {
+  
   private let db: Firestore
   
+  private lazy var collectionUsersRef: CollectionReference = {
+    db.collection(Constants.Firebase.USER_REF)
+  }()
+  
   init(db: Firestore = .firestore(),
-       queue: DispatchQueue = .init(label: "my.concurrent.queue")) {
-//       queue: DispatchQueue = .main) {
+       queue: DispatchQueue = DispatchQueue(label: "my.firestore.queue")) {
     
-    self.db = db
     let setting = FirestoreSettings()
     setting.dispatchQueue = queue
-    self.db.settings = setting
+    db.settings = setting
+    
+    self.db = db
   }
   
   deinit {
@@ -28,40 +33,40 @@ class UserManager {
   
   func uploadUser(_ user: User, email: String,
                   fullName: String, userName: String,
-                  avatarUrl: String, completion: @escaping (User?, AuthError?) -> Void) {
+                  avatarUrl: String, completion: @escaping (User?, Error?) -> Void) {
     
-    db.collection(Constants.Firebase.USER_REF)
-      .document(user.uid)
-      .setData(user.description) { error in
-        print(Thread.current)
-        guard error == nil else {
-          completion(nil, .otherError(error!))
-          return
-        }
-        DispatchQueue.main.async {
-          completion(user, nil)
-        }
+    collectionUsersRef.document(user.uid).setData(user.description) { error in
+      guard error == nil else {
+        completion(nil, error)
+        return
       }
+      
+      DispatchQueue.main.async {
+        completion(user, nil)
+      }
+    }
   }
   
-  func fetchUser(withUid uid: String, completion: @escaping (User?) -> Void) {
-    db.collection(Constants.Firebase.USER_REF)
-      .document(uid)
-      .getDocument { documentSnapshot, error in
-        print("Fetch user thread: \(Thread.current)")
-        guard error == nil else {
-          completion(nil)
-          return
-        }
-        guard let dictionary = documentSnapshot!.data() else {
-          completion(nil)
-          return
-        }
-        let user = User(dictionary: dictionary)
-        DispatchQueue.main.async {
-          print("DEBUG: completion with USER")
-          completion(user)
-        }
+  func fetchUser(withUid uid: String,
+                 completion: @escaping (User?, Error?) -> Void) {
+    
+    collectionUsersRef.document(uid).getDocument { documentSnapshot, error in
+      print("Fetch user thread: \(Thread.current)")
+      guard error == nil else {
+        completion(nil, error)
+        return
       }
+      
+      guard let dictionary = documentSnapshot!.data() else {
+        completion(nil, error)
+        return
+      }
+      
+      let user = User(dictionary: dictionary)
+      DispatchQueue.main.async {
+        print("DEBUG: completion with USER")
+        completion(user, nil)
+      }
+    }
   }
 }
