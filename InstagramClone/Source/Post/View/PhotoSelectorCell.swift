@@ -8,10 +8,15 @@
 import UIKit
 import Photos
 
+/// Đây là collection view cell sẽ có nhiệm vụ request và hiển thị UIImage từ PHAsset.
+/// Nó sẽ cancel những request của các cell không hiển thị trên màn hình.
 class PhotoSelectorCell: UICollectionViewCell {
   
   static var identifier: String { String(describing: self) }
-  var assetQueue: DispatchQueue!
+  
+  // assetQueue cần xem xét lại có phù hợp không
+//  var assetQueue: DispatchQueue!
+  var requestId: PHImageRequestID!
   
   private let photoImageView: UIImageView = {
     let imageView = UIImageView()
@@ -30,25 +35,23 @@ class PhotoSelectorCell: UICollectionViewCell {
     fatalError("init(coder:) has not been implemented")
   }
   
+  /// Reset lại trạng thái của cell trước khi được reuse.
   override func prepareForReuse() {
     super.prepareForReuse()
     photoImageView.image = nil
+    // khi scroll quá nhanh + cơ chế reuse cell
+    // dẫn đến ảnh bị nhảy lung tung.
+    // Trước khi reuse lại cell, những cell bị lướt qua (không hiển thị) cancel request.
+    PHImageManager.default().cancelImageRequest(requestId)
   }
   
-  func configure(withImage image: UIImage) {
-    photoImageView.image = image
-  }
-  
+  /// Configure `photoImageView` trong cell với `asset` được truyền vào.
   func configure(withAsset asset: PHAsset) {
-    let options = PHImageRequestOptions()
     let targetSize = CGSize(width: bounds.size.width * 4, height: bounds.size.height * 4)
     
-    asset.getImageFromAsset(targetSize: targetSize, options: options, queue: assetQueue) { image in
+    self.requestId = asset.getImageAsync(targetSize: targetSize) { image in
       if let image = image {
-        DispatchQueue.main.async {
-          self.photoImageView.image = image
-          print("cell image size: \(image.size)")
-        }
+        self.photoImageView.image = image
       }
     }
   }

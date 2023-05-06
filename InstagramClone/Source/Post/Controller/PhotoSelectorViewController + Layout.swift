@@ -9,9 +9,13 @@ import UIKit
 
 // MARK: - UI Layout
 extension PhotoSelectorViewController {
+  
+  // MARK: View
   func setupView() {
     self.title = "New post"
     self.view.backgroundColor = .systemBackground
+    ProgressHUD.colorHUD = .black
+    ProgressHUD.colorAnimation = .white
     setupCollectionView()
     setupConstraints()
     setupNavigationBar()
@@ -41,17 +45,18 @@ extension PhotoSelectorViewController {
       image: UIImage(systemName: "xmark"),
       style: .done,
       target: self,
-      action: #selector(leftBarButtonTapped)
+      action: #selector(closeButtonTapped)
     )
     navigationItem.rightBarButtonItem = UIBarButtonItem(
       title: "Next",
       style: .done,
       target: self,
-      action: #selector(rightBarButtonTapped)
+      action: #selector(nextButtonTapped)
     )
     navigationItem.rightBarButtonItem?.tintColor = .link
   }
   
+  // MARK: Collection view
   private func setupCollectionView() {
     let layout = createLayout()
     collectionView = UICollectionView(frame: .zero, collectionViewLayout: layout)
@@ -70,6 +75,7 @@ extension PhotoSelectorViewController {
   
   private func createLayout() -> UICollectionViewCompositionalLayout {
     let itemInsets: CGFloat = 0.5
+    let numberOfItemsInGroup: CGFloat = 4
     
     // Item
     let itemSize = NSCollectionLayoutSize(

@@ -26,7 +26,7 @@ class NewPostViewController: UIViewController {
     imageView.clipsToBounds = true
     imageView.translatesAutoresizingMaskIntoConstraints = false
     
-    let tapGesture = UITapGestureRecognizer(target: self, action: #selector(photoImageViewTapped))
+    let tapGesture = UITapGestureRecognizer(target: self, action: #selector(smallPhotoTapped))
     imageView.isUserInteractionEnabled = true
     imageView.addGestureRecognizer(tapGesture)
     return imageView
@@ -39,11 +39,10 @@ class NewPostViewController: UIViewController {
   }()
   
   private lazy var previewPhotoView: UIView = {
-    let view = UIView(frame: self.view.bounds)
+    let view = UIView(frame: self.view.frame)
     view.backgroundColor = .systemBackground.withAlphaComponent(0.8)
     view.addSubview(largePhotoImageView)
-    
-    let tapGesture = UITapGestureRecognizer(target: self, action: #selector(removePreviewPhotoView))
+    let tapGesture = UITapGestureRecognizer(target: self, action: #selector(removePreviewPhoto))
     view.isUserInteractionEnabled = true
     view.addGestureRecognizer(tapGesture)
     return view
@@ -64,7 +63,17 @@ class NewPostViewController: UIViewController {
   private let idealPhotoResolution = CGSize(width: 1080, height: 1080)
   
   private lazy var photoAspectRatio: CGFloat = {
-    return CGFloat(asset.pixelWidth) / CGFloat(asset.pixelHeight)
+    let aspectRatio = CGFloat(asset.pixelWidth) / CGFloat(asset.pixelHeight)
+    
+    if aspectRatio < PhotoConstants.Post.portraitAspectRatio {
+      return PhotoConstants.Post.portraitAspectRatio
+    }
+    else if aspectRatio > PhotoConstants.Post.landscapeAspectRatio {
+      return PhotoConstants.Post.landscapeAspectRatio
+    }
+    else {
+      return aspectRatio
+    }
   }()
   
   private lazy var initialLargePhotoFrame: CGRect = {
@@ -80,6 +89,7 @@ class NewPostViewController: UIViewController {
     let finalWidth = screenWidth
     let height: CGFloat = finalWidth / photoAspectRatio
     let finalHeight: CGFloat = (height > 500) ? 500 : height
+    
     return CGRect(x: 0, y: (screenHeight - finalHeight) / 2,
                   width: finalWidth, height: finalHeight)
   }()
@@ -100,6 +110,7 @@ class NewPostViewController: UIViewController {
   
   override func viewDidLoad() {
     super.viewDidLoad()
+    hideKeyBoardWhenTapped()
     bindViewModel()
     fetchImage()
     setupView()
@@ -108,17 +119,22 @@ class NewPostViewController: UIViewController {
   // MARK: - Functions
   private func bindViewModel() {
     viewModel.createPostSuccess = { [weak self] in
-      print("DEBUG: create post success on main thread is: \(Thread.isMainThread)")
       DispatchQueue.main.async {
         self?.dismiss(animated: true)
       }
     }
     
     viewModel.createPostFailure = { [weak self] error in
-      print("DEBUG: create post failure error: \(error) on main thread is: \(Thread.isMainThread)")
+      print("Create post failure error: \(error)")
       DispatchQueue.main.async {
         self?.dismiss(animated: true)
       }
+    }
+    
+    viewModel.loadingIndicator = { [weak self] in
+      guard let self = self else { return }
+      let isLoading = self.viewModel.isLoading
+      isLoading ? ProgressHUD.show() : ProgressHUD.dismiss()
     }
   }
   
@@ -130,7 +146,9 @@ class NewPostViewController: UIViewController {
     largePhotoImageView.image = largeImage
   }
   
-  @objc private func rightBarButtonTapped() {
+  @objc private func shareButtonTapped() {
+    view.endEditing(true)
+    
     guard let postImage = postImage,
           let imageData = postImage.jpegData(compressionQuality: 1),
           let caption = captionTextView.text else { return }
@@ -138,30 +156,36 @@ class NewPostViewController: UIViewController {
     viewModel.createPost(withImage: imageData, aspectRatio: photoAspectRatio, caption: caption)
   }
   
-  @objc private func photoImageViewTapped() {
+  @objc private func smallPhotoTapped() {
     view.addSubview(previewPhotoView)
     largePhotoImageView.frame = initialLargePhotoFrame
     showPreviewPhoto()
   }
   
-  @objc private func removePreviewPhotoView() {
+  @objc private func removePreviewPhoto() {
     hidePreviewPhoto()
   }
   
   private func showPreviewPhoto() {
-    UIView.animate(withDuration: 0.35) {
-      self.smallPhotoImageView.alpha = 0
+    self.smallPhotoImageView.alpha = 0
+    UIView.animate(withDuration: 0.75, delay: 0,
+                   usingSpringWithDamping: 0.8,
+                   initialSpringVelocity: 1,
+                   options: .curveEaseInOut, animations: {
       self.largePhotoImageView.frame = self.expandLargePhotoFrame
-    }
+    })
   }
   
   private func hidePreviewPhoto() {
-    UIView.animate(withDuration: 0.35) {
+    UIView.animate(withDuration: 0.75, delay: 0,
+                   usingSpringWithDamping: 0.75,
+                   initialSpringVelocity: 1,
+                   options: .curveEaseInOut, animations: {
       self.largePhotoImageView.frame = self.initialLargePhotoFrame
-    } completion: { _ in
+    }, completion: { _ in
       self.smallPhotoImageView.alpha = 1
       self.previewPhotoView.removeFromSuperview()
-    }
+    })
   }
   
 }
@@ -178,7 +202,7 @@ extension NewPostViewController {
   private func setupNavigationBar() {
     navigationController?.navigationBar.topItem?.backButtonDisplayMode = .minimal
     navigationItem.rightBarButtonItem = UIBarButtonItem(title: "Share", style: .done, target: self,
-                                                        action: #selector(rightBarButtonTapped))
+                                                        action: #selector(shareButtonTapped))
     navigationItem.rightBarButtonItem?.tintColor = .systemBlue
   }
   

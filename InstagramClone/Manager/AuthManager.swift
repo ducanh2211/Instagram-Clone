@@ -33,7 +33,7 @@ class AuthManager {
   private let storageManager: StorageManager
   
   deinit {
-    print("Auth Manager deinit")
+    print("AuthManager deinit")
   }
   
   init(auth: Auth = .auth(),
@@ -59,6 +59,7 @@ class AuthManager {
       return
     }
     
+    // completion call on main thread
     auth.createUser(withEmail: email, password: password) { [weak self] auth, error in
       guard let self = self else { return }
 
@@ -70,18 +71,18 @@ class AuthManager {
       guard let avatarImageData = self.defaultAvatar().jpegData(compressionQuality: 0.3) else { return }
       let uid = auth!.user.uid
       
+      // completion call on main thread
       self.storageManager.uploadUserAvatar(avatarImageData, folderName: uid) { imageUrl, error in
         if let error = error {
           completion(nil, .otherError(error))
           return
         }
         
-        let userData = User(uid: uid, email: email, fullName: fullName,
+        let user = User(uid: uid, email: email, fullName: fullName,
                             userName: userName, avatarUrl: imageUrl!)
         
-        self.userManager.uploadUser(userData, email: email,
-                                    fullName: fullName, userName: userName,
-                                    avatarUrl: imageUrl!) { user, error in
+        // completion call on background thread
+        self.userManager.uploadUser(user) { user, error in
           if let error = error {
             completion(nil, .otherError(error))
             return
@@ -106,6 +107,7 @@ class AuthManager {
       
       let uid = auth!.user.uid
       
+      // completion call on background thread
       self.userManager.fetchUser(withUid: uid) { user, error in
         if let error = error {
           completion(nil, .otherError(error))

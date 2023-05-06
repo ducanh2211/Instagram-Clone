@@ -27,7 +27,7 @@ class PhotoSelectorViewModel {
   }
   
   func getAssetAtSelectedIndex() -> PHAsset? {
-    guard let index = selectedIndex else { return nil}
+    guard let index = selectedIndex else { return nil }
     return allAssets[index]
   }
   

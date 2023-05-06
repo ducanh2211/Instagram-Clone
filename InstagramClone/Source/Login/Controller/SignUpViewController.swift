@@ -94,39 +94,42 @@ class SignUpViewController: UIViewController {
     bindViewModel()
   }
 
-  override func viewDidLayoutSubviews() {
-    super.viewDidLayoutSubviews()
-//    dropShadow()
+  deinit {
+    print("SignUpViewController deinit")
   }
+  
+//  override func viewDidLayoutSubviews() {
+//    super.viewDidLayoutSubviews()
+//    dropShadow()
+//  }
   
   // MARK: - Functions
   private func bindViewModel() {
     viewModel.loadingIndicator = { [weak self] in
-      guard let self = self else { return }
-      let isLoading = self.viewModel.isLoading
-      if isLoading {
-//        self.indicatorActivity.startAnimating()
-        ProgressHUD.show()
-      } else {
-//        self.indicatorActivity.stopAnimating()
-        ProgressHUD.dismiss()
+      DispatchQueue.main.async {
+        guard let self = self else { return }
+        let isLoading = self.viewModel.isLoading
+        isLoading ? ProgressHUD.show() : ProgressHUD.dismiss()
       }
     }
     
     viewModel.failure = { [weak self] in
-      guard let self = self else { return }
-      self.errorLabel.isHidden = false
-      self.errorLabel.text = self.viewModel.errorMessage
+      DispatchQueue.main.async {
+        guard let self = self else { return }
+        self.errorLabel.isHidden = false
+        self.errorLabel.text = self.viewModel.errorMessage
+      }
     }
     
     viewModel.success = { [weak self] in
-      guard let self = self else { return }
-      guard let tabBarController = UIApplication
-        .shared.keyWindow?.rootViewController as? TabBarViewController else { return }
-      
-      tabBarController.validateUser()
-      self.errorLabel.isHidden = true
-      self.dismiss(animated: true)
+      DispatchQueue.main.async {
+        guard let self = self else { return }
+        guard let tabBarController = UIApplication
+          .shared.keyWindow?.rootViewController as? TabBarViewController else { return }
+        tabBarController.validateUser()
+        self.errorLabel.isHidden = true
+        self.dismiss(animated: true)
+      }
     }
   }
   
@@ -141,10 +144,8 @@ class SignUpViewController: UIViewController {
     guard let email = emailTextField.text,
           let password = passwordTextField.text,
           let fullName = fullNameTextField.text,
-          let userName = userNameTextField.text
-    else {
-      return
-    }
+          let userName = userNameTextField.text else { return }
+    
     viewModel.signUpUser(email: email, password: password, fullName: fullName, username: userName)
   }
   

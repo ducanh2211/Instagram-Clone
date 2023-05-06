@@ -9,16 +9,7 @@ import UIKit
 
 class LogInViewController: UIViewController {
   
-  private let viewModel = LoginViewModel()
-  
   // MARK: - UI components
-//  private let indicatorActivity: UIActivityIndicatorView = {
-//    let spinner = UIActivityIndicatorView(style: .large)
-//    spinner.color = .black
-//    spinner.translatesAutoresizingMaskIntoConstraints = false
-//    return spinner
-//  }()
-  
   private let logoImageView: UIImageView = {
     let imageView = UIImageView()
     imageView.contentMode = .scaleAspectFill
@@ -77,6 +68,8 @@ class LogInViewController: UIViewController {
     return button
   }()
   
+  private let viewModel = LoginViewModel()
+  
   // MARK: - Life cycle
   override func viewDidLoad() {
     super.viewDidLoad()
@@ -90,6 +83,10 @@ class LogInViewController: UIViewController {
     dropShadow()
   }
   
+  deinit {
+    print("LogInViewController deinit")
+  }
+  
 //  override func viewDidLayoutSubviews() {
 //    super.viewDidLayoutSubviews()
 //    dropShadow()
@@ -98,34 +95,31 @@ class LogInViewController: UIViewController {
   // MARK: - Functions
   private func bindViewModel() {
     viewModel.loadingIndicator = { [weak self] in
-      guard let self = self else { return }
-      let isLoading = self.viewModel.isLoading
-      if isLoading {
-//        self.indicatorActivity.startAnimating()
-//        CustomActivityIndicator().showActivityIndicator(uiView: self.view)
-        ProgressHUD.show()
-      } else {
-//        self.indicatorActivity.stopAnimating()
-//        CustomActivityIndicator().hideActivityIndicator(uiView: self.view)
-        ProgressHUD.dismiss()
+      DispatchQueue.main.async {
+        guard let self = self else { return }
+        let isLoading = self.viewModel.isLoading
+        isLoading ? ProgressHUD.show() : ProgressHUD.dismiss()
       }
     }
     
     viewModel.failure = { [weak self] in
-      guard let self = self else { return }
-      self.errorLabel.isHidden = false
-      self.errorLabel.text = self.viewModel.errorMessage
+      DispatchQueue.main.async {
+        guard let self = self else { return }
+        self.errorLabel.isHidden = false
+        self.errorLabel.text = self.viewModel.errorMessage
+      }
     }
     
     viewModel.success = { [weak self] in
-      guard let self = self else { return }
-      guard let tabBarController = UIApplication
-        .shared.keyWindow?.rootViewController as? TabBarViewController else { return }
-      tabBarController.viewModel.user = self.viewModel.user
-      tabBarController.validateUser()
-//      tabBarController.user = self.viewModel.user
-      self.errorLabel.isHidden = true
-      self.dismiss(animated: true)
+      DispatchQueue.main.async {
+        guard let self = self else { return }
+        guard let tabBarController = UIApplication
+          .shared.keyWindow?.rootViewController as? TabBarViewController else { return }
+        tabBarController.viewModel.user = self.viewModel.user
+        tabBarController.validateUser()
+        self.errorLabel.isHidden = true
+        self.dismiss(animated: true)
+      }
     }
   }
   

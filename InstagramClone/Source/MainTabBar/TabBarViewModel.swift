@@ -34,6 +34,8 @@ class TabBarViewModel {
   func fetchUser() {
     guard isUserAlreadyLogIn else { return }
     let uid = auth.currentUser!.uid
+    
+    // completion call on background thread
     userManager.fetchUser(withUid: uid) { user , error in
       print("DEBUG: fetch user da den")
       guard error == nil else { return }

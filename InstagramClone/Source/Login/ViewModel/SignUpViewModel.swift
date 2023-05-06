@@ -29,13 +29,14 @@ class SignUpViewModel {
   }
   
   deinit {
-    print("Signup View Model deinit")
+    print("SignupViewModel deinit")
   }
   
   func signUpUser(email: String, password: String,
                   fullName: String, username: String) {
-    
     isLoading = true
+    
+    // completion perhaps call on background thread
     authManager.createUser(email: email, password: password,
                              fullName: fullName, userName: username) { [weak self] user, error in
       guard let self = self else { return }

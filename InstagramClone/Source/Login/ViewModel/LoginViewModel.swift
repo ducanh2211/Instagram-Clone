@@ -29,14 +29,17 @@ class LoginViewModel {
   }
   
   deinit {
-    print("Login View Model deinit")
+    print("LoginViewModel deinit")
   }
   
   func logInUser(email: String, password: String) {
     isLoading = true
+    
+    // completion perhaps call on background thread
     authManager.logInUser(email: email, password: password) { [weak self] user, error in
       guard let self = self else { return }
       self.isLoading = false
+      
       if let error = error {
         self.errorMessage = error.description
         return

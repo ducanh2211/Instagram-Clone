@@ -25,7 +25,7 @@ class StorageManager {
   }
   
   deinit {
-    print("Storage Manager deinit")
+    print("StorageManager deinit")
   }
   
   func uploadUserAvatar(_ imageData: Data, folderName: String,

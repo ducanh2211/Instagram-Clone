@@ -11,20 +11,16 @@ import Photos
 class PhotoSelectorViewController: UIViewController {
   
   // MARK: - Properties
-//  private var allAssets = PHFetchResult<PHAsset>()
-  let viewModel = PhotoSelectorViewModel()
+  private let viewModel = PhotoSelectorViewModel()
   private var headerView: PhotoSelectorHeader?
+//  private let assetQueue = DispatchQueue(label: "get.image.asset.queue")
   
-//  private var selectedImageIndex: Int?
-//  private var selectedImage: UIImage?
-  private let assetQueue = DispatchQueue(label: "get.image.asset.queue")
-  
-  let numberOfItemsInGroup: CGFloat = 4
-  lazy var itemSize: CGSize = {
-    let screenWidth = UIScreen.main.bounds.width
-    return CGSize(width: screenWidth / numberOfItemsInGroup,
-                  height: screenWidth / numberOfItemsInGroup)
-  }()
+//  let numberOfItemsInGroup: CGFloat = 4
+//  lazy var itemSize: CGSize = {
+//    let screenWidth = UIScreen.main.bounds.width
+//    return CGSize(width: screenWidth / numberOfItemsInGroup,
+//                  height: screenWidth / numberOfItemsInGroup)
+//  }()
   
   // MARK: - UI components
   var collectionView: UICollectionView!
@@ -34,16 +30,7 @@ class PhotoSelectorViewController: UIViewController {
     super.viewDidLoad()
     setupView()
     registerLibraryObserver()
-//    getPermissionIfNeed { granted in
-//      if granted {
-//        self.fetchAssets()
-//      }
-//    }
-    viewModel.receivedAssets = { [weak self] in
-      self?.collectionView.reloadData()
-    }
-    viewModel.getPermissionIfNeed()
-    
+    bindViewModel()
   }
   
   deinit {
@@ -52,42 +39,26 @@ class PhotoSelectorViewController: UIViewController {
   }
   
   // MARK: - Functions
-  @objc func leftBarButtonTapped() {
+  private func bindViewModel() {
+    viewModel.receivedAssets = { [weak self] in
+      DispatchQueue.main.async {
+        self?.collectionView.reloadData()        
+      }
+    }
+    viewModel.getPermissionIfNeed()
+  }
+  
+  @objc func closeButtonTapped() {
     self.dismiss(animated: true)
   }
   
-  @objc func rightBarButtonTapped() {
+  @objc func nextButtonTapped() {
     if let asset = viewModel.getAssetAtSelectedIndex() {
+//      let viewModel = NewPostViewModel()
       let vc = NewPostViewController(asset: asset)
       navigationController?.pushViewController(vc, animated: true)
     }
   }
-  
-//  private func getPermissionIfNeed(completion: @escaping (Bool) -> Void) {
-//    if PHPhotoLibrary.authorizationStatus(for: .readWrite) == .authorized {
-//      completion(true)
-//      return
-//    }
-//
-//    PHPhotoLibrary.requestAuthorization(for: .readWrite) { status in
-//      if status == .authorized { completion(true) }
-//      else { completion(false) }
-//    }
-//  }
-
-//  private func fetchAssets() {
-//    let option = PHFetchOptions()
-//    option.sortDescriptors = [
-//      NSSortDescriptor(key: "creationDate", ascending: false)
-//    ]
-//
-//    allAssets = PHAsset.fetchAssets(with: .image, options: option)
-//
-//    if allAssets.count != 0 {
-//      self.selectedImageIndex = 0
-//    }
-//    self.collectionView.reloadData()
-//  }
   
   private func registerLibraryObserver() {
     PHPhotoLibrary.shared().register(self)
@@ -96,12 +67,12 @@ class PhotoSelectorViewController: UIViewController {
   private func unregisterLibraryObserver() {
     PHPhotoLibrary.shared().unregisterChangeObserver(self)
   }
+  
 }
 
 // MARK: - UICollectionViewDataSource
 extension PhotoSelectorViewController: UICollectionViewDataSource {
   func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
-//    return allAssets.count
     return viewModel.numberOfItems
   }
   
@@ -110,21 +81,10 @@ extension PhotoSelectorViewController: UICollectionViewDataSource {
       withReuseIdentifier: PhotoSelectorCell.identifier,
       for: indexPath
     ) as! PhotoSelectorCell
-    cell.assetQueue = self.assetQueue
-    
+        
     let asset = viewModel.getAssetAtIndex(indexPath.item)
+//    cell.assetQueue = self.assetQueue
     cell.configure(withAsset: asset)
-//    let asset = allAssets[indexPath.item]
-//    let options = PHImageRequestOptions()
-    
-//    asset.getImageFromAsset(targetSize: itemSize, options: options, queue: assetQueue) { image in
-//      if let image = image {
-//        DispatchQueue.main.async {
-//          cell.configure(withImage: image)          
-//        }
-//      }
-//    }
-    
     return cell
   }
 }
@@ -132,10 +92,6 @@ extension PhotoSelectorViewController: UICollectionViewDataSource {
 // MARK: - UICollectionViewDelegate
 extension PhotoSelectorViewController: UICollectionViewDelegate {
   func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
-//    let index = indexPath.item
-//    let asset = allAssets[index]
-//    self.selectedImageIndex = index
-//    self.headerView?.configure(withAsset: asset)
     let index = indexPath.item
     viewModel.selectedIndex = index
     if let asset = viewModel.getAssetAtSelectedIndex() {
@@ -143,7 +99,10 @@ extension PhotoSelectorViewController: UICollectionViewDelegate {
     }
   }
   
-  func collectionView(_ collectionView: UICollectionView, viewForSupplementaryElementOfKind kind: String, at indexPath: IndexPath) -> UICollectionReusableView {
+  func collectionView(_ collectionView: UICollectionView,
+                      viewForSupplementaryElementOfKind kind: String,
+                      at indexPath: IndexPath) -> UICollectionReusableView {
+    
     guard
       kind == UICollectionView.elementKindSectionHeader,
       indexPath.section == 0
@@ -202,15 +161,5 @@ extension PhotoSelectorViewController: PhotoSelectorHeaderDelegate, UIImagePicke
 extension PhotoSelectorViewController: PHPhotoLibraryChangeObserver {
   func photoLibraryDidChange(_ changeInstance: PHChange) {
     viewModel.handlePhotoLibraryChange(changeInstance)
-    
-//    guard let changeDetails = changeInstance.changeDetails(for: allAssets) else { return }
-//    
-//    DispatchQueue.main.sync {
-//      self.allAssets = changeDetails.fetchResultAfterChanges
-//      self.selectedImageIndex = 0
-//      self.collectionView.reloadData()
-//    }
-    
-    
   }
 }

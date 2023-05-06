@@ -28,12 +28,12 @@ class UserManager {
   }
   
   deinit {
-    print("User Manager deinit")
+    print("UserManager deinit")
   }
   
-  func uploadUser(_ user: User, email: String,
-                  fullName: String, userName: String,
-                  avatarUrl: String, completion: @escaping (User?, Error?) -> Void) {
+  /// - Note: Completion  being invoked from background thread.
+  func uploadUser(_ user: User,
+                  completion: @escaping (User?, Error?) -> Void) {
     
     collectionUsersRef.document(user.uid).setData(user.description) { error in
       guard error == nil else {
@@ -41,12 +41,13 @@ class UserManager {
         return
       }
       
-      DispatchQueue.main.async {
+      
         completion(user, nil)
-      }
+      
     }
   }
   
+  /// - Note: Completion  being invoked from background thread.
   func fetchUser(withUid uid: String,
                  completion: @escaping (User?, Error?) -> Void) {
     
@@ -63,10 +64,10 @@ class UserManager {
       }
       
       let user = User(dictionary: dictionary)
-      DispatchQueue.main.async {
+      
         print("DEBUG: completion with USER")
         completion(user, nil)
-      }
+      
     }
   }
 }

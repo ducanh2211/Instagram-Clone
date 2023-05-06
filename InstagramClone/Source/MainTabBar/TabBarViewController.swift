@@ -44,7 +44,9 @@ class TabBarViewController: UITabBarController {
     print("DEBUG: Bind VIew Model")
     viewModel.receivedUser = { [weak self] in
       print("DEBUG: Bind view model completion")
-      self?.setupController()
+      DispatchQueue.main.async {
+        self?.setupController()
+      }
     }
   }
   
@@ -109,7 +111,7 @@ extension TabBarViewController {
   }
 }
 
-// MARK: -
+// MARK: - UITabBarControllerDelegate
 extension TabBarViewController: UITabBarControllerDelegate {
   func tabBarController(_ tabBarController: UITabBarController, shouldSelect viewController: UIViewController) -> Bool {
     guard let index = tabBarController.viewControllers?.firstIndex(of: viewController) else { return true }

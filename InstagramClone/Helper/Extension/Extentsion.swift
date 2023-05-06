@@ -124,6 +124,22 @@ extension PHAsset {
     return photo
   }
   
+  func getImageAsync(targetSize: CGSize,
+                     contentMode: PHImageContentMode = .aspectFit,
+                     completion: @escaping (UIImage?) -> Void) -> PHImageRequestID {
+    
+    let manager = PHImageManager.default()
+    
+    let id = manager.requestImage(for: self,
+                         targetSize: targetSize,
+                         contentMode: contentMode,
+                         options: nil) { image, _ in
+      completion(image)
+    }
+    
+    return id
+  }
+  
   func getImageFromAsset(targetSize: CGSize,
                          contentMode: PHImageContentMode = .aspectFit,
                          options: PHImageRequestOptions,

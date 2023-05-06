@@ -35,3 +35,13 @@ enum Constants {
   }
 }
 
+enum PhotoConstants {
+  enum Post {
+    static let portraitAspectRatio: CGFloat = 2/3
+    static let landscapeAspectRatio: CGFloat = 16/9
+  }
+  
+  enum Profile {
+    static let aspectRatio: CGFloat = 1/1
+  }
+}

@@ -37,13 +37,6 @@ class StatusView: UIView {
     return button
   }()
   
-  private let seperatorView: UIView = {
-    let view = UIView()
-    view.backgroundColor = .systemGray5
-    view.translatesAutoresizingMaskIntoConstraints = false
-    return view
-  }()
-  
   override init(frame: CGRect) {
     super.init(frame: frame)
     setupConstraints()
@@ -60,7 +53,6 @@ class StatusView: UIView {
   private func setupConstraints() {
     addSubview(backButton)
     addSubview(titleLabel)
-    addSubview(seperatorView)
     
     NSLayoutConstraint.activate([
       backButton.leftAnchor.constraint(equalTo: leftAnchor, constant: 12),
@@ -69,12 +61,7 @@ class StatusView: UIView {
       backButton.heightAnchor.constraint(equalTo: backButton.widthAnchor),
       
       titleLabel.centerXAnchor.constraint(equalTo: centerXAnchor),
-      titleLabel.centerYAnchor.constraint(equalTo: centerYAnchor),
-      
-      seperatorView.leftAnchor.constraint(equalTo: leftAnchor),
-      seperatorView.rightAnchor.constraint(equalTo: rightAnchor),
-      seperatorView.bottomAnchor.constraint(equalTo: bottomAnchor),
-      seperatorView.heightAnchor.constraint(equalToConstant: 1)
+      titleLabel.centerYAnchor.constraint(equalTo: centerYAnchor)
     ])
   }
 }
