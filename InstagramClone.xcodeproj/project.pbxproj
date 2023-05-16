@@ -18,8 +18,31 @@
 		572388D229F771C700B5936D /* Post.swift in Sources */ = {isa = PBXBuildFile; fileRef = 572388D129F771C700B5936D /* Post.swift */; };
 		5725FD2129F4C75000D5A600 /* NewPostViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5725FD2029F4C75000D5A600 /* NewPostViewController.swift */; };
 		5725FD2329F4E40A00D5A600 /* PhotoSelectorViewController + Layout.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5725FD2229F4E40A00D5A600 /* PhotoSelectorViewController + Layout.swift */; };
+		572C73352A060EE6005664E5 /* ProfilePhotoMenu.swift in Sources */ = {isa = PBXBuildFile; fileRef = 572C73342A060EE6005664E5 /* ProfilePhotoMenu.swift */; };
+		572C73372A0663C6005664E5 /* ProfilePhotoCell + Layout.swift in Sources */ = {isa = PBXBuildFile; fileRef = 572C73362A0663C6005664E5 /* ProfilePhotoCell + Layout.swift */; };
+		5733AE2F2A1325A100193A85 /* PagingViewController + Setup.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5733AE2D2A1325A100193A85 /* PagingViewController + Setup.swift */; };
+		5733AE302A1325A100193A85 /* PagingViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5733AE2E2A1325A100193A85 /* PagingViewController.swift */; };
+		5733AE322A1325E200193A85 /* UIViewController + Extension.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5733AE312A1325E200193A85 /* UIViewController + Extension.swift */; };
+		5733AE352A13263B00193A85 /* SwipeDirection.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5733AE342A13263B00193A85 /* SwipeDirection.swift */; };
+		5733AE442A13268800193A85 /* MenuBottomIndicator.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5733AE372A13268800193A85 /* MenuBottomIndicator.swift */; };
+		5733AE452A13268800193A85 /* PagingMenuView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5733AE382A13268800193A85 /* PagingMenuView.swift */; };
+		5733AE462A13268800193A85 /* PagingMenuCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5733AE3A2A13268800193A85 /* PagingMenuCell.swift */; };
+		5733AE472A13268800193A85 /* PagingMenuUpdatable.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5733AE3B2A13268800193A85 /* PagingMenuUpdatable.swift */; };
+		5733AE482A13268800193A85 /* MenuItemProvider.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5733AE3C2A13268800193A85 /* MenuItemProvider.swift */; };
+		5733AE492A13268800193A85 /* PagingViewControllerDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5733AE3D2A13268800193A85 /* PagingViewControllerDelegate.swift */; };
+		5733AE4A2A13268800193A85 /* PagingViewControllerDataSource.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5733AE3E2A13268800193A85 /* PagingViewControllerDataSource.swift */; };
+		5733AE4B2A13268800193A85 /* PagingMenuSettings.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5733AE402A13268800193A85 /* PagingMenuSettings.swift */; };
+		5733AE4C2A13268800193A85 /* MenuItemSize.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5733AE412A13268800193A85 /* MenuItemSize.swift */; };
+		5733AE4D2A13268800193A85 /* DefaultMenuItem.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5733AE422A13268800193A85 /* DefaultMenuItem.swift */; };
+		5733AE4E2A13268800193A85 /* PagingMenuCollectionViewLayout.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5733AE432A13268800193A85 /* PagingMenuCollectionViewLayout.swift */; };
+		5733AE502A13269F00193A85 /* DefaultPagingMenuCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5733AE4F2A13269F00193A85 /* DefaultPagingMenuCell.swift */; };
+		5733AE532A13275700193A85 /* UIView + Extension.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5733AE522A13275700193A85 /* UIView + Extension.swift */; };
+		5733AE582A1328E600193A85 /* BottomControllerProvider.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5733AE542A1328E500193A85 /* BottomControllerProvider.swift */; };
+		5733AE592A1328E600193A85 /* PaginationableView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5733AE552A1328E500193A85 /* PaginationableView.swift */; };
+		5733AE5A2A1328E600193A85 /* MasterScrollViewDatasource.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5733AE562A1328E500193A85 /* MasterScrollViewDatasource.swift */; };
+		5733AE5B2A1328E600193A85 /* ContainerScrollViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5733AE572A1328E600193A85 /* ContainerScrollViewController.swift */; };
+		5733AE5D2A13294000193A85 /* BottomControllerProviderDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5733AE5C2A13294000193A85 /* BottomControllerProviderDelegate.swift */; };
 		57391E2A2A03A4A40096D00A /* ProfileStatusView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 57391E292A03A4A40096D00A /* ProfileStatusView.swift */; };
-		575050082A03AEAA008D2789 /* ProfileHeaderView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 575050072A03AEAA008D2789 /* ProfileHeaderView.swift */; };
 		5750500A2A03FD47008D2789 /* UserStatLabel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 575050092A03FD47008D2789 /* UserStatLabel.swift */; };
 		5750500C2A03FD78008D2789 /* UserProfileButton.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5750500B2A03FD78008D2789 /* UserProfileButton.swift */; };
 		575C4D5129F7BCC700C9287B /* NewPostViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 575C4D5029F7BCC700C9287B /* NewPostViewModel.swift */; };
@@ -28,6 +51,10 @@
 		576F57D129EAFC4F002F2A6E /* UserManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 576F57D029EAFC4F002F2A6E /* UserManager.swift */; };
 		576F57D729EBB8B5002F2A6E /* TabBarViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 576F57D629EBB8B5002F2A6E /* TabBarViewModel.swift */; };
 		576F57D929EC06A0002F2A6E /* FeedViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 576F57D829EC06A0002F2A6E /* FeedViewModel.swift */; };
+		57AB72942A13309500FB5B09 /* ProfileHeaderViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 57AB72932A13309500FB5B09 /* ProfileHeaderViewController.swift */; };
+		57AB72962A13316900FB5B09 /* ProfileBottomViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 57AB72952A13316900FB5B09 /* ProfileBottomViewController.swift */; };
+		57AB72982A1339B000FB5B09 /* ProfileHeaderView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 57AB72972A1339B000FB5B09 /* ProfileHeaderView.swift */; };
+		57AB729A2A13443000FB5B09 /* ProfilePhotoDisplayController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 57AB72992A13443000FB5B09 /* ProfilePhotoDisplayController.swift */; };
 		57ABFC4829E998FD00FF1BEB /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 57ABFC4729E998FD00FF1BEB /* AppDelegate.swift */; };
 		57ABFC4A29E998FD00FF1BEB /* SceneDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 57ABFC4929E998FD00FF1BEB /* SceneDelegate.swift */; };
 		57ABFC5429E998FE00FF1BEB /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 57ABFC5229E998FE00FF1BEB /* LaunchScreen.storyboard */; };
@@ -66,8 +93,31 @@
 		572388D129F771C700B5936D /* Post.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Post.swift; sourceTree = "<group>"; };
 		5725FD2029F4C75000D5A600 /* NewPostViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NewPostViewController.swift; sourceTree = "<group>"; };
 		5725FD2229F4E40A00D5A600 /* PhotoSelectorViewController + Layout.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "PhotoSelectorViewController + Layout.swift"; sourceTree = "<group>"; };
+		572C73342A060EE6005664E5 /* ProfilePhotoMenu.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProfilePhotoMenu.swift; sourceTree = "<group>"; };
+		572C73362A0663C6005664E5 /* ProfilePhotoCell + Layout.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "ProfilePhotoCell + Layout.swift"; sourceTree = "<group>"; };
+		5733AE2D2A1325A100193A85 /* PagingViewController + Setup.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "PagingViewController + Setup.swift"; sourceTree = "<group>"; };
+		5733AE2E2A1325A100193A85 /* PagingViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = PagingViewController.swift; sourceTree = "<group>"; };
+		5733AE312A1325E200193A85 /* UIViewController + Extension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "UIViewController + Extension.swift"; sourceTree = "<group>"; };
+		5733AE342A13263B00193A85 /* SwipeDirection.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SwipeDirection.swift; sourceTree = "<group>"; };
+		5733AE372A13268800193A85 /* MenuBottomIndicator.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MenuBottomIndicator.swift; sourceTree = "<group>"; };
+		5733AE382A13268800193A85 /* PagingMenuView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = PagingMenuView.swift; sourceTree = "<group>"; };
+		5733AE3A2A13268800193A85 /* PagingMenuCell.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = PagingMenuCell.swift; sourceTree = "<group>"; };
+		5733AE3B2A13268800193A85 /* PagingMenuUpdatable.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = PagingMenuUpdatable.swift; sourceTree = "<group>"; };
+		5733AE3C2A13268800193A85 /* MenuItemProvider.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MenuItemProvider.swift; sourceTree = "<group>"; };
+		5733AE3D2A13268800193A85 /* PagingViewControllerDelegate.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = PagingViewControllerDelegate.swift; sourceTree = "<group>"; };
+		5733AE3E2A13268800193A85 /* PagingViewControllerDataSource.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = PagingViewControllerDataSource.swift; sourceTree = "<group>"; };
+		5733AE402A13268800193A85 /* PagingMenuSettings.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = PagingMenuSettings.swift; sourceTree = "<group>"; };
+		5733AE412A13268800193A85 /* MenuItemSize.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MenuItemSize.swift; sourceTree = "<group>"; };
+		5733AE422A13268800193A85 /* DefaultMenuItem.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = DefaultMenuItem.swift; sourceTree = "<group>"; };
+		5733AE432A13268800193A85 /* PagingMenuCollectionViewLayout.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = PagingMenuCollectionViewLayout.swift; sourceTree = "<group>"; };
+		5733AE4F2A13269F00193A85 /* DefaultPagingMenuCell.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = DefaultPagingMenuCell.swift; sourceTree = "<group>"; };
+		5733AE522A13275700193A85 /* UIView + Extension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "UIView + Extension.swift"; sourceTree = "<group>"; };
+		5733AE542A1328E500193A85 /* BottomControllerProvider.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = BottomControllerProvider.swift; sourceTree = "<group>"; };
+		5733AE552A1328E500193A85 /* PaginationableView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = PaginationableView.swift; sourceTree = "<group>"; };
+		5733AE562A1328E500193A85 /* MasterScrollViewDatasource.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MasterScrollViewDatasource.swift; sourceTree = "<group>"; };
+		5733AE572A1328E600193A85 /* ContainerScrollViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ContainerScrollViewController.swift; sourceTree = "<group>"; };
+		5733AE5C2A13294000193A85 /* BottomControllerProviderDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BottomControllerProviderDelegate.swift; sourceTree = "<group>"; };
 		57391E292A03A4A40096D00A /* ProfileStatusView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProfileStatusView.swift; sourceTree = "<group>"; };
-		575050072A03AEAA008D2789 /* ProfileHeaderView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProfileHeaderView.swift; sourceTree = "<group>"; };
 		575050092A03FD47008D2789 /* UserStatLabel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UserStatLabel.swift; sourceTree = "<group>"; };
 		5750500B2A03FD78008D2789 /* UserProfileButton.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UserProfileButton.swift; sourceTree = "<group>"; };
 		575C4D5029F7BCC700C9287B /* NewPostViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NewPostViewModel.swift; sourceTree = "<group>"; };
@@ -76,6 +126,10 @@
 		576F57D029EAFC4F002F2A6E /* UserManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UserManager.swift; sourceTree = "<group>"; };
 		576F57D629EBB8B5002F2A6E /* TabBarViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TabBarViewModel.swift; sourceTree = "<group>"; };
 		576F57D829EC06A0002F2A6E /* FeedViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FeedViewModel.swift; sourceTree = "<group>"; };
+		57AB72932A13309500FB5B09 /* ProfileHeaderViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProfileHeaderViewController.swift; sourceTree = "<group>"; };
+		57AB72952A13316900FB5B09 /* ProfileBottomViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProfileBottomViewController.swift; sourceTree = "<group>"; };
+		57AB72972A1339B000FB5B09 /* ProfileHeaderView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProfileHeaderView.swift; sourceTree = "<group>"; };
+		57AB72992A13443000FB5B09 /* ProfilePhotoDisplayController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProfilePhotoDisplayController.swift; sourceTree = "<group>"; };
 		57ABFC4429E998FD00FF1BEB /* InstagramClone.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = InstagramClone.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		57ABFC4729E998FD00FF1BEB /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		57ABFC4929E998FD00FF1BEB /* SceneDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SceneDelegate.swift; sourceTree = "<group>"; };
@@ -127,25 +181,116 @@
 			path = Pods;
 			sourceTree = "<group>";
 		};
-		5718EAEF2A04188100C44428 /* Cell */ = {
+		572C73382A0673D7005664E5 /* HeaderSection */ = {
 			isa = PBXGroup;
 			children = (
+				57AB72972A1339B000FB5B09 /* ProfileHeaderView.swift */,
 				5718EAF22A05E27500C44428 /* ProfileHeaderCell.swift */,
-				5718EAF62A05EC9000C44428 /* ProfileStoryCell.swift */,
-				5718EAEB2A040A2300C44428 /* ProfilePhotoCell.swift */,
-				5718EAF42A05E73C00C44428 /* CommonPhotoCell.swift */,
-			);
-			path = Cell;
-			sourceTree = "<group>";
-		};
-		5718EAF12A04189A00C44428 /* Others */ = {
-			isa = PBXGroup;
-			children = (
-				57391E292A03A4A40096D00A /* ProfileStatusView.swift */,
 				575050092A03FD47008D2789 /* UserStatLabel.swift */,
 				5750500B2A03FD78008D2789 /* UserProfileButton.swift */,
 			);
-			path = Others;
+			path = HeaderSection;
+			sourceTree = "<group>";
+		};
+		572C73392A0673E4005664E5 /* StorySection */ = {
+			isa = PBXGroup;
+			children = (
+				5718EAF62A05EC9000C44428 /* ProfileStoryCell.swift */,
+			);
+			path = StorySection;
+			sourceTree = "<group>";
+		};
+		572C733A2A0673F1005664E5 /* PhotoSection */ = {
+			isa = PBXGroup;
+			children = (
+				5718EAEB2A040A2300C44428 /* ProfilePhotoCell.swift */,
+				572C73362A0663C6005664E5 /* ProfilePhotoCell + Layout.swift */,
+				572C73342A060EE6005664E5 /* ProfilePhotoMenu.swift */,
+			);
+			path = PhotoSection;
+			sourceTree = "<group>";
+		};
+		5733AE292A1324E000193A85 /* Utilities */ = {
+			isa = PBXGroup;
+			children = (
+				5733AE2A2A13250000193A85 /* PagingViewController */,
+				5733AE512A1326D200193A85 /* ContainerScrollViewController */,
+			);
+			path = Utilities;
+			sourceTree = "<group>";
+		};
+		5733AE2A2A13250000193A85 /* PagingViewController */ = {
+			isa = PBXGroup;
+			children = (
+				5733AE392A13268800193A85 /* Protocol */,
+				5733AE3F2A13268800193A85 /* Struct */,
+				5733AE362A13268800193A85 /* View */,
+				5733AE332A13263B00193A85 /* Enum */,
+				5733AE2B2A13251000193A85 /* Class */,
+			);
+			path = PagingViewController;
+			sourceTree = "<group>";
+		};
+		5733AE2B2A13251000193A85 /* Class */ = {
+			isa = PBXGroup;
+			children = (
+				5733AE2D2A1325A100193A85 /* PagingViewController + Setup.swift */,
+				5733AE2E2A1325A100193A85 /* PagingViewController.swift */,
+			);
+			path = Class;
+			sourceTree = "<group>";
+		};
+		5733AE332A13263B00193A85 /* Enum */ = {
+			isa = PBXGroup;
+			children = (
+				5733AE412A13268800193A85 /* MenuItemSize.swift */,
+				5733AE342A13263B00193A85 /* SwipeDirection.swift */,
+			);
+			path = Enum;
+			sourceTree = "<group>";
+		};
+		5733AE362A13268800193A85 /* View */ = {
+			isa = PBXGroup;
+			children = (
+				5733AE372A13268800193A85 /* MenuBottomIndicator.swift */,
+				5733AE382A13268800193A85 /* PagingMenuView.swift */,
+				5733AE4F2A13269F00193A85 /* DefaultPagingMenuCell.swift */,
+			);
+			path = View;
+			sourceTree = "<group>";
+		};
+		5733AE392A13268800193A85 /* Protocol */ = {
+			isa = PBXGroup;
+			children = (
+				5733AE3A2A13268800193A85 /* PagingMenuCell.swift */,
+				5733AE3B2A13268800193A85 /* PagingMenuUpdatable.swift */,
+				5733AE3C2A13268800193A85 /* MenuItemProvider.swift */,
+				5733AE3D2A13268800193A85 /* PagingViewControllerDelegate.swift */,
+				5733AE3E2A13268800193A85 /* PagingViewControllerDataSource.swift */,
+			);
+			path = Protocol;
+			sourceTree = "<group>";
+		};
+		5733AE3F2A13268800193A85 /* Struct */ = {
+			isa = PBXGroup;
+			children = (
+				5733AE402A13268800193A85 /* PagingMenuSettings.swift */,
+				5733AE422A13268800193A85 /* DefaultMenuItem.swift */,
+				5733AE432A13268800193A85 /* PagingMenuCollectionViewLayout.swift */,
+			);
+			path = Struct;
+			sourceTree = "<group>";
+		};
+		5733AE512A1326D200193A85 /* ContainerScrollViewController */ = {
+			isa = PBXGroup;
+			children = (
+				5733AE572A1328E600193A85 /* ContainerScrollViewController.swift */,
+				5733AE562A1328E500193A85 /* MasterScrollViewDatasource.swift */,
+				5733AE542A1328E500193A85 /* BottomControllerProvider.swift */,
+				5733AE5C2A13294000193A85 /* BottomControllerProviderDelegate.swift */,
+				5733AE552A1328E500193A85 /* PaginationableView.swift */,
+			);
+			path = ContainerScrollViewController;
 			sourceTree = "<group>";
 		};
 		575C4D5229F8020900C9287B /* Controller */ = {
@@ -153,6 +298,9 @@
 			children = (
 				57ABFC6E29E9A7BB00FF1BEB /* ProfileViewController.swift */,
 				5718EAED2A04130E00C44428 /* ProfileViewController + Layout.swift */,
+				57AB72932A13309500FB5B09 /* ProfileHeaderViewController.swift */,
+				57AB72952A13316900FB5B09 /* ProfileBottomViewController.swift */,
+				57AB72992A13443000FB5B09 /* ProfilePhotoDisplayController.swift */,
 			);
 			path = Controller;
 			sourceTree = "<group>";
@@ -167,9 +315,11 @@
 		575C4D5429F8022800C9287B /* View */ = {
 			isa = PBXGroup;
 			children = (
-				575050072A03AEAA008D2789 /* ProfileHeaderView.swift */,
-				5718EAF12A04189A00C44428 /* Others */,
-				5718EAEF2A04188100C44428 /* Cell */,
+				57391E292A03A4A40096D00A /* ProfileStatusView.swift */,
+				5718EAF42A05E73C00C44428 /* CommonPhotoCell.swift */,
+				572C73382A0673D7005664E5 /* HeaderSection */,
+				572C73392A0673E4005664E5 /* StorySection */,
+				572C733A2A0673F1005664E5 /* PhotoSection */,
 			);
 			path = View;
 			sourceTree = "<group>";
@@ -213,6 +363,7 @@
 			children = (
 				57ABFC4729E998FD00FF1BEB /* AppDelegate.swift */,
 				57ABFC4929E998FD00FF1BEB /* SceneDelegate.swift */,
+				5733AE292A1324E000193A85 /* Utilities */,
 				57ABFC7D29EA60FE00FF1BEB /* Helper */,
 				57ABFC7E29EA626200FF1BEB /* Manager */,
 				57ABFC8129EA643400FF1BEB /* Model */,
@@ -315,6 +466,8 @@
 			isa = PBXGroup;
 			children = (
 				57ABFC7829E9BDA300FF1BEB /* Extentsion.swift */,
+				5733AE312A1325E200193A85 /* UIViewController + Extension.swift */,
+				5733AE522A13275700193A85 /* UIView + Extension.swift */,
 			);
 			path = Extension;
 			sourceTree = "<group>";
@@ -521,44 +674,71 @@
 			buildActionMask = 2147483647;
 			files = (
 				5725FD2329F4E40A00D5A600 /* PhotoSelectorViewController + Layout.swift in Sources */,
+				5733AE322A1325E200193A85 /* UIViewController + Extension.swift in Sources */,
+				5733AE352A13263B00193A85 /* SwipeDirection.swift in Sources */,
 				57ABFC8529EA64EA00FF1BEB /* FirebaseModel.swift in Sources */,
 				57ABFC8C29EA7AB900FF1BEB /* SignUpViewModel.swift in Sources */,
 				57B4E75829F665E000F5B977 /* PhotoSelectorViewModel.swift in Sources */,
+				5733AE5D2A13294000193A85 /* BottomControllerProviderDelegate.swift in Sources */,
+				5733AE4B2A13268800193A85 /* PagingMenuSettings.swift in Sources */,
 				57ABFC8329EA647300FF1BEB /* User.swift in Sources */,
 				57ABFC7929E9BDA300FF1BEB /* Extentsion.swift in Sources */,
 				5718EAF32A05E27500C44428 /* ProfileHeaderCell.swift in Sources */,
 				57ABFC8029EA627000FF1BEB /* AuthManager.swift in Sources */,
+				5733AE4A2A13268800193A85 /* PagingViewControllerDataSource.swift in Sources */,
 				576F57D929EC06A0002F2A6E /* FeedViewModel.swift in Sources */,
 				5720688529F433D500FB133B /* PhotoSelectorHeader.swift in Sources */,
+				5733AE452A13268800193A85 /* PagingMenuView.swift in Sources */,
 				57ABFC5E29E9A53A00FF1BEB /* TabBarViewController.swift in Sources */,
+				5733AE472A13268800193A85 /* PagingMenuUpdatable.swift in Sources */,
+				5733AE4E2A13268800193A85 /* PagingMenuCollectionViewLayout.swift in Sources */,
+				57AB729A2A13443000FB5B09 /* ProfilePhotoDisplayController.swift in Sources */,
 				5718EAEC2A040A2300C44428 /* ProfilePhotoCell.swift in Sources */,
 				57ABFC8829EA690D00FF1BEB /* Constants.swift in Sources */,
 				57ED8BE629EEEFB400E5AD93 /* PhotoSelectorCell.swift in Sources */,
+				572C73352A060EE6005664E5 /* ProfilePhotoMenu.swift in Sources */,
 				57ABFC7C29EA507C00FF1BEB /* StatusView.swift in Sources */,
 				575C4D5129F7BCC700C9287B /* NewPostViewModel.swift in Sources */,
+				5733AE502A13269F00193A85 /* DefaultPagingMenuCell.swift in Sources */,
 				576F57C929EAD014002F2A6E /* LoginViewModel.swift in Sources */,
+				57AB72962A13316900FB5B09 /* ProfileBottomViewController.swift in Sources */,
+				5733AE442A13268800193A85 /* MenuBottomIndicator.swift in Sources */,
+				5733AE4D2A13268800193A85 /* DefaultMenuItem.swift in Sources */,
 				57F6AC6229EEAD33003F1BA9 /* PhotoSelectorViewController.swift in Sources */,
 				57ABFC6529E9A65C00FF1BEB /* SignUpViewController.swift in Sources */,
 				57ABFC7129E9A7C400FF1BEB /* SearchViewController.swift in Sources */,
+				5733AE2F2A1325A100193A85 /* PagingViewController + Setup.swift in Sources */,
 				572388D029F76DF900B5936D /* PostManager.swift in Sources */,
 				57ABFC7329E9A7DC00FF1BEB /* PostViewController.swift in Sources */,
+				57AB72942A13309500FB5B09 /* ProfileHeaderViewController.swift in Sources */,
 				5725FD2129F4C75000D5A600 /* NewPostViewController.swift in Sources */,
-				575050082A03AEAA008D2789 /* ProfileHeaderView.swift in Sources */,
 				572388D229F771C700B5936D /* Post.swift in Sources */,
 				57ABFC4829E998FD00FF1BEB /* AppDelegate.swift in Sources */,
 				57F6AC5F29EEA8FC003F1BA9 /* PlaceholderTextView.swift in Sources */,
 				5718EAF52A05E73C00C44428 /* CommonPhotoCell.swift in Sources */,
 				5750500A2A03FD47008D2789 /* UserStatLabel.swift in Sources */,
+				5733AE532A13275700193A85 /* UIView + Extension.swift in Sources */,
+				57AB72982A1339B000FB5B09 /* ProfileHeaderView.swift in Sources */,
+				5733AE492A13268800193A85 /* PagingViewControllerDelegate.swift in Sources */,
+				5733AE582A1328E600193A85 /* BottomControllerProvider.swift in Sources */,
 				57ABFC6329E9A64600FF1BEB /* LogInViewController.swift in Sources */,
 				5718EAEE2A04130E00C44428 /* ProfileViewController + Layout.swift in Sources */,
 				57ABFC4A29E998FD00FF1BEB /* SceneDelegate.swift in Sources */,
+				5733AE482A13268800193A85 /* MenuItemProvider.swift in Sources */,
+				5733AE302A1325A100193A85 /* PagingViewController.swift in Sources */,
+				5733AE4C2A13268800193A85 /* MenuItemSize.swift in Sources */,
+				572C73372A0663C6005664E5 /* ProfilePhotoCell + Layout.swift in Sources */,
 				57ABFC6F29E9A7BB00FF1BEB /* ProfileViewController.swift in Sources */,
 				5718EAF72A05EC9000C44428 /* ProfileStoryCell.swift in Sources */,
 				5750500C2A03FD78008D2789 /* UserProfileButton.swift in Sources */,
+				5733AE5B2A1328E600193A85 /* ContainerScrollViewController.swift in Sources */,
 				57391E2A2A03A4A40096D00A /* ProfileStatusView.swift in Sources */,
 				57ABFC6D29E9A7A900FF1BEB /* FeedViewController.swift in Sources */,
 				57ABFC8A29EA748400FF1BEB /* StorageManager.swift in Sources */,
+				5733AE592A1328E600193A85 /* PaginationableView.swift in Sources */,
+				5733AE462A13268800193A85 /* PagingMenuCell.swift in Sources */,
 				576F57D129EAFC4F002F2A6E /* UserManager.swift in Sources */,
+				5733AE5A2A1328E600193A85 /* MasterScrollViewDatasource.swift in Sources */,
 				576F57D729EBB8B5002F2A6E /* TabBarViewModel.swift in Sources */,
 				576F57CF29EAEBBA002F2A6E /* ProgressHUD.swift in Sources */,
 			);

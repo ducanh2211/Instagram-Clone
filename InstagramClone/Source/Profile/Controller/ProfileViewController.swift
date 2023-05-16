@@ -7,96 +7,57 @@
 
 import UIKit
 
-/// Là ViewController hiển thị thông tin của user.
-///
-/// Layout được chia làm 3 phần tương ứng với 3 section.
-/// "Header": từ đầu đến follow button,
-/// "Story": phần hightlight story của user,
-/// "Photo": chứa toàn bộ photo mà user đã đăng.
-///
-class ProfileViewController: UIViewController {
+class ProfileViewController: UIViewController, MasterScrollViewDatasource {
   
-  /// Enum dùng để phân chia collection view ra làm 3 section.
-  enum SectionType: Int, CaseIterable {
-    case header
-    case story
-    case photo
+  // MARK: - MasterScrollViewDatasource
+  var minHeaderViewHeight: CGFloat {
+    return view.safeAreaInsets.top + statusViewHeight
   }
-  var colors: [UIColor] = [.systemPink, .systemBlue, .systemMint, .systemBrown, .systemGray, .systemGreen, .systemYellow]
-  // MARK: - UI components
   
-  lazy var statusView: ProfileStatusView = {
-    let view = ProfileStatusView()
-    view.title = "duc3385"
-    view.translatesAutoresizingMaskIntoConstraints = false
-    return view
-  }()
+  var headerViewController: UIViewController = ProfileHeaderViewController()
   
-  var collectionView: UICollectionView!
+  var bottomViewController: BottomControllerProvider = ProfileBottomViewController()
+  
+  // MARK: - Properties
+  private var statusView: ProfileStatusView!
+  private var containerScrollView: ContainerScrollViewController!
+  
+  private let statusViewHeight: CGFloat = 44
   
   // MARK: - Life cycle
-  
   override func viewDidLoad() {
     super.viewDidLoad()
+    navigationController?.isNavigationBarHidden = true
+    setupStatusView()
+    setupMasterScrollView()
+  }
+  
+  private func setupStatusView() {
+    statusView = ProfileStatusView()
+    statusView.title = "ducanh2211"
+    statusView.translatesAutoresizingMaskIntoConstraints = false
+    view.addSubview(statusView)
     
-    setupView()
+    NSLayoutConstraint.activate([
+      statusView.leftAnchor.constraint(equalTo: view.leftAnchor),
+      statusView.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor),
+      statusView.rightAnchor.constraint(equalTo: view.rightAnchor),
+      statusView.heightAnchor.constraint(equalToConstant: statusViewHeight)
+    ])
+  }
+  
+  private func setupMasterScrollView() {
+    let vc = ContainerScrollViewController()
+    vc.dataSource = self
+    addChildController(vc)
+    vc.view.translatesAutoresizingMaskIntoConstraints = false
+    
+    NSLayoutConstraint.activate([
+      vc.view.leftAnchor.constraint(equalTo: view.leftAnchor),
+      vc.view.topAnchor.constraint(equalTo: statusView.bottomAnchor),
+      vc.view.rightAnchor.constraint(equalTo: view.rightAnchor),
+      vc.view.bottomAnchor.constraint(equalTo: view.bottomAnchor)
+    ])
   }
   
 }
-
-// MARK: - UICollectionViewDataSource
-extension ProfileViewController: UICollectionViewDataSource {
-  
-  func numberOfSections(in collectionView: UICollectionView) -> Int {
-    return SectionType.allCases.count
-  }
-  
-  func collectionView(_ collectionView: UICollectionView,
-                      numberOfItemsInSection section: Int) -> Int {
-    
-    switch SectionType(rawValue: section) {
-      case .header: return 1
-      case .story: return 7
-      case .photo: return 1
-      default: return 0
-    }
-  }
-  
-  func collectionView(_ collectionView: UICollectionView,
-                      cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
-    
-    guard let sectionType = SectionType(rawValue: indexPath.section) else {
-      return UICollectionViewCell()
-    }
-    
-    if sectionType == .header {
-      let cell = collectionView.dequeueReusableCell(
-        withReuseIdentifier: ProfileHeaderCell.identifier,
-        for: indexPath
-      ) as! ProfileHeaderCell
-      return cell
-    }
-    
-    else if sectionType == .story {
-      let cell = collectionView.dequeueReusableCell(
-        withReuseIdentifier: ProfileStoryCell.identifier,
-        for: indexPath
-      ) as! ProfileStoryCell
-      cell.backgroundColor = colors[indexPath.item]
-      return cell
-    }
-    
-    else if sectionType == .photo {
-      let cell = collectionView.dequeueReusableCell(
-        withReuseIdentifier: ProfilePhotoCell.identifier,
-        for: indexPath
-      ) as! ProfilePhotoCell
-      cell.backgroundColor = .red
-      return cell
-    }
-    
-    return UICollectionViewCell()
-  }
-  
-}
-

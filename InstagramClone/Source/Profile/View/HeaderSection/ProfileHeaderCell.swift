@@ -1,22 +1,17 @@
 //
-//  ProfileHeaderView.swift
+//  ProfileHeaderCell.swift
 //  InstagramClone
 //
-//  Created by Đức Anh Trần on 04/05/2023.
+//  Created by Đức Anh Trần on 06/05/2023.
 //
 
 import UIKit
 
-protocol ProfileHeaderViewDelegate: AnyObject {
-  
-}
-
-class ProfileHeaderView: UICollectionReusableView {
-  
+class ProfileHeaderCell: UICollectionViewCell {
+    
   static var identifier: String { String(describing: self) }
   
   // MARK: - UI Components
-  
   private lazy var profileImageView: UIImageView = {
     let imageView = UIImageView()
     imageView.image = UIImage(systemName: "person.circle")
@@ -41,7 +36,7 @@ class ProfileHeaderView: UICollectionReusableView {
   
   private let bioLabel: UILabel = {
     let label = UILabel()
-    label.text = "2 dong \n thuc su luon"
+    label.text = "2 dong\nthuc su luon\nsao lai the"
     label.numberOfLines = 0
     label.font = .systemFont(ofSize: 12, weight: .regular)
     label.translatesAutoresizingMaskIntoConstraints = false
@@ -65,8 +60,6 @@ class ProfileHeaderView: UICollectionReusableView {
   }()
   
   // MARK: - Life cycle
-  
-  weak var delegate: ProfileHeaderViewDelegate?
   
   
   override init(frame: CGRect) {
@@ -92,7 +85,7 @@ class ProfileHeaderView: UICollectionReusableView {
 
 // MARK: - UI Layout
 
-extension ProfileHeaderView {
+extension ProfileHeaderCell {
   private func setupView() {
     // create stack view
     let statLabelStack = UIStackView(arrangedSubviews: [postsLabel, followerslabel, followingLabel])
@@ -141,6 +134,3 @@ extension ProfileHeaderView {
     ])
   }
 }
-
-
-

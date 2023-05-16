@@ -1,18 +1,15 @@
 //
-//  ProfileHeaderCell.swift
+//  ProfileHeaderView.swift
 //  InstagramClone
 //
-//  Created by Đức Anh Trần on 06/05/2023.
+//  Created by Đức Anh Trần on 16/05/2023.
 //
 
 import UIKit
 
-class ProfileHeaderCell: UICollectionViewCell {
-    
-  static var identifier: String { String(describing: self) }
-  
+class ProfileHeaderView: UIView {
+
   // MARK: - UI Components
-  
   private lazy var profileImageView: UIImageView = {
     let imageView = UIImageView()
     imageView.image = UIImage(systemName: "person.circle")
@@ -60,11 +57,7 @@ class ProfileHeaderCell: UICollectionViewCell {
     return button
   }()
   
-  // MARK: - Life cycle
-  
-  weak var delegate: ProfileHeaderViewDelegate?
-  
-  
+  // MARK: - Initializer
   override init(frame: CGRect) {
     super.init(frame: frame)
     setupView()
@@ -75,7 +68,6 @@ class ProfileHeaderCell: UICollectionViewCell {
   }
   
   // MARK: - Functions
-  
   @objc private func followOrEditButtonDidTap() {
     print("follow")
   }
@@ -83,25 +75,25 @@ class ProfileHeaderCell: UICollectionViewCell {
   @objc private func messageOrShareButtonDidTap() {
     print("message")
   }
-  
 }
 
 // MARK: - UI Layout
-
-extension ProfileHeaderCell {
+extension ProfileHeaderView {
   private func setupView() {
-    // create stack view
+    // stat label stack view
     let statLabelStack = UIStackView(arrangedSubviews: [postsLabel, followerslabel, followingLabel])
     statLabelStack.axis = .horizontal
     statLabelStack.distribution = .equalCentering
     statLabelStack.translatesAutoresizingMaskIntoConstraints = false
     
+    // user info stack view
     let userInfoStack = UIStackView(arrangedSubviews: [fullNameLabel, bioLabel])
     userInfoStack.axis = .vertical
     userInfoStack.alignment = .leading
     userInfoStack.spacing = 2
     userInfoStack.translatesAutoresizingMaskIntoConstraints = false
     
+    // button stack view
     let buttonStack = UIStackView(arrangedSubviews: [followOrEditButton, messageOrShareButton])
     buttonStack.axis = .horizontal
     buttonStack.distribution = .fillEqually
