@@ -1,6 +1,6 @@
 //
-//  DABottomProvider.swift
-//  NestedScrollView
+//  BottomControllerProvider.swift
+//  InstagramClone
 //
 //  Created by Đức Anh Trần on 11/05/2023.
 //

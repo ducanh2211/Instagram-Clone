@@ -20,7 +20,7 @@ class DefaultPagingMenuCell: UICollectionViewCell, PagingMenuCell {
   private let imageView: UIImageView = {
     let imv = UIImageView()
     imv.translatesAutoresizingMaskIntoConstraints = false
-    imv.contentMode = .scaleAspectFill
+    imv.contentMode = .scaleAspectFit
     imv.clipsToBounds = true
     return imv
   }()
@@ -86,9 +86,8 @@ class DefaultPagingMenuCell: UICollectionViewCell, PagingMenuCell {
       
       imageView.centerXAnchor.constraint(equalTo: contentView.centerXAnchor),
       imageView.centerYAnchor.constraint(equalTo: contentView.centerYAnchor),
-      imageView.widthAnchor.constraint(lessThanOrEqualTo: contentView.widthAnchor),
-      imageView.heightAnchor.constraint(lessThanOrEqualTo: contentView.heightAnchor),
-      
+      imageView.widthAnchor.constraint(equalToConstant: 22),
+      imageView.heightAnchor.constraint(equalToConstant: 22),
     ])
   }
   

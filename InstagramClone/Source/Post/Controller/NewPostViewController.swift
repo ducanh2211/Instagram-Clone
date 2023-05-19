@@ -11,6 +11,8 @@ import Photos
 class NewPostViewController: UIViewController {
   
   // MARK: - UI components
+  private var navBar: CustomNavigationBar!
+  
   private lazy var stackView: UIStackView = {
     let stack = UIStackView(arrangedSubviews: [smallPhotoImageView, captionTextView])
     stack.axis = .horizontal
@@ -22,7 +24,7 @@ class NewPostViewController: UIViewController {
   
   private lazy var smallPhotoImageView: UIImageView = {
     let imageView = UIImageView()
-    imageView.contentMode = .scaleAspectFill
+    imageView.contentMode = .scaleAspectFit
     imageView.clipsToBounds = true
     imageView.translatesAutoresizingMaskIntoConstraints = false
     
@@ -40,7 +42,6 @@ class NewPostViewController: UIViewController {
   
   private lazy var previewPhotoView: UIView = {
     let view = UIView(frame: self.view.frame)
-    view.backgroundColor = .systemBackground.withAlphaComponent(0.8)
     view.addSubview(largePhotoImageView)
     let tapGesture = UITapGestureRecognizer(target: self, action: #selector(removePreviewPhoto))
     view.isUserInteractionEnabled = true
@@ -50,7 +51,7 @@ class NewPostViewController: UIViewController {
   
   private let largePhotoImageView: UIImageView = {
     let imageView = UIImageView()
-    imageView.contentMode = .scaleAspectFill
+    imageView.contentMode = .scaleAspectFit
     imageView.clipsToBounds = true
     return imageView
   }()
@@ -59,20 +60,23 @@ class NewPostViewController: UIViewController {
   private let viewModel = NewPostViewModel()
   private let asset: PHAsset
   private var postImage: UIImage?
+  private let originAspectRatio: CGFloat
   
   private let idealPhotoResolution = CGSize(width: 1080, height: 1080)
   
-  private lazy var photoAspectRatio: CGFloat = {
-    let aspectRatio = CGFloat(asset.pixelWidth) / CGFloat(asset.pixelHeight)
-    
-    if aspectRatio < PhotoConstants.Post.portraitAspectRatio {
+  private var shouldCropImage: Bool {
+    originAspectRatio < PhotoConstants.Post.portraitAspectRatio || originAspectRatio > PhotoConstants.Post.landscapeAspectRatio
+  }
+  
+  private lazy var idealPhotoAspectRatio: CGFloat = {
+    if originAspectRatio < PhotoConstants.Post.portraitAspectRatio {
       return PhotoConstants.Post.portraitAspectRatio
     }
-    else if aspectRatio > PhotoConstants.Post.landscapeAspectRatio {
+    else if originAspectRatio > PhotoConstants.Post.landscapeAspectRatio {
       return PhotoConstants.Post.landscapeAspectRatio
     }
     else {
-      return aspectRatio
+      return originAspectRatio
     }
   }()
   
@@ -84,19 +88,16 @@ class NewPostViewController: UIViewController {
   }()
   
   private lazy var expandLargePhotoFrame: CGRect = {
-    let screenHeight = view.bounds.height
-    let screenWidth = view.bounds.width
-    let finalWidth = screenWidth
-    let height: CGFloat = finalWidth / photoAspectRatio
-    let finalHeight: CGFloat = (height > 500) ? 500 : height
-    
-    return CGRect(x: 0, y: (screenHeight - finalHeight) / 2,
-                  width: finalWidth, height: finalHeight)
+    let width = view.bounds.width
+    let height: CGFloat = width / idealPhotoAspectRatio
+    return CGRect(x: 0, y: (view.bounds.height - height) / 2,
+                  width: width, height: height)
   }()
   
   // MARK: - Life cycle
   init(asset: PHAsset) {
     self.asset = asset
+    self.originAspectRatio = CGFloat(asset.pixelWidth) / CGFloat(asset.pixelHeight)
     super.init(nibName: nil, bundle: nil)
   }
   
@@ -115,7 +116,7 @@ class NewPostViewController: UIViewController {
     fetchImage()
     setupView()
   }
-  
+
   // MARK: - Functions
   private func bindViewModel() {
     viewModel.createPostSuccess = { [weak self] in
@@ -125,7 +126,6 @@ class NewPostViewController: UIViewController {
     }
     
     viewModel.createPostFailure = { [weak self] error in
-      print("Create post failure error: \(error)")
       DispatchQueue.main.async {
         self?.dismiss(animated: true)
       }
@@ -139,11 +139,20 @@ class NewPostViewController: UIViewController {
   }
   
   private func fetchImage() {
-    let smallImage = asset.getImageFromAsset(targetSize: smallPhotoImageView.bounds.size)
-    let largeImage = asset.getImageFromAsset(targetSize: idealPhotoResolution)
-    postImage = largeImage
-    smallPhotoImageView.image = smallImage
-    largePhotoImageView.image = largeImage
+    guard let image = asset.getImageFromAsset(targetSize: idealPhotoResolution) else { return }
+    
+    if shouldCropImage {
+      let croppedImage = image.crop(with: idealPhotoAspectRatio)
+      postImage = croppedImage
+      smallPhotoImageView.image = croppedImage
+      largePhotoImageView.image = croppedImage
+    }
+    else {
+      postImage = image 
+      smallPhotoImageView.image = image
+      largePhotoImageView.image = image
+    }
+    
   }
   
   @objc private func shareButtonTapped() {
@@ -153,7 +162,7 @@ class NewPostViewController: UIViewController {
           let imageData = postImage.jpegData(compressionQuality: 1),
           let caption = captionTextView.text else { return }
     
-    viewModel.createPost(withImage: imageData, aspectRatio: photoAspectRatio, caption: caption)
+    viewModel.createPost(withImage: imageData, aspectRatio: idealPhotoAspectRatio, caption: caption)
   }
   
   @objc private func smallPhotoTapped() {
@@ -173,6 +182,7 @@ class NewPostViewController: UIViewController {
                    initialSpringVelocity: 1,
                    options: .curveEaseInOut, animations: {
       self.largePhotoImageView.frame = self.expandLargePhotoFrame
+      self.previewPhotoView.backgroundColor = .systemBackground.withAlphaComponent(0.9)
     })
   }
   
@@ -182,6 +192,7 @@ class NewPostViewController: UIViewController {
                    initialSpringVelocity: 1,
                    options: .curveEaseInOut, animations: {
       self.largePhotoImageView.frame = self.initialLargePhotoFrame
+      self.previewPhotoView.backgroundColor = .systemBackground.withAlphaComponent(0)
     }, completion: { _ in
       self.smallPhotoImageView.alpha = 1
       self.previewPhotoView.removeFromSuperview()
@@ -190,33 +201,51 @@ class NewPostViewController: UIViewController {
   
 }
 
-// MARK: - UI Layout
+// MARK: - Setup
 extension NewPostViewController {
   private func setupView() {
-    self.title = "New post"
+    navigationController?.isNavigationBarHidden = true
     view.backgroundColor = .systemBackground
-    setupNavigationBar()
+    setupNavBar()
     setupConstraints()
   }
   
-  private func setupNavigationBar() {
-    navigationController?.navigationBar.topItem?.backButtonDisplayMode = .minimal
-    navigationItem.rightBarButtonItem = UIBarButtonItem(title: "Share", style: .done, target: self,
-                                                        action: #selector(shareButtonTapped))
-    navigationItem.rightBarButtonItem?.tintColor = .systemBlue
+  private func setupNavBar() {
+    let imageWeight = UIImage.SymbolConfiguration(weight: .semibold)
+    let image = UIImage(systemName: "chevron.backward", withConfiguration: imageWeight)!
+    let backButton = AttributedButton(image: image) { [weak self] in
+      self?.navigationController?.popViewController(animated: true)
+    }
+    
+    let shareButton = AttributedButton(title: "Share") { [weak self] in
+      self?.shareButtonTapped()
+    }
+    
+    navBar = CustomNavigationBar(title: "New post",
+                                 shouldShowSeparator: false,
+                                 leftBarButtons: [backButton],
+                                 rightBarButtons: [shareButton])
   }
   
   private func setupConstraints() {
+    navBar.translatesAutoresizingMaskIntoConstraints = false
+    view.addSubview(navBar)
     view.addSubview(stackView)
     
     NSLayoutConstraint.activate([
+      navBar.leftAnchor.constraint(equalTo: view.leftAnchor),
+      navBar.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor),
+      navBar.rightAnchor.constraint(equalTo: view.rightAnchor),
+      navBar.heightAnchor.constraint(equalToConstant: 44),
+      
       smallPhotoImageView.heightAnchor.constraint(equalToConstant: 70),
-      smallPhotoImageView.widthAnchor.constraint(equalTo: smallPhotoImageView.heightAnchor, multiplier: photoAspectRatio),
+      smallPhotoImageView.widthAnchor.constraint(equalTo: smallPhotoImageView.heightAnchor,
+                                                 multiplier: idealPhotoAspectRatio),
       
       captionTextView.heightAnchor.constraint(equalTo: smallPhotoImageView.heightAnchor),
       
       stackView.leftAnchor.constraint(equalTo: view.leftAnchor, constant: 20),
-      stackView.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor, constant: 20),
+      stackView.topAnchor.constraint(equalTo: navBar.bottomAnchor, constant: 20),
       stackView.rightAnchor.constraint(equalTo: view.rightAnchor, constant: -12),
       stackView.heightAnchor.constraint(equalToConstant: 140)
     ])

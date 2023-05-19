@@ -32,6 +32,14 @@ class PhotoSelectorHeader: UICollectionReusableView {
     return imageView
   }()
   
+  // Cho phép người dùng lựa khung hình để crop ảnh. Tính năng này phát triển sau
+  private let cropRectView: UIView = {
+    let view = UIView()
+    view.translatesAutoresizingMaskIntoConstraints = false
+    view.backgroundColor = .systemBlue.withAlphaComponent(0.5)
+    return view
+  }()
+  
   private let separatorView: UIView = {
     let view = UIView()
     view.layer.borderColor = UIColor.darkGray.cgColor
@@ -75,10 +83,13 @@ class PhotoSelectorHeader: UICollectionReusableView {
   }
   
   func configure(withAsset asset: PHAsset) {
-    if let image = asset.getImageFromAsset(targetSize: bounds.size) {
-      photoImageView.image = image
-      print(image.size)
-    }
+    let image = asset.getImageFromAsset(targetSize: bounds.size)
+    photoImageView.image = image
+    configCropRectView()
+  }
+  
+  private func configCropRectView() {
+    let _ = photoImageView.getImageFrame()
   }
   
   // MARK: - UI Layout

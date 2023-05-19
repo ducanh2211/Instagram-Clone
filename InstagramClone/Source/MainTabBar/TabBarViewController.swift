@@ -12,7 +12,7 @@ class TabBarViewController: UITabBarController {
   
   private(set) var viewModel: TabBarViewModel
   
-  //  private let feedVC = FeedViewController()
+  //  private let feedVC = HomeViewController()
   private let searchVC = SearchViewController()
   private let postVC = PostViewController()
   private let profileVC = ProfileViewController()
@@ -73,8 +73,8 @@ extension TabBarViewController {
   private func setupController() {
     guard let user = self.viewModel.user else { return }
     
-    let feedViewModel = FeedViewModel(user: user)
-    let feedVC = FeedViewController(viewModel: feedViewModel)
+    let feedViewModel = HomeViewModel(user: user)
+    let feedVC = HomeViewController(viewModel: feedViewModel)
     
     let feedNav = self.createController(
       feedVC,
@@ -87,7 +87,7 @@ extension TabBarViewController {
       unselectedImage: UIImage(systemName: "magnifyingglass.circle")
     )
     let postNav = self.createController(
-      PhotoSelectorViewController(),
+      UIViewController(),
       selectedImage: UIImage(systemName: "plus.app.fill"),
       unselectedImage: UIImage(systemName: "plus.app")
     )
@@ -113,14 +113,16 @@ extension TabBarViewController {
 
 // MARK: - UITabBarControllerDelegate
 extension TabBarViewController: UITabBarControllerDelegate {
-  func tabBarController(_ tabBarController: UITabBarController, shouldSelect viewController: UIViewController) -> Bool {
+  func tabBarController(_ tabBarController: UITabBarController,
+                        shouldSelect viewController: UIViewController) -> Bool {
+    
     guard let index = tabBarController.viewControllers?.firstIndex(of: viewController) else { return true }
     
     if index == 2 {
       let vc = PhotoSelectorViewController()
       let nav = UINavigationController(rootViewController: vc)
       nav.modalPresentationStyle = .fullScreen
-      self.present(nav, animated: false)
+      self.present(nav, animated: true)
       return false
     }
     

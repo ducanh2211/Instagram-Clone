@@ -23,6 +23,7 @@ class PhotoSelectorViewController: UIViewController {
 //  }()
   
   // MARK: - UI components
+  var navBar: CustomNavigationBar!
   var collectionView: UICollectionView!
   
   // MARK: - Life cycle
@@ -48,11 +49,11 @@ class PhotoSelectorViewController: UIViewController {
     viewModel.getPermissionIfNeed()
   }
   
-  @objc func closeButtonTapped() {
+  @objc func didTapCloseButton() {
     self.dismiss(animated: true)
   }
   
-  @objc func nextButtonTapped() {
+  @objc func didTapNextButton() {
     if let asset = viewModel.getAssetAtSelectedIndex() {
 //      let viewModel = NewPostViewModel()
       let vc = NewPostViewController(asset: asset)
@@ -72,11 +73,13 @@ class PhotoSelectorViewController: UIViewController {
 
 // MARK: - UICollectionViewDataSource
 extension PhotoSelectorViewController: UICollectionViewDataSource {
-  func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
+  func collectionView(_ collectionView: UICollectionView,
+                      numberOfItemsInSection section: Int) -> Int {
     return viewModel.numberOfItems
   }
   
-  func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
+  func collectionView(_ collectionView: UICollectionView,
+                      cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
     let cell = collectionView.dequeueReusableCell(
       withReuseIdentifier: PhotoSelectorCell.identifier,
       for: indexPath
@@ -91,7 +94,9 @@ extension PhotoSelectorViewController: UICollectionViewDataSource {
 
 // MARK: - UICollectionViewDelegate
 extension PhotoSelectorViewController: UICollectionViewDelegate {
-  func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
+  
+  func collectionView(_ collectionView: UICollectionView,
+                      didSelectItemAt indexPath: IndexPath) {
     let index = indexPath.item
     viewModel.selectedIndex = index
     if let asset = viewModel.getAssetAtSelectedIndex() {
@@ -128,7 +133,9 @@ extension PhotoSelectorViewController: UICollectionViewDelegate {
 }
 
 // MARK: - UIImagePickerControllerDelegate
-extension PhotoSelectorViewController: PhotoSelectorHeaderDelegate, UIImagePickerControllerDelegate, UINavigationControllerDelegate {
+extension PhotoSelectorViewController: PhotoSelectorHeaderDelegate,
+                                       UIImagePickerControllerDelegate,
+                                       UINavigationControllerDelegate {
   
   func didTapCameraButton() {
     let picker = UIImagePickerController()

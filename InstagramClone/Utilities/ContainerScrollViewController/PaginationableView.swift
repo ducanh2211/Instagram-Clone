@@ -1,6 +1,6 @@
 //
 //  PaginationableView.swift
-//  NestedScrollView
+//  InstagramClone
 //
 //  Created by Đức Anh Trần on 10/05/2023.
 //

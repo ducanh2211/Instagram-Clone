@@ -12,48 +12,47 @@ extension PhotoSelectorViewController {
   
   // MARK: View
   func setupView() {
-    self.title = "New post"
-    self.view.backgroundColor = .systemBackground
+    navigationController?.isNavigationBarHidden = true
+    view.backgroundColor = .systemBackground
     ProgressHUD.colorHUD = .black
     ProgressHUD.colorAnimation = .white
+    setupNavBar()
     setupCollectionView()
     setupConstraints()
-    setupNavigationBar()
+  }
+  
+  private func setupNavBar() {
+    let closeButton = AttributedButton(image: UIImage(systemName: "xmark")!) { [weak self] in
+      self?.didTapCloseButton()
+    }
+    
+    let nextButton = AttributedButton(title: "Next") { [weak self] in
+      self?.didTapNextButton()
+    }
+    
+    navBar = CustomNavigationBar(title: "New post",
+                                 shouldShowSeparator: false,
+                                 leftBarButtons: [closeButton],
+                                 rightBarButtons: [nextButton])
   }
   
   private func setupConstraints() {
+    view.addSubview(navBar)
     view.addSubview(collectionView)
+    navBar.translatesAutoresizingMaskIntoConstraints = false
     collectionView.translatesAutoresizingMaskIntoConstraints = false
     
     NSLayoutConstraint.activate([
+      navBar.leftAnchor.constraint(equalTo: view.leftAnchor),
+      navBar.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor),
+      navBar.rightAnchor.constraint(equalTo: view.rightAnchor),
+      navBar.heightAnchor.constraint(equalToConstant: 44),
+      
       collectionView.leftAnchor.constraint(equalTo: view.leftAnchor),
-      collectionView.topAnchor.constraint(equalTo: view.topAnchor),
+      collectionView.topAnchor.constraint(equalTo: navBar.bottomAnchor),
       collectionView.rightAnchor.constraint(equalTo: view.rightAnchor),
       collectionView.bottomAnchor.constraint(equalTo: view.bottomAnchor)
     ])
-  }
-  
-  private func setupNavigationBar() {
-    let appearance = UINavigationBarAppearance()
-    appearance.backgroundColor = .systemBackground
-    navigationController?.navigationBar.standardAppearance = appearance
-    navigationController?.navigationBar.scrollEdgeAppearance = appearance
-    navigationController?.navigationBar.backgroundColor = .systemBackground
-    navigationController?.navigationBar.tintColor = .label
-    
-    navigationItem.leftBarButtonItem = UIBarButtonItem(
-      image: UIImage(systemName: "xmark"),
-      style: .done,
-      target: self,
-      action: #selector(closeButtonTapped)
-    )
-    navigationItem.rightBarButtonItem = UIBarButtonItem(
-      title: "Next",
-      style: .done,
-      target: self,
-      action: #selector(nextButtonTapped)
-    )
-    navigationItem.rightBarButtonItem?.tintColor = .link
   }
   
   // MARK: Collection view

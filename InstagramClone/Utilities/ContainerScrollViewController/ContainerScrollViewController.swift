@@ -1,6 +1,6 @@
 //
-//  DAMasterScrollController.swift
-//  NestedScrollView
+//  ContainerScrollViewController.swift
+//  InstagramClone
 //
 //  Created by Đức Anh Trần on 10/05/2023.
 //
@@ -58,7 +58,7 @@ class ContainerScrollViewController: UIViewController {
   /// Có thể sử dụng đến thư viện thứ ba như: `Parchment`, `XLPagerTabStrip`.
   private var bottomVC: BottomControllerProvider!
   
-  weak var dataSource: MasterScrollViewDatasource!
+  weak var dataSource: ContainerScrollViewDatasource!
   
   // MARK: - Life cycle
   
@@ -96,11 +96,26 @@ class ContainerScrollViewController: UIViewController {
                              change: [NSKeyValueChangeKey : Any]?,
                              context: UnsafeMutableRawPointer?) {
 
-    if let object = object as? UIScrollView, keyPath == #keyPath(UIScrollView.contentSize) {
-      if let paginationView = paginationViews[currentIndex], object == paginationView  {
-        self.updateLogicHanlderScrollContentSize(with: paginationView)
+    if let object = object as? UIScrollView,
+       let paginationView = paginationViews[currentIndex],
+       object == paginationView {
+      
+      if let contentSize = change?[.newKey] as? CGSize,
+         keyPath == #keyPath(UIScrollView.contentSize) {
+        let height = max(
+          contentSize.height + headerHeight + menuItemHeight, // Trường hợp content height > view.bounds.height
+          view.frame.height + headerHeight - minHeaderHeight             // Trường hợp content height < view.bounds.height
+        )
+        logicHandlerScrollView.contentSize = CGSize(width: contentSize.width, height: height)
       }
     }
+    
+//    if let object = object as? UIScrollView, keyPath == #keyPath(UIScrollView.contentSize) {
+//      if let paginationView = paginationViews[currentIndex], object == paginationView  {
+//        self.updateLogicHanlderScrollContentSize(with: paginationView)
+//        print("DEBUG: scroll view: \(paginationView.contentSize)")
+//      }
+//    }
   }
   
   /// Update lại content size của `logicHandlerScrollView`.
@@ -112,8 +127,7 @@ class ContainerScrollViewController: UIViewController {
   private func getContentSize(for scrollView: UIScrollView) -> CGSize {
     let height = max(
       scrollView.contentSize.height + headerHeight + menuItemHeight, // Trường hợp content height > view.bounds.height
-//      view.frame.height + headerHeight - minHeaderHeight             // Trường hợp content height < view.bounds.height
-      view.frame.height + headerHeight
+      view.frame.height + headerHeight - minHeaderHeight             // Trường hợp content height < view.bounds.height
     )
     return CGSize(width: scrollView.contentSize.width, height: height)
   }
@@ -142,7 +156,7 @@ extension ContainerScrollViewController: UIScrollViewDelegate {
     /// Khoảng cách xa nhất mà `overlayScrollView` cho phép `containerScrollView` được scroll
     /// trước khi header bị dính vào top screen, và `paginationView` sau đó sẽ được scroll.
     let maximumScrollDistance = headerHeight - minHeaderHeight
-//    let maximumScrollDistance = headerHeight
+
     if currentOffset < maximumScrollDistance {
       containerSrollView.contentOffset.y = currentOffset
       paginationViews.forEach { (_, scrollView) in
@@ -184,8 +198,8 @@ extension ContainerScrollViewController: BottomControllerProviderDelegate {
     
     /**
      Update lại `contentSize` của `logicHandlerScrollView` với `paginationView` (i.e. scrollView).
-     Xảy ra lỗi nếu không có dòng code này: khi chuyển từ `panView` có contentSize nhỏ hơn sang `panView` có contentSize lớn hơn
-     sẽ làm cho `panView` lớn hơn không thể scroll được vì contentSize mới bằng contentSize cũ (nhỏ). Vì vậy cần update contentSize. */
+     Xảy ra lỗi nếu không có dòng code này: khi chuyển từ `paginationView` có contentSize nhỏ hơn sang `paginationView`
+     có contentSize lớn hơn sẽ làm cho `paginationView` lớn hơn không thể scroll được. Vì vậy cần update contentSize. */
     if let paginationView = paginationViews[currentIndex] {
       updateLogicHanlderScrollContentSize(with: paginationView)
     }

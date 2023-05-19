@@ -1,5 +1,5 @@
 //
-//  DABottomDelegate.swift
+//  BottomControllerProviderDelegate.swift
 //  InstagramClone
 //
 //  Created by Đức Anh Trần on 16/05/2023.

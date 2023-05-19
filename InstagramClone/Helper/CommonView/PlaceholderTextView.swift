@@ -21,7 +21,7 @@ class PlaceholderTextView: UITextView {
   override init(frame: CGRect, textContainer: NSTextContainer?) {
     super.init(frame: frame, textContainer: textContainer)
     
-    font = UIFont.systemFont(ofSize: 17)
+    font = UIFont.systemFont(ofSize: 15)
     
     addSubview(placeholderLabel)
     NSLayoutConstraint.activate([

@@ -15,11 +15,6 @@ class StatusView: UIView {
     didSet { titleLabel.text = title }
   }
   
-//  override var intrinsicContentSize: CGSize {
-//    let width = UIScreen.main.bounds.width
-//    return CGSize(width: width, height: 44)
-//  }
-  
   private var titleLabel: UILabel = {
     let label = UILabel()
     label.font = .systemFont(ofSize: 16, weight: .bold)
