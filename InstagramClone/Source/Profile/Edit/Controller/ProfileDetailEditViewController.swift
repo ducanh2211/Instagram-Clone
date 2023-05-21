@@ -7,9 +7,9 @@
 
 import UIKit
 
-class ProfileDetailEditViewController: UIViewController {
+class ProfileDetailEditViewController: UIViewController, CustomizableNavigationBar {
   
-  private var navBar: CustomNavigationBar!
+  var navBar: CustomNavigationBar!
   
   private let descriptionLabel: UILabel = {
     let label = UILabel()

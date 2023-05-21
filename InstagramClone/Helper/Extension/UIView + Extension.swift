@@ -34,4 +34,14 @@ extension UIView {
       bottomAnchor.constraint(equalTo: view.bottomAnchor)
     ])
   }
+  
+  func roundCorners(_ corners: UIRectCorner, radius: CGFloat) {
+    let roundedLayer = CAShapeLayer()
+    roundedLayer.path = UIBezierPath(
+      roundedRect: bounds,
+      byRoundingCorners: corners,
+      cornerRadii: CGSize(width: radius, height: radius)
+    ).cgPath
+    layer.mask = roundedLayer
+  }
 }

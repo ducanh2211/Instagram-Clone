@@ -8,10 +8,10 @@
 import UIKit
 import Photos
 
-class NewPostViewController: UIViewController {
+class NewPostViewController: UIViewController, CustomizableNavigationBar {
   
   // MARK: - UI components
-  private var navBar: CustomNavigationBar!
+  var navBar: CustomNavigationBar!
   
   private lazy var stackView: UIStackView = {
     let stack = UIStackView(arrangedSubviews: [smallPhotoImageView, captionTextView])

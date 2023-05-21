@@ -39,6 +39,7 @@ extension HomeViewController {
     collectionView.delegate = self
     collectionView.register(HomeStoryCell.self, forCellWithReuseIdentifier: HomeStoryCell.identifier)
     collectionView.register(HomePostCell.self, forCellWithReuseIdentifier: HomePostCell.identifier)
+    collectionView.showsVerticalScrollIndicator = false
   }
   
   private func getSafeAreaTopHeight() -> CGFloat {

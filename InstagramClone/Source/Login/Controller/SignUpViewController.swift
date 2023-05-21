@@ -7,26 +7,10 @@
 
 import UIKit
 
-class SignUpViewController: UIViewController {
-  
-  private let viewModel = SignUpViewModel()
+class SignUpViewController: UIViewController, CustomizableNavigationBar {
   
   // MARK: UI components
-  private lazy var statusView: StatusView = {
-    let view = StatusView()
-    view.title = "Create account"
-    view.backButtonTapped = { [weak self] in
-      self?.navigationController?.popViewController(animated: true)
-    }
-    view.translatesAutoresizingMaskIntoConstraints = false
-    return view
-  }()
-  
-//  private let indicatorActivity: UIActivityIndicatorView = {
-//    let spinner = UIActivityIndicatorView(style: .large)
-//    spinner.translatesAutoresizingMaskIntoConstraints = false
-//    return spinner
-//  }()
+  var navBar: CustomNavigationBar!
   
   private lazy var emailTextField: UITextField = {
     let textField = createTextField(placeHolder: "Email", tag: 0)
@@ -87,6 +71,8 @@ class SignUpViewController: UIViewController {
   }()
   
   // MARK: - Life cycle
+  private let viewModel = SignUpViewModel()
+  
   override func viewDidLoad() {
     super.viewDidLoad()
     setupView()
@@ -97,11 +83,6 @@ class SignUpViewController: UIViewController {
   deinit {
     print("SignUpViewController deinit")
   }
-  
-//  override func viewDidLayoutSubviews() {
-//    super.viewDidLayoutSubviews()
-//    dropShadow()
-//  }
   
   // MARK: - Functions
   private func bindViewModel() {
@@ -124,20 +105,12 @@ class SignUpViewController: UIViewController {
     viewModel.success = { [weak self] in
       DispatchQueue.main.async {
         guard let self = self else { return }
-        guard let tabBarController = UIApplication
-          .shared.keyWindow?.rootViewController as? TabBarViewController else { return }
+        guard let tabBarController = UIApplication.shared.keyWindow?.rootViewController as? TabBarViewController else { return }
         tabBarController.validateUser()
         self.errorLabel.isHidden = true
         self.dismiss(animated: true)
       }
     }
-  }
-  
-  @objc private func validateInput(_ textfield: UITextField) {
-    let textFields = [emailTextField, fullNameTextField, userNameTextField, passwordTextField]
-    let validTextFields = textFields.filter { !$0.text!.isEmpty }
-    let isInputValid = validTextFields.count == textFields.count
-    isInputValid ? enableSignUpButton() : disableSignUpButton()
   }
   
   @objc private func signUpButtonTapped() {
@@ -153,7 +126,13 @@ class SignUpViewController: UIViewController {
     navigationController?.popViewController(animated: true)
   }
   
-  // MARK: - Helpers
+  @objc private func validateInput(_ textfield: UITextField) {
+    let textFields = [emailTextField, fullNameTextField, userNameTextField, passwordTextField]
+    let validTextFields = textFields.filter { !$0.text!.isEmpty }
+    let isInputValid = validTextFields.count == textFields.count
+    isInputValid ? enableSignUpButton() : disableSignUpButton()
+  }
+  
   private func disableSignUpButton() {
     signUpButton.isEnabled = false
     signUpButton.alpha = 0.5
@@ -163,6 +142,7 @@ class SignUpViewController: UIViewController {
     signUpButton.isEnabled = true
     signUpButton.alpha = 1
   }
+
 }
 
 // MARK: - UI Layout
@@ -172,6 +152,16 @@ extension SignUpViewController {
     ProgressHUD.colorHUD = .black
     ProgressHUD.colorAnimation = .white
     setupConstraints()
+  }
+  
+  private func setupNavBar() {
+    let imageWeight = UIImage.SymbolConfiguration(weight: .semibold)
+    let image = UIImage(systemName: "chevron.backward", withConfiguration: imageWeight)!
+    let backButton = AttributedButton(image: image) { [weak self] in
+      self?.navigationController?.popViewController(animated: true)
+    }
+    
+    navBar = CustomNavigationBar(title: "Create account", leftBarButtons: [backButton])
   }
   
   private func setupConstraints() {
@@ -186,19 +176,15 @@ extension SignUpViewController {
     stackView.spacing = 15
     stackView.translatesAutoresizingMaskIntoConstraints = false
     
-//    view.addSubview(indicatorActivity)
-    view.addSubview(statusView)
+    view.addSubview(navBar)
     view.addSubview(stackView)
     view.addSubview(alreadyHaveAccountButton)
 
     NSLayoutConstraint.activate([
-//      indicatorActivity.centerYAnchor.constraint(equalTo: view.centerYAnchor),
-//      indicatorActivity.centerXAnchor.constraint(equalTo: view.centerXAnchor),
-      
-      statusView.leftAnchor.constraint(equalTo: view.leftAnchor),
-      statusView.topAnchor.constraint(equalTo: safeArea.topAnchor),
-      statusView.rightAnchor.constraint(equalTo: view.rightAnchor),
-      statusView.heightAnchor.constraint(equalToConstant: 44),
+      navBar.leftAnchor.constraint(equalTo: view.leftAnchor),
+      navBar.topAnchor.constraint(equalTo: safeArea.topAnchor),
+      navBar.rightAnchor.constraint(equalTo: view.rightAnchor),
+      navBar.heightAnchor.constraint(equalToConstant: 44),
       
       emailTextField.heightAnchor.constraint(equalToConstant: 50),
       fullNameTextField.heightAnchor.constraint(equalTo: emailTextField.heightAnchor),

@@ -215,7 +215,7 @@ extension ContainerScrollViewController {
     logicHandlerScrollView.pinToView(view)
     
     logicHandlerScrollView.delegate = self
-    logicHandlerScrollView.showsVerticalScrollIndicator = false
+    logicHandlerScrollView.showsVerticalScrollIndicator = true
     logicHandlerScrollView.showsHorizontalScrollIndicator = false
     logicHandlerScrollView.layer.zPosition = CGFloat.greatestFiniteMagnitude // Dòng này vẫn chưa hiểu chức năng.
     logicHandlerScrollView.contentInsetAdjustmentBehavior = .never

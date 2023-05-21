@@ -22,15 +22,22 @@ class ProfileConfigurationController: UITableViewController {
     .init(image: UIImage(named: "vtv24-logo")!, title: "Favorites"),
   ]
   
+  deinit {
+    print("DEBUG: deinit ProfileConfigurationController")
+  }
+  
   override func viewDidLoad() {
     super.viewDidLoad()
-    tableView.isScrollEnabled = false
+//    navigationController?.isNavigationBarHidden = true
+    tableView.isScrollEnabled = true
     tableView.rowHeight = 55
-    tableView.contentInset = UIEdgeInsets(top: 30, left: 0,
+    tableView.contentInset = UIEdgeInsets(top: 0, left: 0,
                                           bottom: 0, right: 0)
     tableView.register(ProfileConfigurationCell.self,
                        forCellReuseIdentifier: ProfileConfigurationCell.identifier)
   }
+  
+  
   
   // MARK: - Table view data source
   override func tableView(_ tableView: UITableView,
@@ -48,6 +55,11 @@ class ProfileConfigurationController: UITableViewController {
     return cell
   }
   
+  override func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
+    let vc = UIViewController()
+    vc.view.backgroundColor = .systemPink
+    navigationController?.pushViewController(vc, animated: true)
+  }
 }
 
 // MARK: - ProfileConfigurationCell

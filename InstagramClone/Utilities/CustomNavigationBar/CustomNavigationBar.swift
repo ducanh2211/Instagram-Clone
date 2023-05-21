@@ -8,7 +8,7 @@
 import UIKit
 
 protocol CustomizableNavigationBar: AnyObject {
-  var navBar: CustomNavigationBar { get }
+  var navBar: CustomNavigationBar! { get }
 }
 
 // MARK: - AttributedButton
@@ -22,7 +22,7 @@ struct AttributedButton {
   
   init() {
     self.image = nil
-    self.title = "Title"
+    self.title = "Button"
     self.font = .systemFont(ofSize: 16)
     self.color = .link
     self.size = nil
@@ -164,7 +164,7 @@ class CustomNavigationBar: UIView {
     
     // layout
     let stack = UIStackView(arrangedSubviews: leftBarButtonItems)
-    stack.spacing = 12
+    stack.spacing = 8
     stack.alignment = .center
     stack.translatesAutoresizingMaskIntoConstraints = false
     addSubview(stack)
@@ -206,8 +206,8 @@ class CustomNavigationBar: UIView {
     }
     
     // layout
-    let stack = UIStackView(arrangedSubviews: rightBarButtonItems)
-    stack.spacing = 12
+    let stack = UIStackView(arrangedSubviews: rightBarButtonItems.reversed())
+    stack.spacing = 8
     stack.translatesAutoresizingMaskIntoConstraints = false
     
     addSubview(stack)

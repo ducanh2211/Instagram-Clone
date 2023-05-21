@@ -87,11 +87,6 @@ class LogInViewController: UIViewController {
     print("LogInViewController deinit")
   }
   
-//  override func viewDidLayoutSubviews() {
-//    super.viewDidLayoutSubviews()
-//    dropShadow()
-//  }
-  
   // MARK: - Functions
   private func bindViewModel() {
     viewModel.loadingIndicator = { [weak self] in
@@ -123,13 +118,6 @@ class LogInViewController: UIViewController {
     }
   }
   
-  @objc private func validateInput(_ textfield: UITextField) {
-    let textFields = [emailTextField, passwordTextField]
-    let validTextFields = textFields.filter { !$0.text!.isEmpty }
-    let isInputValid = validTextFields.count == textFields.count
-    isInputValid ? enableSignUpButton() : disableSignUpButton()
-  }
-  
   @objc private func loginButtonTapped() {
     guard let email = emailTextField.text,
           let password = passwordTextField.text else {
@@ -143,7 +131,13 @@ class LogInViewController: UIViewController {
     navigationController?.pushViewController(vc, animated: true)
   }
   
-  // MARK: - Helpers
+  @objc private func validateInput(_ textfield: UITextField) {
+    let textFields = [emailTextField, passwordTextField]
+    let validTextFields = textFields.filter { !$0.text!.isEmpty }
+    let isInputValid = validTextFields.count == textFields.count
+    isInputValid ? enableSignUpButton() : disableSignUpButton()
+  }
+  
   private func disableSignUpButton() {
     loginButton.isEnabled = false
     loginButton.alpha = 0.5
@@ -153,24 +147,19 @@ class LogInViewController: UIViewController {
     loginButton.isEnabled = true
     loginButton.alpha = 1
   }
-  
-}
 
+}
 
 // MARK: - UI Layout
 extension LogInViewController {
   private func setupView() {
+    navigationController?.navigationBar.isHidden = true
     view.backgroundColor = .systemBackground
     ProgressHUD.colorHUD = .black
     ProgressHUD.colorAnimation = .white
-    setupNavigationBar()
     setupConstraints()
   }
-  
-  private func setupNavigationBar() {
-    navigationController?.navigationBar.isHidden = true
-  }
-  
+
   private func setupConstraints() {
     let safeArea = view.safeAreaLayoutGuide
     let screenHeight = UIScreen.main.bounds.height

@@ -8,7 +8,7 @@
 import UIKit
 import Photos
 
-class PhotoSelectorViewController: UIViewController {
+class PhotoSelectorViewController: UIViewController, CustomizableNavigationBar {
   
   // MARK: - Properties
   private let viewModel = PhotoSelectorViewModel()

@@ -18,6 +18,12 @@ class TabBarViewController: UITabBarController {
   private let profileVC = ProfileViewController()
   
   // MARK: - Life cycle
+  init(viewModel: TabBarViewModel) {
+    print("DEBUG: init tab bar VC")
+    self.viewModel = viewModel
+    super.init(nibName: nil, bundle: nil)
+  }
+  
   override func viewDidLoad() {
     super.viewDidLoad()
     self.view.backgroundColor = .systemBackground
@@ -27,12 +33,6 @@ class TabBarViewController: UITabBarController {
 //        logout()
     bindViewModel()
     validateUser()
-  }
-  
-  init(viewModel: TabBarViewModel) {
-    print("DEBUG: init tab bar VC")
-    self.viewModel = viewModel
-    super.init(nibName: nil, bundle: nil)
   }
   
   required init?(coder: NSCoder) {

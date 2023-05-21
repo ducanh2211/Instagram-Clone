@@ -37,7 +37,6 @@
 		5733AE5A2A1328E600193A85 /* ContainerScrollViewDatasource.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5733AE562A1328E500193A85 /* ContainerScrollViewDatasource.swift */; };
 		5733AE5B2A1328E600193A85 /* ContainerScrollViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5733AE572A1328E600193A85 /* ContainerScrollViewController.swift */; };
 		5733AE5D2A13294000193A85 /* BottomControllerProviderDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5733AE5C2A13294000193A85 /* BottomControllerProviderDelegate.swift */; };
-		57391E2A2A03A4A40096D00A /* ProfileNavBar.swift in Sources */ = {isa = PBXBuildFile; fileRef = 57391E292A03A4A40096D00A /* ProfileNavBar.swift */; };
 		574039192A16145400A9A2F6 /* ProfileConfigurationController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 574039182A16145400A9A2F6 /* ProfileConfigurationController.swift */; };
 		574039252A162DC000A9A2F6 /* ProfileEditViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 574039242A162DC000A9A2F6 /* ProfileEditViewController.swift */; };
 		574039292A162E9100A9A2F6 /* ProfileEditCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 574039282A162E9100A9A2F6 /* ProfileEditCell.swift */; };
@@ -77,6 +76,12 @@
 		57ABFC8A29EA748400FF1BEB /* StorageManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 57ABFC8929EA748400FF1BEB /* StorageManager.swift */; };
 		57ABFC8C29EA7AB900FF1BEB /* SignUpViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 57ABFC8B29EA7AB900FF1BEB /* SignUpViewModel.swift */; };
 		57B4E75829F665E000F5B977 /* PhotoSelectorViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 57B4E75729F665E000F5B977 /* PhotoSelectorViewModel.swift */; };
+		57CA5F772A17C89B001D1E4A /* BottomSheetController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 57CA5F762A17C89B001D1E4A /* BottomSheetController.swift */; };
+		57CA5F792A188AB4001D1E4A /* UINavigationController + Extension.swift in Sources */ = {isa = PBXBuildFile; fileRef = 57CA5F782A188AB4001D1E4A /* UINavigationController + Extension.swift */; };
+		57CA5F7B2A18D5B3001D1E4A /* FakeViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 57CA5F7A2A18D5B3001D1E4A /* FakeViewController.swift */; };
+		57CA5F7D2A193334001D1E4A /* BottomSheetSettings.swift in Sources */ = {isa = PBXBuildFile; fileRef = 57CA5F7C2A193334001D1E4A /* BottomSheetSettings.swift */; };
+		57CA5F812A1A0A88001D1E4A /* ProfileSettingsSheetController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 57CA5F802A1A0A88001D1E4A /* ProfileSettingsSheetController.swift */; };
+		57CA5F832A1A1534001D1E4A /* BottomSheetControllerVer2.swift in Sources */ = {isa = PBXBuildFile; fileRef = 57CA5F822A1A1534001D1E4A /* BottomSheetControllerVer2.swift */; };
 		57DE12582A13962800FDF302 /* String + Extension.swift in Sources */ = {isa = PBXBuildFile; fileRef = 57DE12572A13962800FDF302 /* String + Extension.swift */; };
 		57DE125A2A13965900FDF302 /* PHAsset + Extenstion.swift in Sources */ = {isa = PBXBuildFile; fileRef = 57DE12592A13965900FDF302 /* PHAsset + Extenstion.swift */; };
 		57DE12622A13D74700FDF302 /* NewPostNavBar.swift in Sources */ = {isa = PBXBuildFile; fileRef = 57DE12612A13D74700FDF302 /* NewPostNavBar.swift */; };
@@ -120,7 +125,6 @@
 		5733AE562A1328E500193A85 /* ContainerScrollViewDatasource.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ContainerScrollViewDatasource.swift; sourceTree = "<group>"; };
 		5733AE572A1328E600193A85 /* ContainerScrollViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ContainerScrollViewController.swift; sourceTree = "<group>"; };
 		5733AE5C2A13294000193A85 /* BottomControllerProviderDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BottomControllerProviderDelegate.swift; sourceTree = "<group>"; };
-		57391E292A03A4A40096D00A /* ProfileNavBar.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProfileNavBar.swift; sourceTree = "<group>"; };
 		574039182A16145400A9A2F6 /* ProfileConfigurationController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProfileConfigurationController.swift; sourceTree = "<group>"; };
 		574039242A162DC000A9A2F6 /* ProfileEditViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProfileEditViewController.swift; sourceTree = "<group>"; };
 		574039282A162E9100A9A2F6 /* ProfileEditCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProfileEditCell.swift; sourceTree = "<group>"; };
@@ -162,6 +166,12 @@
 		57ABFC8929EA748400FF1BEB /* StorageManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StorageManager.swift; sourceTree = "<group>"; };
 		57ABFC8B29EA7AB900FF1BEB /* SignUpViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SignUpViewModel.swift; sourceTree = "<group>"; };
 		57B4E75729F665E000F5B977 /* PhotoSelectorViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PhotoSelectorViewModel.swift; sourceTree = "<group>"; };
+		57CA5F762A17C89B001D1E4A /* BottomSheetController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BottomSheetController.swift; sourceTree = "<group>"; };
+		57CA5F782A188AB4001D1E4A /* UINavigationController + Extension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "UINavigationController + Extension.swift"; sourceTree = "<group>"; };
+		57CA5F7A2A18D5B3001D1E4A /* FakeViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FakeViewController.swift; sourceTree = "<group>"; };
+		57CA5F7C2A193334001D1E4A /* BottomSheetSettings.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BottomSheetSettings.swift; sourceTree = "<group>"; };
+		57CA5F802A1A0A88001D1E4A /* ProfileSettingsSheetController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProfileSettingsSheetController.swift; sourceTree = "<group>"; };
+		57CA5F822A1A1534001D1E4A /* BottomSheetControllerVer2.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BottomSheetControllerVer2.swift; sourceTree = "<group>"; };
 		57DE12572A13962800FDF302 /* String + Extension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "String + Extension.swift"; sourceTree = "<group>"; };
 		57DE12592A13965900FDF302 /* PHAsset + Extenstion.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "PHAsset + Extenstion.swift"; sourceTree = "<group>"; };
 		57DE12612A13D74700FDF302 /* NewPostNavBar.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NewPostNavBar.swift; sourceTree = "<group>"; };
@@ -200,6 +210,7 @@
 		5733AE292A1324E000193A85 /* Utilities */ = {
 			isa = PBXGroup;
 			children = (
+				57CA5F752A17C884001D1E4A /* BottomSheetController */,
 				574039302A171A9400A9A2F6 /* CustomNavigationBar */,
 				5733AE2A2A13250000193A85 /* PagingViewController */,
 				5733AE512A1326D200193A85 /* ContainerScrollViewController */,
@@ -350,6 +361,7 @@
 			children = (
 				57ABFC6E29E9A7BB00FF1BEB /* ProfileViewController.swift */,
 				574039182A16145400A9A2F6 /* ProfileConfigurationController.swift */,
+				57CA5F802A1A0A88001D1E4A /* ProfileSettingsSheetController.swift */,
 			);
 			path = Controller;
 			sourceTree = "<group>";
@@ -357,7 +369,6 @@
 		574039222A16259800A9A2F6 /* View */ = {
 			isa = PBXGroup;
 			children = (
-				57391E292A03A4A40096D00A /* ProfileNavBar.swift */,
 			);
 			path = View;
 			sourceTree = "<group>";
@@ -554,6 +565,7 @@
 				57DE12572A13962800FDF302 /* String + Extension.swift */,
 				57DE12592A13965900FDF302 /* PHAsset + Extenstion.swift */,
 				57DE12652A147F2A00FDF302 /* UIImage + Extenstion.swift */,
+				57CA5F782A188AB4001D1E4A /* UINavigationController + Extension.swift */,
 			);
 			path = Extension;
 			sourceTree = "<group>";
@@ -614,6 +626,17 @@
 				575C4D5029F7BCC700C9287B /* NewPostViewModel.swift */,
 			);
 			path = "View Model";
+			sourceTree = "<group>";
+		};
+		57CA5F752A17C884001D1E4A /* BottomSheetController */ = {
+			isa = PBXGroup;
+			children = (
+				57CA5F762A17C89B001D1E4A /* BottomSheetController.swift */,
+				57CA5F7C2A193334001D1E4A /* BottomSheetSettings.swift */,
+				57CA5F7A2A18D5B3001D1E4A /* FakeViewController.swift */,
+				57CA5F822A1A1534001D1E4A /* BottomSheetControllerVer2.swift */,
+			);
+			path = BottomSheetController;
 			sourceTree = "<group>";
 		};
 		57DE12672A14BEE000FDF302 /* View */ = {
@@ -784,6 +807,7 @@
 				57ABFC8329EA647300FF1BEB /* User.swift in Sources */,
 				57ABFC7929E9BDA300FF1BEB /* Extentsion.swift in Sources */,
 				57ABFC8029EA627000FF1BEB /* AuthManager.swift in Sources */,
+				57CA5F7B2A18D5B3001D1E4A /* FakeViewController.swift in Sources */,
 				5733AE4A2A13268800193A85 /* PagingViewControllerDataSource.swift in Sources */,
 				576F57D929EC06A0002F2A6E /* HomeViewModel.swift in Sources */,
 				5720688529F433D500FB133B /* PhotoSelectorHeader.swift in Sources */,
@@ -798,6 +822,7 @@
 				57ABFC7C29EA507C00FF1BEB /* StatusView.swift in Sources */,
 				575C4D5129F7BCC700C9287B /* NewPostViewModel.swift in Sources */,
 				5733AE502A13269F00193A85 /* DefaultPagingMenuCell.swift in Sources */,
+				57CA5F812A1A0A88001D1E4A /* ProfileSettingsSheetController.swift in Sources */,
 				576F57C929EAD014002F2A6E /* LoginViewModel.swift in Sources */,
 				57AB72962A13316900FB5B09 /* ProfileBottomViewController.swift in Sources */,
 				5733AE442A13268800193A85 /* MenuBottomIndicator.swift in Sources */,
@@ -821,8 +846,10 @@
 				5718EAF52A05E73C00C44428 /* CommonPhotoCell.swift in Sources */,
 				5750500A2A03FD47008D2789 /* UserStatLabel.swift in Sources */,
 				5733AE532A13275700193A85 /* UIView + Extension.swift in Sources */,
+				57CA5F772A17C89B001D1E4A /* BottomSheetController.swift in Sources */,
 				57AB72982A1339B000FB5B09 /* ProfileHeaderMainView.swift in Sources */,
 				5740392D2A16701B00A9A2F6 /* ProfileDetailEditViewController.swift in Sources */,
+				57CA5F792A188AB4001D1E4A /* UINavigationController + Extension.swift in Sources */,
 				5733AE492A13268800193A85 /* PagingViewControllerDelegate.swift in Sources */,
 				5733AE582A1328E600193A85 /* BottomControllerProvider.swift in Sources */,
 				57ABFC6329E9A64600FF1BEB /* LogInViewController.swift in Sources */,
@@ -831,11 +858,12 @@
 				5733AE302A1325A100193A85 /* PagingViewController.swift in Sources */,
 				5733AE4C2A13268800193A85 /* MenuItemSize.swift in Sources */,
 				57ABFC6F29E9A7BB00FF1BEB /* ProfileViewController.swift in Sources */,
+				57CA5F7D2A193334001D1E4A /* BottomSheetSettings.swift in Sources */,
 				5718EAF72A05EC9000C44428 /* ProfileStoryCell.swift in Sources */,
 				5750500C2A03FD78008D2789 /* ActionProfileButton.swift in Sources */,
 				5740392B2A16484200A9A2F6 /* ProfileEditHeader.swift in Sources */,
+				57CA5F832A1A1534001D1E4A /* BottomSheetControllerVer2.swift in Sources */,
 				5733AE5B2A1328E600193A85 /* ContainerScrollViewController.swift in Sources */,
-				57391E2A2A03A4A40096D00A /* ProfileNavBar.swift in Sources */,
 				57ABFC6D29E9A7A900FF1BEB /* HomeViewController.swift in Sources */,
 				57ABFC8A29EA748400FF1BEB /* StorageManager.swift in Sources */,
 				5733AE592A1328E600193A85 /* PaginationableView.swift in Sources */,

@@ -29,15 +29,16 @@ extension ProfileEditViewController {
 }
 
 // MARK: - ProfileEditViewController
-class ProfileEditViewController: UIViewController {
+class ProfileEditViewController: UIViewController, CustomizableNavigationBar {
   
+  // MARK: - Properties
   var dataSource: [UserInfoData] = [
     .init(type: .name, data: "Duc Anh"),
     .init(type: .userName, data: "duc3385"),
     .init(type: .bio, data: "I'm something of developer myself. I'm something of developer myself. I'm something of developer myself")
   ]
   
-  private var navBar: CustomNavigationBar!
+  var navBar: CustomNavigationBar!
   private let headerView = ProfileEditHeader()
   private var tableView: UITableView!
   
@@ -61,6 +62,8 @@ class ProfileEditViewController: UIViewController {
   
   private func setupView() {
     navigationController?.isNavigationBarHidden = true
+    navigationController?.interactivePopGestureRecognizer?.isEnabled = true
+//    print("DEBUG: \(navigationController?.interactivePopGestureRecognizer)")
     view.backgroundColor = .systemBackground
     setupTableView()
     setupNavBar()

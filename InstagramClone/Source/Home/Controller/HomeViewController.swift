@@ -15,12 +15,11 @@ extension HomeViewController {
 }
 
 // MARK: - HomeViewController
-class HomeViewController: UIViewController {
-  
+class HomeViewController: UIViewController, CustomizableNavigationBar {
+
   // MARK: - Properties
   var collectionView: UICollectionView!
   var navBar: CustomNavigationBar!
-  
   var fakeView: UIView = {
     let view = UIView()
     view.translatesAutoresizingMaskIntoConstraints = false
@@ -88,6 +87,12 @@ extension HomeViewController: UICollectionViewDataSource {
 extension HomeViewController: UICollectionViewDelegate {
   
   func scrollViewDidEndDragging(_ scrollView: UIScrollView, willDecelerate decelerate: Bool) {
+    
+  }
+  
+  func scrollViewWillEndDragging(_ scrollView: UIScrollView,
+                                 withVelocity velocity: CGPoint,
+                                 targetContentOffset: UnsafeMutablePointer<CGPoint>) {
     guard scrollView == collectionView else { return }
     let currentOffset = scrollView.contentOffset.y
     

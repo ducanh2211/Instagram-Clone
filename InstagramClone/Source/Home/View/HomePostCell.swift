@@ -108,8 +108,8 @@ class HomePostCell: UICollectionViewCell {
     let shareImage = UIImage(systemName: "paperplane", withConfiguration: config)!
     let shareButton = AttributedButton(image: shareImage)
     
-    let saveImage = UIImage(systemName: "bookmark", withConfiguration: config)!
-    let saveButton = AttributedButton(image: saveImage)
+    let saveButton = AttributedButton(image: UIImage(named: "save-icon")!,
+                                      size: CGSize(width: 23, height: 22))
     
     let actionButtons = CustomNavigationBar(shouldShowSeparator: false,
                                             leftBarButtons: [likeButton, commentButton, shareButton],
@@ -169,15 +169,7 @@ class HomePostCell: UICollectionViewCell {
   required init?(coder: NSCoder) {
     fatalError("init(coder:) has not been implemented")
   }
-  
-  private func createButton(image: UIImage? = nil, title: String? = nil, size: CGSize) -> UIButton {
-    let button = UIButton(type: .system)
-    button.translatesAutoresizingMaskIntoConstraints = false
-    button.setImage(image, for: .normal)
-    button.setTitle(title, for: .normal)
-    button.tintColor = .label
-    return button
-  }
+
 }
 
 // MARK: - Setup
@@ -230,9 +222,9 @@ extension HomePostCell {
 //      saveButton.centerYAnchor.constraint(equalTo: buttonStack.centerYAnchor),
 //      saveButton.heightAnchor.constraint(equalToConstant: 22),
       
-      buttonActions.leftAnchor.constraint(equalTo: contentView.leftAnchor, constant: 15),
+      buttonActions.leftAnchor.constraint(equalTo: contentView.leftAnchor, constant: 3),
       buttonActions.topAnchor.constraint(equalTo: photoPostImageView.bottomAnchor, constant: 13),
-      buttonActions.rightAnchor.constraint(equalTo: contentView.rightAnchor, constant: -15),
+      buttonActions.rightAnchor.constraint(equalTo: contentView.rightAnchor, constant: -3),
       buttonActions.heightAnchor.constraint(equalToConstant: 22),
       
       bottomStack.leftAnchor.constraint(equalTo: contentView.leftAnchor, constant: 15),
