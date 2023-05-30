@@ -9,17 +9,21 @@ import UIKit
 
 protocol ProfileEditHeaderDelegate: AnyObject {
   func didTapEditAvatarButton()
+  func didTapAvatarImage()
 }
 
 class ProfileEditHeader: UIView {
 
-  private let profileImageView: UIImageView = {
+  // MARK: - Properties
+
+  private lazy var profileImageView: UIImageView = {
     let imv = UIImageView()
     imv.translatesAutoresizingMaskIntoConstraints = false
-    imv.contentMode = .scaleAspectFit
+    imv.contentMode = .scaleAspectFill
     imv.clipsToBounds = true
     imv.layer.cornerRadius = 80/2
-    imv.image = UIImage(named: "vtv24-logo")
+    imv.isUserInteractionEnabled = true
+    imv.addGestureRecognizer(UITapGestureRecognizer(target: self, action: #selector(didTapAvatarImage)))
     return imv
   }()
   
@@ -33,8 +37,16 @@ class ProfileEditHeader: UIView {
     return btn
   }()
   
+  var profileImage: UIImage? {
+    didSet { profileImageView.image = profileImage }
+  }
+  var profileImageString: String! {
+    didSet { profileImageView.sd_setImage(with: URL(string: profileImageString), placeholderImage: UIImage(named: "user"), context: nil) }
+  }
   weak var delegate: ProfileEditHeaderDelegate?
-  
+
+  // MARK: - Initializer
+
   override init(frame: CGRect) {
     super.init(frame: frame)
     setup()
@@ -42,6 +54,16 @@ class ProfileEditHeader: UIView {
   
   required init?(coder: NSCoder) {
     fatalError("init(coder:) has not been implemented")
+  }
+  
+  deinit {
+    print("DEBUG: ProfileEditHeader deinit")
+  }
+  
+  // MARK: - Functions
+
+  @objc private func didTapAvatarImage() {
+    delegate?.didTapAvatarImage()
   }
   
   @objc private func didTapEditAvatarButton() {
@@ -55,7 +77,7 @@ class ProfileEditHeader: UIView {
     NSLayoutConstraint.activate([
       profileImageView.topAnchor.constraint(equalTo: topAnchor, constant: 20),
       profileImageView.widthAnchor.constraint(equalToConstant: 80),
-      profileImageView.heightAnchor.constraint(equalTo: profileImageView.widthAnchor),
+      profileImageView.heightAnchor.constraint(equalToConstant: 80),
       profileImageView.centerXAnchor.constraint(equalTo: centerXAnchor),
         
       editAvatarButton.topAnchor.constraint(equalTo: profileImageView.bottomAnchor, constant: 10),

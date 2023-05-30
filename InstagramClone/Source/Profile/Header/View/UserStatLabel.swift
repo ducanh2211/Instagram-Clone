@@ -39,7 +39,6 @@ class UserStatLabel: UILabel {
   func setValue(_ value: Int) {
     self.value = value
     configureText()
-    
   }
   
   private func configureText() {

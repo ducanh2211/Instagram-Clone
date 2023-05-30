@@ -9,53 +9,28 @@ import Foundation
 import FirebaseFirestore
 
 struct Post {
-  var postId: String
-  var caption: String
-  var imageUrl: String
-  var aspectRatio: Double
-  var creationDate: Date
-  var uid: String
-  var likesCount: Int = 0
-  var commentsCount: Int = 0
-  
-  var user: User! = nil
+    var postId: String
+    var caption: String
+    var imageUrl: String
+    var aspectRatio: Double
+    var creationDate: Date
+
+    var user: User
+    var likesCount: Int = 0
+    var commentsCount: Int = 0
+    var likedByCurrentUser: Bool = false
 }
 
-extension Post: FirebaseModel {
-  init?(dictionary: [String : Any]) {
-    guard let postId = dictionary["post_id"] as? String,
-          let caption = dictionary["caption"] as? String,
-          let imageUrl = dictionary["image_url"] as? String,
-          let aspectRatio = dictionary["aspect_ratio"] as? Double,
-          let timestamp = dictionary["creation_date"] as? Timestamp,
-          let uid = dictionary["uid"] as? String,
-          let likesCount = dictionary["likes_count"] as? Int,
-          let commentsCount = dictionary["comments_count"] as? Int
-    else {
-      return nil
+extension Post {
+    init(user: User, dictionary: [String: Any]) {
+        let postId = dictionary[Firebase.Post.postId] as? String ?? ""
+        let caption = dictionary[Firebase.Post.caption] as? String ?? ""
+        let imageUrl = dictionary[Firebase.Post.imageUrl] as? String ?? ""
+        let aspectRatio = dictionary[Firebase.Post.aspectRatio] as? Double ?? 0
+        let timestamp = dictionary[Firebase.Post.creationDate] as? Timestamp ?? Timestamp()
+
+        self.init(postId: postId, caption: caption,
+                  imageUrl: imageUrl, aspectRatio: aspectRatio,
+                  creationDate: timestamp.dateValue(), user: user)
     }
-    
-    self.init(postId: postId, caption: caption,
-              imageUrl: imageUrl, aspectRatio: aspectRatio,
-              creationDate: timestamp.dateValue(), uid: uid,
-              likesCount: likesCount, commentsCount: commentsCount)
-  }
-  
-  init?(user: User, dictionary: [String: Any]) {
-    self.init(dictionary: dictionary)
-    self.user = user
-  }
-  
-  var description: [String : Any] {
-    [
-      "post_id": postId,
-      "caption": caption,
-      "image_url": imageUrl,
-      "aspect_ratio": aspectRatio,
-      "creation_date": Timestamp(date: creationDate),
-      "uid": uid,
-      "likes_count": likesCount,
-      "comments_count": commentsCount
-    ]
-  }
 }

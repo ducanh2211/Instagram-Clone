@@ -25,34 +25,6 @@ struct PagingMenuCollectionViewLayout {
     
     // Group
     switch menuItemSize {
-      case .fixed(let width, let height):
-        let size = NSCollectionLayoutSize(
-          widthDimension: .absolute(width),
-          heightDimension: .absolute(height)
-        )
-        let item = NSCollectionLayoutItem(layoutSize: size)
-        
-        group = NSCollectionLayoutGroup.horizontal(
-          layoutSize: size,
-          subitems: [item]
-        )
-        
-      case .flexible(let minWidth, let height):
-        let size = NSCollectionLayoutSize(
-          widthDimension: .fractionalWidth(1),
-          heightDimension: .absolute(height)
-        )
-        let item = NSCollectionLayoutItem(layoutSize: size)
-        
-        let groupSize = NSCollectionLayoutSize(
-          widthDimension: .estimated(minWidth),
-          heightDimension: .absolute(height)
-        )
-        group = NSCollectionLayoutGroup.horizontal(
-          layoutSize: groupSize,
-          subitems: [item]
-        )
-        
       case .fill(let height):
         let size = NSCollectionLayoutSize(
           widthDimension: .fractionalWidth(1),

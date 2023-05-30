@@ -27,12 +27,9 @@ protocol PagingViewControllerDelegate: AnyObject {
   ///   `False` khi transition không thành công và index sẽ giữ nguyên sau transition.
   ///
   func pagingViewController(_ pagingViewController: PagingViewController,
-                            isTrasitioning fromIndex: Int,
-                            toIndex: Int,
-                            currentIndex: Int,
+                            didTrasitioningAt currentIndex: Int,
                             progress: CGFloat,
-                            indexWasChange: Bool,
-                            success: Bool)
+                            indexJustChanged: Bool)
   
   /// Transition giữa các page controller đã hoàn thành.
   /// - Parameters:
@@ -63,9 +60,9 @@ extension PagingViewControllerDelegate {
   
   
   func pagingViewController(_ pagingViewController: PagingViewController,
-                            isTrasitioning fromIndex: Int, toIndex: Int,
-                            currentIndex: Int, progress: CGFloat,
-                            indexWasChange: Bool, success: Bool) {
+                            didTrasitioningAt currentIndex: Int,
+                            progress: CGFloat,
+                            indexJustChanged: Bool) {
     return
   }
   

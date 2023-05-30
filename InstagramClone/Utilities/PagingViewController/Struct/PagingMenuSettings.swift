@@ -29,6 +29,6 @@ struct PagingMenuSettings {
     self.selectedColor = .blue
     self.normalFont = .systemFont(ofSize: 13)
     self.selectedFont = .systemFont(ofSize: 13, weight: .semibold)
-    self.transitionTimeInterval = 0.3
+    self.transitionTimeInterval = 0.35
   }
 }

@@ -8,44 +8,44 @@
 import UIKit
 
 extension UIViewController: PaginationableView {
-  func getPaginationView() -> UIScrollView? {
-    if let view = view.subviews.first(where: { $0 is UIScrollView} ) {
-      return view as? UIScrollView
-    } else {
-      return nil
+    func getPaginationView() -> UIScrollView? {
+        if let view = view.subviews.first(where: { $0 is UIScrollView} ) {
+            return view as? UIScrollView
+        } else {
+            return nil
+        }
     }
-  }
-  
-  func hideKeyBoardWhenTapped() {
-    let tapGesture = UITapGestureRecognizer(target: self, action: #selector(UIViewController.dismissKeyboard))
-    tapGesture.cancelsTouchesInView = false
-    view.addGestureRecognizer(tapGesture)
-  }
-  
-  @objc func dismissKeyboard() {
-    view.endEditing(true)
-  }
-  
-  func addChildController(_ child: UIViewController, toView: UIView? = nil, frame: CGRect? = nil) {
-    addChild(child)
-    
-    if let frame = frame {
-      child.view.frame = frame
+
+    func hideKeyBoardWhenTapped() {
+        let tapGesture = UITapGestureRecognizer(target: self, action: #selector(UIViewController.dismissKeyboard))
+        tapGesture.cancelsTouchesInView = false
+        view.addGestureRecognizer(tapGesture)
+    }
+
+    @objc func dismissKeyboard() {
+        view.endEditing(true)
     }
     
-    if let toView = toView {
-      toView.addSubview(child.view)
-    } else {
-      view.addSubview(child.view)
+    func addChildController(_ child: UIViewController, toView: UIView? = nil, frame: CGRect? = nil) {
+        addChild(child)
+
+        if let frame = frame {
+            child.view.frame = frame
+        }
+
+        if let toView = toView {
+            toView.addSubview(child.view)
+        } else {
+            view.addSubview(child.view)
+        }
+
+        child.didMove(toParent: self)
     }
-    
-    child.didMove(toParent: self)
-  }
-  
-  func removeChildController() {
-    guard parent != nil else { return }
-    willMove(toParent: nil)
-    view.removeFromSuperview()
-    removeFromParent()
-  }
+
+    func removeChildController() {
+        guard parent != nil else { return }
+        willMove(toParent: nil)
+        view.removeFromSuperview()
+        removeFromParent()
+    }
 }

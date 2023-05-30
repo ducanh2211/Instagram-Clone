@@ -17,7 +17,7 @@ protocol PagingMenuUpdatable: AnyObject {
   ///   - success: `True` khi transition sẽ thành công và index sẽ thay đổi.
   ///   `False` khi transition không thành công và index sẽ giữ nguyên sau transition.
   ///
-  func didTransitioning(fromIndex: Int, toIndex: Int, progress: CGFloat, indexWasChange: Bool, success: Bool)
+    func didTransitioning(fromIndex: Int, toIndex: Int, currentIndex: Int, progress: CGFloat, indexWasChange: Bool, success: Bool)
   
   /// Update lại menu item khi transition đã hoàn thành (đã scroll xong).
   /// - Parameters:
