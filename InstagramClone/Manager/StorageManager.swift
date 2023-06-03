@@ -12,20 +12,16 @@ class StorageManager {
 
     static let shared: StorageManager = StorageManager()
 
-    private let storage: Storage = Storage.storage()
-
     private lazy var avatarRef: StorageReference = {
-//        storage.reference().child(Constants.Firebase.AVATAR_REF)
-        storage.reference().child(Firebase.RootCollection.avatar)
+        Storage.storage().reference().child(Firebase.RootCollection.avatar)
     }()
 
     private lazy var postImagesRef: StorageReference = {
-//        storage.reference().child(Constants.Firebase.POST_IMAGES_REF)
-        storage.reference().child(Firebase.RootCollection.postImages)
+        Storage.storage().reference().child(Firebase.RootCollection.postImages)
     }()
 
     deinit {
-        print("StorageManager deinit")
+        print("DEBUG: StorageManager deinit")
     }
 
     func uploadUserAvatar(_ imageData: Data, folderName: String,

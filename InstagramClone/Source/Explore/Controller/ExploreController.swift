@@ -7,24 +7,30 @@
 
 import UIKit
 
-class ExploreController: UIViewController, UserSearchViewDelegate {
+class ExploreController: UIViewController {
+
+    // MARK: - UI components
+
+    var searchView: UserSearchView!
+    var collectionView: UICollectionView!
+    var footerView: LoadingIndicatorFooterView!
+    let refreshControl = UIRefreshControl()
+    var searchViewHeightConstraint: NSLayoutConstraint!
+    let compositionalLayoutConfig = UICollectionViewCompositionalLayoutConfiguration()
+    var footerItem: NSCollectionLayoutBoundarySupplementaryItem!
 
     // MARK: - Properties
 
-    private var searchView: UserSearchView!
-    private var collectionView: UICollectionView!
-    private let refreshControl = UIRefreshControl()
-    private var searchViewHeightConstraint: NSLayoutConstraint!
-    private let searchViewHeight: CGFloat = 56
+    let searchViewHeight: CGFloat = 56
+    private let viewModel: ExploreViewModel
     private var currentUser: User
-    private var posts: [Post] = [] {
-        didSet { collectionView.reloadData() }
-    }
+    private var posts = [Post]()
 
     // MARK: - Life cycle
 
     init(currentUser: User) {
         self.currentUser = currentUser
+        self.viewModel = ExploreViewModel(currentUid: currentUser.uid)
         super.init(nibName: nil, bundle: nil)
     }
 
@@ -35,12 +41,7 @@ class ExploreController: UIViewController, UserSearchViewDelegate {
     override func viewDidLoad() {
         super.viewDidLoad()
         setupView()
-        fetchPosts()
-    }
-
-    override func viewWillDisappear(_ animated: Bool) {
-        super.viewWillDisappear(animated)
-        searchView.searchBar.resignFirstResponder()
+        bindViewModel()
     }
 
     override func viewDidAppear(_ animated: Bool) {
@@ -50,17 +51,38 @@ class ExploreController: UIViewController, UserSearchViewDelegate {
         }
     }
 
-    // MARK: - Functions
-
-    func fetchPosts() {
-        PostManager.shared.fetchExplorePosts { posts in
-            DispatchQueue.main.async {
-                let sortedPosts = posts.sorted { $0.creationDate > $1.creationDate }
-                self.posts = sortedPosts
-            }
-        }
+    override func viewWillDisappear(_ animated: Bool) {
+        super.viewWillDisappear(animated)
+        searchView.searchBar.resignFirstResponder()
     }
 
+    // MARK: - Functions
+
+    private func bindViewModel() {
+        viewModel.updatePostsData = { [weak self] in
+            guard let self = self else { return }
+            self.refreshControl.endRefreshing()
+            self.posts = self.viewModel.posts
+            self.collectionView.reloadData()
+        }
+        viewModel.getPosts()
+    }
+
+    @objc func handleRefresh() {
+        viewModel.removeData()
+        viewModel.getPosts()
+        shouldShowFooterView(true)
+    }
+
+    private func shouldShowFooterView(_ show: Bool) {
+        compositionalLayoutConfig.boundarySupplementaryItems = show ? [footerItem] : []
+        (collectionView.collectionViewLayout as? UICollectionViewCompositionalLayout)?.configuration = compositionalLayoutConfig
+    }
+}
+
+// MARK: - UserSearchViewDelegate
+
+extension ExploreController: UserSearchViewDelegate {
     func didSelectUser(_ user: User) {
         let otherUser = currentUser.uid == user.uid ? nil : user
         let vc = ProfileController(currentUser: currentUser, otherUser: otherUser)
@@ -76,7 +98,7 @@ class ExploreController: UIViewController, UserSearchViewDelegate {
     }
 }
 
-// MARK: - UICollectionViewDataSource
+// MARK: - UICollectionViewDataSource, Delegate
 
 extension ExploreController: UICollectionViewDataSource, UICollectionViewDelegate {
     func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
@@ -84,7 +106,8 @@ extension ExploreController: UICollectionViewDataSource, UICollectionViewDelegat
     }
 
     func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
-        let cell = collectionView.dequeueReusableCell(withReuseIdentifier: PhotoCollectionViewCell.identifier, for: indexPath) as! PhotoCollectionViewCell
+        let cell = collectionView.dequeueReusableCell(
+            withReuseIdentifier: PhotoCollectionViewCell.identifier, for: indexPath) as! PhotoCollectionViewCell
         let post = posts[indexPath.item]
         cell.configure(with: post.imageUrl)
         return cell
@@ -95,72 +118,38 @@ extension ExploreController: UICollectionViewDataSource, UICollectionViewDelegat
         let vc = PostDetailController(post: post, currentUser: currentUser)
         navigationController?.pushViewController(vc, animated: true)
     }
-}
 
-// MARK: - Setup
-
-extension ExploreController {
-    private func setupView() {
-        view.backgroundColor = .systemBackground
-        navigationController?.isNavigationBarHidden = true
-        setupSearchView()
-        setupCollectionView()
-        setupConstraints()
+    func collectionView(_ collectionView: UICollectionView,
+                        viewForSupplementaryElementOfKind kind: String, at indexPath: IndexPath) -> UICollectionReusableView {
+        if kind == UICollectionView.elementKindSectionFooter {
+            let footer = collectionView.dequeueReusableSupplementaryView(
+                ofKind: kind, withReuseIdentifier: LoadingIndicatorFooterView.identifier, for: indexPath) as! LoadingIndicatorFooterView
+            footerView = footer
+            footerView.startAnimating()
+            return footer
+        }
+        return UICollectionReusableView()
     }
 
-    private func setupSearchView() {
-        searchView = UserSearchView()
-        searchView.delegate = self
+    func collectionView(_ collectionView: UICollectionView,
+                        didEndDisplayingSupplementaryView view: UICollectionReusableView,
+                        forElementOfKind elementKind: String, at indexPath: IndexPath) {
+        if elementKind == UICollectionView.elementKindSectionFooter {
+            footerView.stopAnimating()
+        }
     }
 
-    private func setupCollectionView() {
-        collectionView = UICollectionView(frame: .zero, collectionViewLayout: createCollectionViewLayout())
-        collectionView.dataSource = self
-        collectionView.delegate = self
-        collectionView.register(PhotoCollectionViewCell.self, forCellWithReuseIdentifier: PhotoCollectionViewCell.identifier)
-    }
+    func scrollViewDidEndDecelerating(_ scrollView: UIScrollView) {
+        let currentOffset = scrollView.contentOffset.y
+        let maximumOffset = scrollView.contentSize.height - scrollView.frame.height
 
-    private func setupConstraints() {
-        searchView.translatesAutoresizingMaskIntoConstraints = false
-        collectionView.translatesAutoresizingMaskIntoConstraints = false
-        view.addSubview(collectionView)
-        view.addSubview(searchView)
-
-        searchViewHeightConstraint = searchView.heightAnchor.constraint(equalToConstant: searchViewHeight)
-
-        NSLayoutConstraint.activate([
-            searchView.leftAnchor.constraint(equalTo: view.leftAnchor),
-            searchView.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor),
-            searchView.rightAnchor.constraint(equalTo: view.rightAnchor),
-            searchViewHeightConstraint,
-
-            collectionView.leftAnchor.constraint(equalTo: view.leftAnchor),
-            collectionView.topAnchor.constraint(equalTo: searchView.topAnchor),
-            collectionView.rightAnchor.constraint(equalTo: view.rightAnchor),
-            collectionView.bottomAnchor.constraint(equalTo: view.bottomAnchor)
-        ])
-    }
-
-    private func createCollectionViewLayout() -> UICollectionViewCompositionalLayout {
-        let itemSize = NSCollectionLayoutSize(
-            widthDimension: .fractionalWidth(1/3),
-            heightDimension: .fractionalWidth(1/3)
-        )
-        let item = NSCollectionLayoutItem(layoutSize: itemSize)
-        item.contentInsets = .init(top: 0, leading: 0.5, bottom: 0, trailing: 0.5)
-
-        let groupSize = NSCollectionLayoutSize(
-            widthDimension: .fractionalWidth(1)
-            , heightDimension: .fractionalWidth(1/3)
-        )
-        let group = NSCollectionLayoutGroup.horizontal(
-            layoutSize: groupSize,
-            subitems: [item]
-        )
-
-        let section = NSCollectionLayoutSection(group: group)
-        section.interGroupSpacing = 1
-        section.contentInsets = NSDirectionalEdgeInsets(top: searchViewHeight, leading: 0, bottom: 0, trailing: 0)
-        return UICollectionViewCompositionalLayout(section: section)
+        if maximumOffset - currentOffset <= 20 {
+            if !viewModel.isFechingMore {
+                viewModel.getMorePosts()
+            }
+            if viewModel.hasReachedTheEnd {
+                shouldShowFooterView(false)
+            }
+        }
     }
 }

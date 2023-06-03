@@ -19,7 +19,6 @@ class CommentHeader: UICollectionReusableView {
         imageView.contentMode = .scaleAspectFill
         imageView.clipsToBounds = true
         imageView.layer.cornerRadius = 30/2
-        imageView.backgroundColor = .systemPink
         return imageView
     }()
 

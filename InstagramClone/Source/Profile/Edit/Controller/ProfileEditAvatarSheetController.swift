@@ -107,6 +107,28 @@ class ProfileEditAvatarSheetController: BottomSheetViewController {
   }
 }
 
+// MARK: - UITableViewDataSource
+
+extension ProfileEditAvatarSheetController: UITableViewDataSource, UITableViewDelegate {
+    func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
+        return dataSource.count
+    }
+
+    func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
+        let cell = tableView.dequeueReusableCell(
+            withIdentifier: ProfileConfigurationCell.identifier,
+            for: indexPath) as! ProfileConfigurationCell
+        cell.setting = dataSource[indexPath.row]
+        return cell
+    }
+
+    func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
+        removeSheet()
+        guard let option = Options(rawValue: indexPath.row) else { return }
+        delegate?.didSelectOption(self, option: option)
+    }
+}
+
 // MARK: - Setup
 
 extension ProfileEditAvatarSheetController {
@@ -141,24 +163,3 @@ extension ProfileEditAvatarSheetController {
   }
 }
 
-// MARK: - UITableViewDataSource
-
-extension ProfileEditAvatarSheetController: UITableViewDataSource, UITableViewDelegate {
-  func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-    return dataSource.count
-  }
-  
-  func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
-    let cell = tableView.dequeueReusableCell(
-      withIdentifier: ProfileConfigurationCell.identifier,
-      for: indexPath) as! ProfileConfigurationCell
-    cell.setting = dataSource[indexPath.row]
-    return cell
-  }
-  
-  func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
-    self.removeSheet()
-    guard let option = Options(rawValue: indexPath.row) else { return }
-    delegate?.didSelectOption(self, option: option)
-  }
-}

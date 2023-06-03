@@ -168,7 +168,7 @@ extension SignUpViewController {
             self?.navigationController?.popViewController(animated: true)
         }
 
-        navBar = CustomNavigationBar(title: "Create account", leftBarButtons: [backButton])
+        navBar = CustomNavigationBar(title: "Create account", shouldShowSeparator: true, leftBarButtons: [backButton])
     }
 
     private func setupConstraints() {

@@ -17,21 +17,16 @@ class NewPostViewModel {
     var createPostSuccess: (() -> Void)?
     var createPostFailure: ((Error) -> Void)?
 
-    //  private let postManager: PostManager
-    //
-    //  init(postManager: PostManager = PostManager()) {
-    //    self.postManager = postManager
-    //  }
-
     deinit {
-        print("NewPostViewModel deinit")
+        print("DEBUG: NewPostViewModel deinit")
     }
 
     func createPost(withImage imageData: Data,
                     aspectRatio: Double, caption: String) {
         isLoading = true
 
-        PostManager.shared.createPost(withImage: imageData, imageAspectRatio: aspectRatio, caption: caption) { error in
+        PostManager.shared.createPost(withImage: imageData, imageAspectRatio: aspectRatio, caption: caption) { [weak self] error in
+            guard let self = self else { return }
             self.isLoading = false
             if let error = error {
                 self.createPostFailure?(error)

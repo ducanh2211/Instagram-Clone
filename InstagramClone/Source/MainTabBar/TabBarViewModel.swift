@@ -27,11 +27,11 @@ class TabBarViewModel {
         let uid = auth.currentUser!.uid
 
         // completion call on background thread
-        UserManager.shared.fetchUser(withUid: uid) { user , error in
+        UserManager.shared.fetchUser(withUid: uid) { [weak self] user , error in
             print("DEBUG: fetch user da den")
             guard error == nil else { return }
-            self.user = user
-            self.receivedUser?()
+            self?.user = user
+            self?.receivedUser?()
         }
     }
 }

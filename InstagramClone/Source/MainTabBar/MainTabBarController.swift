@@ -69,7 +69,7 @@ extension MainTabBarController {
         let postNav = setupPost()
         let reelsNav = setupReels()
         let profileNav = setupProfile(user: user)
-        self.setViewControllers([homeNav, searchNav, postNav, reelsNav, profileNav], animated: false)
+        setViewControllers([homeNav, searchNav, postNav, reelsNav, profileNav], animated: false)
     }
 
     private func setupHome(user: User) -> UINavigationController {
@@ -144,7 +144,7 @@ extension MainTabBarController: UITabBarControllerDelegate {
         if index == 2 {
             let nav = UINavigationController(rootViewController: PhotoSelectorController())
             nav.modalPresentationStyle = .fullScreen
-            self.present(nav, animated: true)
+            present(nav, animated: true)
             return false
         }
         return true

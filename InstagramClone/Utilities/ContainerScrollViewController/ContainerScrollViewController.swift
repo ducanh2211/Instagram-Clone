@@ -28,20 +28,20 @@ class ContainerScrollViewController: UIViewController {
     }
 
     /// Height tối thiểu của `headerView` nơi mà nó sẽ dính vào top screen. Khi đó
-    /// `containerScrollView` sẽ dừng scroll và`paginationView` sẽ được scroll.
+    /// `containerScrollView` sẽ dừng scroll và`panView` sẽ được scroll.
     private var minHeaderHeight: CGFloat {
         dataSource.minHeaderViewHeight
     }
 
-    /// Dùng để track index hiện tại của paginationView đang được hiển thị trên màn hình.
+    /// Dùng để track index hiện tại của panView đang được hiển thị trên màn hình.
     private var currentIndex: Int = 0
 
     /// Dùng để track content offset cho từng pagination view.
     private var currentContentOffsets: [Int: CGFloat] = [:]
 
     /// Dùng để lưu lại toàn bộ pagination views (về cơ bản thì đây sẽ là các scroll view thuộc các page controller của `bottomVC`)
-    private var paginationViews: [Int: UIScrollView] = [:] {
-        didSet { configurePaginationView() }
+    private var panViews: [Int: UIScrollView] = [:] {
+        didSet { configurePanView() }
     }
 
     /// Là scroll view dùng để chứa subviews `headerView` và `bottomView`.
@@ -49,7 +49,7 @@ class ContainerScrollViewController: UIViewController {
     private var contentView: UIView!
 
     /// Là scroll view sẽ thực sự được scroll,
-    /// nó sẽ tính toán offset để cho phép `containerSrollView` hoặc `paginationViews` được phép scroll.
+    /// nó sẽ tính toán offset để cho phép `containerSrollView` hoặc `panViews` được phép scroll.
     private var logicHandlerScrollView: UIScrollView!
 
     /// Phần header view controller.
@@ -73,7 +73,7 @@ class ContainerScrollViewController: UIViewController {
     }
 
     deinit {
-        paginationViews.forEach { (_, scrollView) in
+        panViews.forEach { (_, scrollView) in
             scrollView.removeObserver(self, forKeyPath: #keyPath(UIScrollView.contentSize), context: nil)
         }
     }
@@ -84,27 +84,28 @@ class ContainerScrollViewController: UIViewController {
                                change: [NSKeyValueChangeKey : Any]?,
                                context: UnsafeMutableRawPointer?) {
 
-        if let object = object as? UIScrollView, let paginationView = paginationViews[currentIndex], object == paginationView {
-            if let contentSize = change?[.newKey] as? CGSize, keyPath == #keyPath(UIScrollView.contentSize) {
-                let height = max(
-                    contentSize.height + headerHeight + menuItemHeight, // Trường hợp content height > view.bounds.height
-                    view.frame.height + headerHeight - minHeaderHeight  // Trường hợp content height < view.bounds.height
-                )
-                logicHandlerScrollView.contentSize = CGSize(width: contentSize.width, height: height)
+//        if let object = object as? UIScrollView, let panView = panViews[currentIndex], object == panView {
+//            if let contentSize = change?[.newKey] as? CGSize, keyPath == #keyPath(UIScrollView.contentSize) {
+//                let height = max(
+//                    contentSize.height + headerHeight + menuItemHeight, // Trường hợp content height > view.bounds.height
+//                    view.frame.height + headerHeight - minHeaderHeight  // Trường hợp content height < view.bounds.height
+//                )
+//                logicHandlerScrollView.contentSize = CGSize(width: contentSize.width, height: height)
+//                print("DEBUG: \(logicHandlerScrollView.contentSize)")
+//            }
+//        }
+
+        if let object = object as? UIScrollView, keyPath == #keyPath(UIScrollView.contentSize) {
+            if let panView = panViews[currentIndex], object == panView  {
+                updateLogicHanlderScrollContentSize(with: panView)
             }
         }
-
-        //    if let object = object as? UIScrollView, keyPath == #keyPath(UIScrollView.contentSize) {
-        //      if let paginationView = paginationViews[currentIndex], object == paginationView  {
-        //        self.updateLogicHanlderScrollContentSize(with: paginationView)
-        //        print("DEBUG: scroll view: \(paginationView.contentSize)")
-        //      }
-        //    }
     }
 
     /// Update lại content size của `logicHandlerScrollView`.
     private func updateLogicHanlderScrollContentSize(with scrollView: UIScrollView) {
         logicHandlerScrollView.contentSize = getContentSize(for: scrollView)
+        print("DEBUG: size \(getContentSize(for: scrollView))")
     }
 
     /// Tính toán lại content size.
@@ -116,13 +117,13 @@ class ContainerScrollViewController: UIViewController {
         return CGSize(width: scrollView.contentSize.width, height: height)
     }
 
-    /// Configure mỗi `paginationView` trước khi được được add vào dictionary `paginationViews`.
-    private func configurePaginationView() {
-        if let scrollView = paginationViews[currentIndex] {
-            //`currentGestureRecognizer.require(toFail otherGestureRecognizer:)`:
-            // là method dùng để bắt buộc `currentGestureRecognizer` đợi cho đến khi `otherGestureRecognizer`
+    /// Configure mỗi `panView` trước khi được được add vào dictionary `panViews`.
+    private func configurePanView() {
+        if let scrollView = panViews[currentIndex] {
+            //`currentGestureRecognizer.require(toFail otherGestureRecognizer:)`: là method dùng
+            // để bắt buộc `currentGestureRecognizer` đợi cho đến khi `otherGestureRecognizer`
             // chuyển sang `UIGestureRecognizer.State.fail` thì nó mới có thể được kích hoạt. Trong trường hợp này,
-            // `paginationView` chỉ được phép scroll "khi và chỉ khi"  panGestureRecognizer của`logicHandlerScrollView` return `fail`.
+            // `panView` chỉ được phép scroll "khi và chỉ khi" panGestureRecognizer của`logicHandlerScrollView` return `fail`.
             scrollView.panGestureRecognizer.require(toFail: logicHandlerScrollView.panGestureRecognizer)
             scrollView.addObserver(self, forKeyPath: #keyPath(UIScrollView.contentSize), options: .new, context: nil)
             scrollView.contentInsetAdjustmentBehavior = .never
@@ -138,12 +139,12 @@ extension ContainerScrollViewController: UIScrollViewDelegate {
         currentContentOffsets[currentIndex] = currentOffset
 
         // Khoảng cách xa nhất mà `overlayScrollView` cho phép `containerScrollView` được scroll
-        // trước khi header bị dính vào top screen, và `paginationView` sau đó sẽ được scroll.
+        // trước khi header bị dính vào top screen, và `panView` sau đó sẽ được scroll.
         let maximumScrollDistance = headerHeight - minHeaderHeight
 
         if currentOffset < maximumScrollDistance {
             containerSrollView.contentOffset.y = currentOffset
-            paginationViews.forEach { (_, scrollView) in
+            panViews.forEach { (_, scrollView) in
                 scrollView.contentOffset.y = 0
             }
             currentContentOffsets.removeAll()
@@ -151,8 +152,8 @@ extension ContainerScrollViewController: UIScrollViewDelegate {
         else {
             containerSrollView.contentOffset.y = maximumScrollDistance
             let targetOffset = currentOffset - maximumScrollDistance
-            if let paginationView = paginationViews[currentIndex] {
-                paginationView.contentOffset.y = targetOffset
+            if let panView = panViews[currentIndex] {
+                panView.contentOffset.y = targetOffset
             }
         }
     }
@@ -168,22 +169,22 @@ extension ContainerScrollViewController: BottomControllerProviderDelegate {
         // Nếu `currentContentOffsets[currentIndex]` == `nil` thì chỉ có 2 trường hợp:
         // 1. `containerScrollView` đã được phép scroll dẫn đến header không còn dính vào top screen nữa.
         // Khi đó, `currentContentOffsets.removeAll()` sẽ được gọi trên `scrollViewDidScroll`.
-        // 2. `paginationViews[currentIndex]` == `nil` (i.e. chưa được add).
+        // 2. `panViews[currentIndex]` == `nil` (i.e. chưa được add).
         if let contentOffset = currentContentOffsets[currentIndex] {
             logicHandlerScrollView.contentOffset.y = contentOffset
         } else {
             logicHandlerScrollView.contentOffset.y = containerSrollView.contentOffset.y
         }
 
-        if let paginationView = currentViewController.getPaginationView(), paginationViews[currentIndex] == nil {
-            paginationViews[currentIndex] = paginationView
+        if let panView = currentViewController.getPaginationView(), panViews[currentIndex] == nil {
+            panViews[currentIndex] = panView
         }
 
-        // Update lại `contentSize` của `logicHandlerScrollView` với `paginationView` (i.e. scrollView).
-        // Xảy ra lỗi nếu không có dòng code này: khi chuyển từ `paginationView` có contentSize nhỏ hơn sang `paginationView`
-        // có contentSize lớn hơn sẽ làm cho `paginationView` lớn hơn không thể scroll được. Vì vậy cần update contentSize. */
-        if let paginationView = paginationViews[currentIndex] {
-            updateLogicHanlderScrollContentSize(with: paginationView)
+        // Update lại `contentSize` của `logicHandlerScrollView` với `panView` (i.e. scrollView).
+        // Xảy ra lỗi nếu không có dòng code này: khi chuyển từ `panView` có contentSize nhỏ hơn sang `panView`
+        // có contentSize lớn hơn sẽ làm cho `panView` lớn hơn không thể scroll được. Vì vậy cần update contentSize. */
+        if let panView = panViews[currentIndex] {
+            updateLogicHanlderScrollContentSize(with: panView)
         }
     }
 }
@@ -262,6 +263,6 @@ extension ContainerScrollViewController {
         ])
 
         let controller = bottomVC.currentViewController
-        paginationViews[currentIndex] = controller.getPaginationView()
+        panViews[currentIndex] = controller.getPaginationView()
     }
 }

@@ -1,19 +1,19 @@
 //
-//  CommentInputAccessoryView.swift
+//  CommentInputView.swift
 //  InstagramClone
 //
-//  Created by Đức Anh Trần on 28/05/2023.
+//  Created by Đức Anh Trần on 02/06/2023.
 //
 
 import UIKit
 
-protocol CommentInputAccessoryDelegate: AnyObject {
+protocol CommentInputViewDelegate: AnyObject {
     func didTapSendButton(with text: String)
 }
 
-class CommentInputAccessoryView: UIView, UITextViewDelegate {
+class CommentInputView: UIView, UITextViewDelegate {
 
-    // MARK: - Properties
+    // MARK: - UI components
 
     private let separatorView: UIView = {
         let view = UIView()
@@ -27,21 +27,24 @@ class CommentInputAccessoryView: UIView, UITextViewDelegate {
         imageView.translatesAutoresizingMaskIntoConstraints = false
         imageView.contentMode = .scaleAspectFill
         imageView.clipsToBounds = true
-        imageView.layer.cornerRadius = 40/2
+        imageView.layer.cornerRadius = 42/2
         imageView.backgroundColor = .systemPink
         return imageView
     }()
 
-    let inputTextView: PlaceholderTextView = {
+    private let containerView: UIView = {
+        let view = UIView()
+        view.translatesAutoresizingMaskIntoConstraints = false
+        view.layer.borderColor = UIColor.systemGray3.cgColor
+        view.layer.borderWidth = 0.35
+        view.layer.cornerRadius = 42/2
+        view.clipsToBounds = true
+        return view
+    }()
+
+    private let inputTextView: PlaceholderTextView = {
         let textView = PlaceholderTextView()
         textView.translatesAutoresizingMaskIntoConstraints = false
-        textView.textContainerInset = UIEdgeInsets(top: 10, left: 12, bottom: 10, right: 12)
-        textView.layer.borderColor = UIColor.systemGray3.cgColor
-        textView.layer.borderWidth = 1
-        textView.layer.cornerRadius = 40/2
-        textView.showsVerticalScrollIndicator = false
-        textView.placeHolderLeftConstraintConstant = 18
-        textView.placeHolderTopConstraintConstant = 10
         textView.placeHolderText = "Add a comment..."
         return textView
     }()
@@ -51,7 +54,7 @@ class CommentInputAccessoryView: UIView, UITextViewDelegate {
         button.translatesAutoresizingMaskIntoConstraints = false
         button.isEnabled = false
         button.alpha = 0.4
-        button.titleLabel?.font = .systemFont(ofSize: 15, weight: .bold)
+        button.titleLabel?.font = .systemFont(ofSize: 14, weight: .semibold)
         button.setTitle("Post", for: .normal)
         button.setTitleColor(UIColor.link, for: .normal)
         button.setContentCompressionResistancePriority(.defaultHigh + 1, for: .vertical)
@@ -59,27 +62,25 @@ class CommentInputAccessoryView: UIView, UITextViewDelegate {
         return button
     }()
 
-    // MARK: - Initializer
+    // MARK: - Properties
 
-    var initialHeight: CGFloat = 60
-    weak var delegate: CommentInputAccessoryDelegate?
+    weak var delegate: CommentInputViewDelegate?
+    let initialHeight: CGFloat = 62
     var profileImageString: String = "" {
         didSet {
             profileImageView.sd_setImage(with: URL(string: profileImageString), placeholderImage: UIImage(named: "user"), context: nil)
         }
     }
-
     private var inputTextViewHeightConstraint: NSLayoutConstraint!
-    private let minHeight: CGFloat = 40
+    private let minHeight: CGFloat = 32
     private let maxHeight: CGFloat = 100
 
-    override var intrinsicContentSize: CGSize {
-        return .zero
-    }
+    // MARK: - Initializer
 
     override init(frame: CGRect) {
         super.init(frame: frame)
-        autoresizingMask = .flexibleHeight
+        backgroundColor = .systemBackground
+        inputTextView.delegate = self
         setup()
     }
 
@@ -97,17 +98,17 @@ class CommentInputAccessoryView: UIView, UITextViewDelegate {
 
     private func clearTextView() {
         inputTextView.text = nil
+        inputTextView.resignFirstResponder()
         inputTextView.textDidChange()
         textViewDidChange(inputTextView)
-//        disableSendButton()
     }
 
     func textViewDidChange(_ textView: UITextView) {
-        let currentHeight = textView.contentSize.height
-        inputTextViewHeightConstraint.constant = min(maxHeight, max(currentHeight, minHeight))
+        let height = textView.contentSize.height
+        inputTextViewHeightConstraint.constant = min(maxHeight, max(minHeight, height))
         layoutIfNeeded()
 
-        if textView.text.isEmpty {
+        if textView.text.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty {
             disableSendButton()
         } else {
             enableSendButton()
@@ -124,17 +125,14 @@ class CommentInputAccessoryView: UIView, UITextViewDelegate {
         sendButton.alpha = 0.4
     }
 
-    private func setup() {
-        backgroundColor = .systemGroupedBackground
-        inputTextView.delegate = self
-        setupConstraints()
-    }
+    // MARK: - Setup
 
-    private func setupConstraints() {
+    func setup() {
         addSubview(separatorView)
         addSubview(profileImageView)
-        addSubview(inputTextView)
-        addSubview(sendButton)
+        addSubview(containerView)
+        containerView.addSubview(inputTextView)
+        containerView.addSubview(sendButton)
 
         inputTextViewHeightConstraint = inputTextView.heightAnchor.constraint(equalToConstant: minHeight)
 
@@ -144,19 +142,26 @@ class CommentInputAccessoryView: UIView, UITextViewDelegate {
             separatorView.rightAnchor.constraint(equalTo: rightAnchor),
             separatorView.heightAnchor.constraint(equalToConstant: 0.25),
 
-            profileImageView.leftAnchor.constraint(equalTo: leftAnchor, constant: 12),
-            profileImageView.bottomAnchor.constraint(equalTo: safeAreaLayoutGuide.bottomAnchor, constant: -(initialHeight - minHeight)/2),
-            profileImageView.widthAnchor.constraint(equalToConstant: 40),
+            profileImageView.leftAnchor.constraint(equalTo: leftAnchor, constant: 15),
+            profileImageView.bottomAnchor.constraint(equalTo: bottomAnchor, constant: -10),
+            profileImageView.widthAnchor.constraint(equalToConstant: 42),
             profileImageView.heightAnchor.constraint(equalTo: profileImageView.widthAnchor),
 
-            inputTextView.leftAnchor.constraint(equalTo: profileImageView.rightAnchor, constant: 8),
-            inputTextView.topAnchor.constraint(equalTo: topAnchor, constant: (initialHeight - minHeight)/2),
-            inputTextView.bottomAnchor.constraint(equalTo: profileImageView.bottomAnchor),
+            containerView.leftAnchor.constraint(equalTo: profileImageView.rightAnchor, constant: 10),
+            containerView.topAnchor.constraint(equalTo: topAnchor, constant: 10),
+            containerView.rightAnchor.constraint(equalTo: rightAnchor, constant: -15),
+            containerView.bottomAnchor.constraint(equalTo: profileImageView.bottomAnchor),
+
+            inputTextView.leftAnchor.constraint(equalTo: containerView.leftAnchor, constant: 8),
+            inputTextView.topAnchor.constraint(equalTo: containerView.topAnchor, constant: 5),
+            inputTextView.bottomAnchor.constraint(equalTo: containerView.bottomAnchor, constant: -5),
             inputTextViewHeightConstraint,
 
-            sendButton.leftAnchor.constraint(equalTo: inputTextView.rightAnchor, constant: 15),
-            sendButton.rightAnchor.constraint(equalTo: rightAnchor, constant: -15),
+            sendButton.leftAnchor.constraint(equalTo: inputTextView.rightAnchor),
+            sendButton.rightAnchor.constraint(equalTo: containerView.rightAnchor),
             sendButton.centerYAnchor.constraint(equalTo: profileImageView.centerYAnchor),
+            sendButton.widthAnchor.constraint(equalToConstant: 50),
+            sendButton.heightAnchor.constraint(equalToConstant: 42)
         ])
     }
 }

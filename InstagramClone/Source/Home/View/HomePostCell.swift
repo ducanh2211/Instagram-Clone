@@ -14,6 +14,7 @@ protocol HomePostCellDelegate: AnyObject {
     func didTapCommentButton(_ cell: HomePostCell)
     func didTapLikeCounterLabel(_ cell: HomePostCell)
     func didTapCommentCounterLabel(_ cell: HomePostCell)
+    func didTapCaptionLabel(_ cell: HomePostCell)
 }
 
 class HomePostCell: UICollectionViewCell {
@@ -95,6 +96,9 @@ class HomePostCell: UICollectionViewCell {
         let label = createLalbel(contentHugging: .defaultHigh, contentCompression: .required - 1)
         label.numberOfLines = 0
         label.lineBreakMode = .byWordWrapping
+        let tap = UITapGestureRecognizer(target: self, action: #selector(didTapCaptionLabel))
+        label.addGestureRecognizer(tap)
+        label.isUserInteractionEnabled = true
         return label
     }()
 
@@ -236,6 +240,10 @@ class HomePostCell: UICollectionViewCell {
 
     @objc private func didTapCommentCounterLabel() {
         delegate?.didTapCommentCounterLabel(self)
+    }
+
+    @objc private func didTapCaptionLabel() {
+        delegate?.didTapCaptionLabel(self)
     }
 
     // MARK: - Helper

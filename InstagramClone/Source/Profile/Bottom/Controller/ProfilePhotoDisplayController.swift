@@ -9,17 +9,32 @@ import UIKit
 
 class ProfilePhotoDisplayController: UICollectionViewController {
 
-    var otherUser: User?
-    var currentUser: User {
-        didSet { fetchPosts() }
-    }
-    private var posts: [Post] = [] {
-        didSet { collectionView.reloadData() }
-    }
+    var footerView: LoadingIndicatorFooterView!
+    let compositionalLayoutConfig = UICollectionViewCompositionalLayoutConfiguration()
+    var footerItem: NSCollectionLayoutBoundarySupplementaryItem!
 
+    // MARK: - Properties
+
+    var currentUser: User {
+        didSet {
+            if rootViewHasLoaded {
+                reloadData()
+            }
+        }
+    }
+    private let viewModel: ProfilePhotoDisplayViewModel
+    private var posts: [Post] = []
+    private var rootViewHasLoaded: Bool = false
+
+    // MARK: - Initializer
+    
     init(currentUser: User, otherUser: User?) {
         self.currentUser = currentUser
-        self.otherUser = otherUser
+        if let otherUser = otherUser {
+            viewModel = ProfilePhotoDisplayViewModel(uid: otherUser.uid)
+        } else {
+            viewModel = ProfilePhotoDisplayViewModel(uid: currentUser.uid)
+        }
         super.init(collectionViewLayout: UICollectionViewFlowLayout())
     }
 
@@ -28,28 +43,47 @@ class ProfilePhotoDisplayController: UICollectionViewController {
     }
 
     deinit {
+        NotificationCenter.default.removeObserver(self, name: .reloadUserProfileFeed, object: nil)
         print("DEBUG: ProfilePhotoDisplayController deinit")
     }
 
     override func viewDidLoad() {
         super.viewDidLoad()
+        rootViewHasLoaded = true
         setupCollecionView()
-        fetchPosts()
+        bindViewModel()
+        NotificationCenter.default.addObserver(self, selector: #selector(reloadData), name: .reloadUserProfileFeed, object: nil)
     }
-    
-    private func fetchPosts() {
-        let user = otherUser == nil ? currentUser : otherUser!
 
-        PostManager.shared.fetchPosts(forUser: user.uid) { posts in
+    // MARK: - Functions
+
+    @objc private func reloadData() {
+        viewModel.removeData()
+        viewModel.getPosts()
+        shouldShowFooterView(true)
+    }
+
+    private func bindViewModel() {
+        viewModel.updatePostsData = { [weak self] in
             DispatchQueue.main.async {
-                let sorted = posts.sorted { $0.creationDate > $1.creationDate }
-                self.posts = sorted
+                guard let self = self else { return }
+                let sortedPosts = self.viewModel.posts.sorted { $0.creationDate > $1.creationDate }
+                self.posts = sortedPosts
+                self.collectionView.reloadData()
             }
+        }
+        viewModel.getPosts()
+    }
+
+    private func shouldShowFooterView(_ show: Bool) {
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
+            self.compositionalLayoutConfig.boundarySupplementaryItems = show ? [self.footerItem] : []
+            (self.collectionView.collectionViewLayout as? UICollectionViewCompositionalLayout)?.configuration = self.compositionalLayoutConfig
         }
     }
 }
 
-// MARK: - UICollectionViewDataSource
+// MARK: - UICollectionViewDataSource, Delegate
 
 extension ProfilePhotoDisplayController {
     override func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
@@ -57,7 +91,8 @@ extension ProfilePhotoDisplayController {
     }
 
     override func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
-        let cell = collectionView.dequeueReusableCell(withReuseIdentifier: PhotoCollectionViewCell.identifier, for: indexPath) as! PhotoCollectionViewCell
+        let cell = collectionView.dequeueReusableCell(
+            withReuseIdentifier: PhotoCollectionViewCell.identifier, for: indexPath) as! PhotoCollectionViewCell
         let post = posts[indexPath.item]
         cell.configure(with: post.imageUrl)
         return cell
@@ -68,6 +103,46 @@ extension ProfilePhotoDisplayController {
         let vc = PostDetailController(post: post, currentUser: currentUser)
         navigationController?.pushViewController(vc, animated: true)
     }
+
+    override func collectionView(_ collectionView: UICollectionView,
+                                 viewForSupplementaryElementOfKind kind: String,
+                                 at indexPath: IndexPath) -> UICollectionReusableView {
+        guard kind == UICollectionView.elementKindSectionFooter else {
+            return UICollectionReusableView()
+        }
+        let footer = collectionView.dequeueReusableSupplementaryView(
+            ofKind: kind, withReuseIdentifier: LoadingIndicatorFooterView.identifier,
+            for: indexPath) as! LoadingIndicatorFooterView
+        footerView = footer
+        footerView.startAnimating()
+        DispatchQueue.main.asyncAfter(deadline: .now() + 1.5) {
+            if footer.activityIndicator.isAnimating {
+                footer.stopAnimating()
+            }
+        }
+        return footer
+    }
+
+    override func collectionView(_ collectionView: UICollectionView,
+                                 didEndDisplayingSupplementaryView view: UICollectionReusableView,
+                                 forElementOfKind elementKind: String, at indexPath: IndexPath) {
+        if elementKind == UICollectionView.elementKindSectionFooter {
+            footerView.stopAnimating()
+        }
+    }
+
+    override func scrollViewDidScroll(_ scrollView: UIScrollView) {
+        let currentOffset = scrollView.contentOffset.y
+        let maximumOffset = scrollView.contentSize.height - scrollView.bounds.height
+        if maximumOffset - currentOffset <= 0 {
+            if !viewModel.isFechingMore {
+                viewModel.getMorePosts()
+                if viewModel.hasReachedTheEnd {
+                    shouldShowFooterView(false)
+                }
+            }
+        }
+    }
 }
 
 // MARK: - Setup
@@ -77,6 +152,9 @@ extension ProfilePhotoDisplayController {
         collectionView.showsVerticalScrollIndicator = false
         collectionView.setCollectionViewLayout(createCollectionViewLayout(), animated: false)
         collectionView.register(PhotoCollectionViewCell.self, forCellWithReuseIdentifier: PhotoCollectionViewCell.identifier)
+        collectionView.register(LoadingIndicatorFooterView.self,
+                                forSupplementaryViewOfKind: UICollectionView.elementKindSectionFooter,
+                                withReuseIdentifier: LoadingIndicatorFooterView.identifier)
     }
 
     private func createCollectionViewLayout() -> UICollectionViewCompositionalLayout {
@@ -98,6 +176,15 @@ extension ProfilePhotoDisplayController {
 
         let section = NSCollectionLayoutSection(group: group)
         section.interGroupSpacing = 1
-        return UICollectionViewCompositionalLayout(section: section)
+
+        let footerItemSize = NSCollectionLayoutSize(widthDimension: .fractionalWidth(1), heightDimension: .absolute(80))
+
+        footerItem = NSCollectionLayoutBoundarySupplementaryItem(
+            layoutSize: footerItemSize,
+            elementKind: UICollectionView.elementKindSectionFooter,
+            alignment: .bottom
+        )
+        compositionalLayoutConfig.boundarySupplementaryItems = [footerItem]
+        return UICollectionViewCompositionalLayout(section: section, configuration: compositionalLayoutConfig)
     }
 }

@@ -7,9 +7,7 @@
 
 import UIKit
 
-// MARK: - UI Layout
 extension HomeController {
-
     func setupView() {
         navigationController?.isNavigationBarHidden = true
         setupNavBar()

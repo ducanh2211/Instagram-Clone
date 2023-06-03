@@ -97,8 +97,9 @@ class ProfileEditController: UIViewController, CustomizableNavigationBar {
         hideDoneButton()
         disableCancelButton()
         
-        let completion = { (error: Error?) in
+        let completion = { [weak self] (error: Error?) in
             DispatchQueue.main.async {
+                guard let self = self else { return }
                 if let error = error {
                     print("DEBUG: updateProfileImage error: \(error)")
                     return

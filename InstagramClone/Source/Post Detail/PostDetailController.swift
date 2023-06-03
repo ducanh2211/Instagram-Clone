@@ -31,8 +31,9 @@ class PostDetailController: UIViewController, CustomizableNavigationBar {
         super.viewDidLoad()
         setupView()
     }
-
 }
+
+// MARK: - PostDetailCellDelegate
 
 extension PostDetailController: PostDetailCellDelegate {
     func didTapProfileImageView(_ cell: PostDetailCell) {
@@ -57,16 +58,27 @@ extension PostDetailController: PostDetailCellDelegate {
         pushToCommentController()
     }
 
+    func didTapCaptionLabel(_ cell: PostDetailCell) {
+        pushToCommentController()
+    }
+
     private func pushToCommentController() {
+//        let vc = CommentController(post: post, currentUser: currentUser)
         let vc = CommentController(post: post, currentUser: currentUser)
         vc.hidesBottomBarWhenPushed = true
         navigationController?.pushViewController(vc, animated: true)
     }
 
-    func didTapLikeButton(_ cell: PostDetailCell) {
-        
+    func didTapLikeCounterLabel(_ cell: PostDetailCell) {
+        guard let post = cell.post else { return }
+        let vc = LikeDetailController(post: post)
+        navigationController?.pushViewController(vc, animated: true)
     }
+
+    func didTapLikeButton(_ cell: PostDetailCell) { }
 }
+
+// MARK: - UICollectionViewDataSource
 
 extension PostDetailController: UICollectionViewDataSource {
     func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
@@ -74,12 +86,15 @@ extension PostDetailController: UICollectionViewDataSource {
     }
 
     func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
-        let cell = collectionView.dequeueReusableCell(withReuseIdentifier: PostDetailCell.identifier, for: indexPath) as! PostDetailCell
+        let cell = collectionView.dequeueReusableCell(
+            withReuseIdentifier: PostDetailCell.identifier, for: indexPath) as! PostDetailCell
         cell.delegate = self
         cell.post = post
         return cell
     }
 }
+
+// MARK: - Setup
 
 extension PostDetailController {
     func setupView() {

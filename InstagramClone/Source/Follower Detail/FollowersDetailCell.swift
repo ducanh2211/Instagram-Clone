@@ -1,13 +1,13 @@
 //
-//  LikeDetailCell.swift
+//  FollowersDetailCell.swift
 //  InstagramClone
 //
-//  Created by Đức Anh Trần on 30/05/2023.
+//  Created by Đức Anh Trần on 01/06/2023.
 //
 
 import UIKit
 
-class LikeDetailCell: UITableViewCell {
+class FollowersDetailCell: UITableViewCell {
 
     static var identifier: String { String(describing: self) }
 
@@ -57,7 +57,7 @@ class LikeDetailCell: UITableViewCell {
         super.init(style: style, reuseIdentifier: reuseIdentifier)
         setup()
     }
-    
+
     required init?(coder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
     }
@@ -113,7 +113,7 @@ class LikeDetailCell: UITableViewCell {
 
 // MARK: - Setup
 
-extension LikeDetailCell {
+extension FollowersDetailCell {
     private func setup() {
         let stack = UIStackView(arrangedSubviews: [userNameLabel, fullNameLabel])
         stack.axis = .vertical

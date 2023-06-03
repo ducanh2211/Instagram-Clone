@@ -49,9 +49,9 @@ class PhotoSelectorCell: UICollectionViewCell {
   func configure(withAsset asset: PHAsset) {
     let targetSize = CGSize(width: bounds.size.width * 4, height: bounds.size.height * 4)
     
-    self.requestId = asset.getImageAsync(targetSize: targetSize) { image in
+    requestId = asset.getImageAsync(targetSize: targetSize) { [weak self] image in
       if let image = image {
-        self.photoImageView.image = image
+        self?.photoImageView.image = image
       }
     }
   }

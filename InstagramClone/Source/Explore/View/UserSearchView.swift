@@ -20,12 +20,11 @@ class UserSearchView: UIView {
     weak var delegate: UserSearchViewDelegate?
     var searchBar: UISearchBar!
     var tableView: UITableView!
+    private var tableViewConstraints = [NSLayoutConstraint]()
     var isPresenting: Bool = false
     private var pendingRequestWorkItem: DispatchWorkItem?
     private var animationDuration: TimeInterval = 0.2
-    private var searchedUser: [User] = [] {
-        didSet { tableView.reloadData() }
-    }
+    private var searchedUser = [User]()
 
     override init(frame: CGRect) {
         super.init(frame: frame)
@@ -79,6 +78,7 @@ extension UserSearchView: UISearchBarDelegate {
             UserManager.shared.searchUser(with: searchText.lowercased()) { users in
                 DispatchQueue.main.async {
                     self?.searchedUser = users
+                    self?.tableView.reloadData()
                 }
             }
         }
@@ -147,6 +147,7 @@ extension UserSearchView {
 
     private func setupConstraints() {
         searchBar.translatesAutoresizingMaskIntoConstraints = false
+        tableView.translatesAutoresizingMaskIntoConstraints = false
         addSubview(searchBar)
         NSLayoutConstraint.activate([
             searchBar.leftAnchor.constraint(equalTo: leftAnchor),

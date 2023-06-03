@@ -14,30 +14,14 @@ class PostManager {
     // MARK: - Properties
 
     static let shared: PostManager = PostManager()
-    private let db: Firestore = .firestore()
-    private let auth: Auth = .auth()
-
-    private lazy var postsRef: CollectionReference = {
-        db.collection(Firebase.RootCollection.posts)
-    }()
-    private lazy var postLikesRef: CollectionReference = {
-        db.collection(Firebase.RootCollection.postLikes)
-    }()
-    private lazy var postCommentsRef: CollectionReference = {
-        db.collection(Firebase.RootCollection.postComments)
-    }()
-    private lazy var commentsRef: CollectionReference = {
-        db.collection(Firebase.RootCollection.comments)
-    }()
-    private lazy var userPostsRef: CollectionReference = {
-        db.collection(Firebase.RootCollection.userPosts)
-    }()
-    private lazy var userFollowingRef: CollectionReference = {
-        db.collection(Firebase.RootCollection.userFollowing)
-    }()
+    private let postsRef = Firestore.firestore().collection(Firebase.RootCollection.posts)
+    private let postLikesRef = Firestore.firestore().collection(Firebase.RootCollection.postLikes)
+    private let postCommentsRef = Firestore.firestore().collection(Firebase.RootCollection.postComments)
+    private let userPostsRef = Firestore.firestore().collection(Firebase.RootCollection.userPosts)
+    private let userFollowingRef = Firestore.firestore().collection(Firebase.RootCollection.userFollowing)
 
     deinit {
-        print("Post Manager deinit")
+        print("DEBUG: Post Manager deinit")
     }
 
     // MARK: - Public funtions
@@ -45,22 +29,24 @@ class PostManager {
     func createPost(withImage imageData: Data, imageAspectRatio aspectRatio: Double,
                     caption: String, completion: @escaping (Error?) -> Void) {
 
-        guard let currentUid = auth.currentUser?.uid else { return }
+        guard let currentUid = Auth.auth().currentUser?.uid else { return }
         let postRef = postsRef.document()
         let postId = postRef.documentID
 
-        StorageManager.shared.uploadPostImage(imageData, folderName: postId) { imageUrl, error in
+        StorageManager.shared.uploadPostImage(imageData, folderName: postId) { [weak self] imageUrl, error in
+            guard let self = self else { return }
             guard error == nil else {
                 completion(error)
                 return
             }
 
+            let creationDate = Date()
             let postData: [String: Any] = [
                 Firebase.Post.postId: postId,
                 Firebase.Post.caption: caption,
                 Firebase.Post.imageUrl: imageUrl!,
                 Firebase.Post.aspectRatio: aspectRatio,
-                Firebase.Post.creationDate: Date(),
+                Firebase.Post.creationDate: creationDate,
                 Firebase.Post.uid: currentUid
             ]
 
@@ -69,42 +55,53 @@ class PostManager {
                     completion(error)
                     return
                 }
+                self.userPostsRef.document(currentUid).setData(["dummy": 1])
 
-                self.userPostsRef.document(currentUid).setData([postId : 1], merge: true) { error in
-                    guard error == nil else {
-                        completion(error)
-                        return
-                    }
-                    completion(nil)
+                self.userPostsRef.document(currentUid)
+                    .collection("posts").document(postId).setData([Firebase.Post.creationDate : creationDate]) { error in
+                        guard error == nil else {
+                            completion(error)
+                            return
+                        }
+                        completion(nil)
                 }
-
             }
         }
     }
 
-    func fetchPosts(forUser uid: String, completion: @escaping ([Post]) -> Void) {
-        let dispatchGroup = DispatchGroup()
-        var postsData: [Post] = []
-        let startTime = Date()
-        userPostsRef.document(uid).getDocument { documentSnapshot, error in
+    func fetchPost(_ postId: String, completion: @escaping (Post?) -> Void) {
+        postsRef.document(postId).getDocument { [weak self] documentSnapshot, error in
+            guard let self = self else { return }
             guard let dictionary = documentSnapshot?.data(), error == nil else {
-                completion([])
+                completion(nil)
                 return
             }
-
-            dictionary.forEach { (postId, _) in
-                dispatchGroup.enter()
-                self.fetchPost(postId) { post in
-                    if let post = post {
-                        postsData.append(post)
-                    }
-                    dispatchGroup.leave()
-                }
+            guard let uid = dictionary[Firebase.Post.uid] as? String else {
+                completion(nil)
+                return
             }
+            self.fetchDataForPost(postId, uid: uid, dictionary: dictionary) { post in
+                completion(post)
+            }
+        }
+    }
 
-            dispatchGroup.notify(queue: .main) {
-                print("DEBUG: fetch posts \(Date().timeIntervalSince(startTime))")
-                completion(postsData)
+    func fetchDataForPost(_ postId: String, uid: String, dictionary: [String: Any], completion: @escaping (Post?) -> Void) {
+        UserManager.shared.fetchUser(withUid: uid) { [weak self] user, error in
+            guard let self = self else { return }
+            guard let user = user, error == nil else {
+                completion(nil)
+                return
+            }
+            var post = Post(user: user, dictionary: dictionary)
+
+            self.checkLikeStateForPost(postId) { likesCount, likedByCurrentUser in
+                self.numberOfComments(forPost: postId) { commentsCount in
+                    post.likedByCurrentUser = likedByCurrentUser
+                    post.likesCount = likesCount
+                    post.commentsCount = commentsCount
+                    completion(post)
+                }
             }
         }
     }
@@ -114,12 +111,13 @@ class PostManager {
         var postsData: [Post] = []
         let startTime = Date()
 
-        userFollowingRef.document(currentUid).getDocument { documentSnapshot, error in
+        userFollowingRef.document(currentUid).getDocument { [weak self] documentSnapshot, error in
+            guard let self = self else { return }
             guard let dictionary = documentSnapshot?.data(), error == nil else {
                 completion([])
                 return
             }
-            print("DEBUG: fetch home posts \(Thread.current)")
+
             dictionary.forEach { (otherUid, _) in
                 dispatchGroup.enter()
                 self.fetchPosts(forUser: otherUid) { posts in
@@ -130,35 +128,6 @@ class PostManager {
 
             dispatchGroup.notify(queue: .main) {
                 print("DEBUG: fetch home posts \(Date().timeIntervalSince(startTime))")
-                completion(postsData)
-            }
-        }
-    }
-
-    func fetchExplorePosts(completion: @escaping ([Post]) -> Void) {
-        guard let currentUid = auth.currentUser?.uid else { return }
-
-        let dispatchGroup = DispatchGroup()
-        let startTime = Date()
-
-        postsRef.whereField(Firebase.Post.uid, notIn: [currentUid]).getDocuments { querySnapshot, error in
-            guard let documents = querySnapshot?.documents else { return }
-            var postsData: [Post] = []
-
-            documents.forEach { document in
-                let postId = document.documentID
-
-                dispatchGroup.enter()
-                self.fetchPost(postId) { post in
-                    if let post = post {
-                        postsData.append(post)
-                    }
-                    dispatchGroup.leave()
-                }
-            }
-
-            dispatchGroup.notify(queue: .main) {
-                print("DEBUG: fetch all posts \(Date().timeIntervalSince(startTime))")
                 completion(postsData)
             }
         }
@@ -191,62 +160,8 @@ class PostManager {
         }
     }
 
-    func sendComment(toPost postId: String, content: String, completion: @escaping (Error?) -> Void) {
-        guard let currentUid = auth.currentUser?.uid else { return }
-        let commentRef = commentsRef.document()
-        let commentId = commentRef.documentID
-
-        let commentData: [String: Any] = [
-            Firebase.Comment.commentId: commentId,
-            Firebase.Comment.content: content,
-            Firebase.Post.creationDate: Date(),
-            Firebase.Post.uid: currentUid
-        ]
-
-        commentRef.setData(commentData) { error in
-            guard error == nil else {
-                completion(error)
-                return
-            }
-
-            self.postCommentsRef.document(postId).setData([commentId : 1], merge: true) { error in
-                guard error == nil else {
-                    completion(error)
-                    return
-                }
-                completion(nil)
-            }
-        }
-    }
-
-    func fetchComments(forPost postId: String, completion: @escaping ([Comment]) -> Void) {
-        let dispatchGroup = DispatchGroup()
-        var commentsData: [Comment] = []
-
-        postCommentsRef.document(postId).getDocument { documentSnapshot, error in
-            guard let dictionary = documentSnapshot?.data(), error == nil else {
-                completion([])
-                return
-            }
-            
-            dictionary.forEach { (commentId, _) in
-                dispatchGroup.enter()
-                self.fetchComment(commentId) { comment in
-                    if let comment = comment {
-                        commentsData.append(comment)
-                    }
-                    dispatchGroup.leave()
-                }
-            }
-
-            dispatchGroup.notify(queue: .main) {
-                completion(commentsData)
-            }
-        }
-    }
-
     func likePost(_ postId: String, completion: @escaping (Error?) -> Void) {
-        guard let currentUid = auth.currentUser?.uid else { return }
+        guard let currentUid = Auth.auth().currentUser?.uid else { return }
 
         postLikesRef.document(postId).setData([currentUid : 1], merge: true) { error in
             guard error == nil else {
@@ -258,7 +173,7 @@ class PostManager {
     }
 
     func unlikePost(_ postId: String, completion: @escaping (Error?) -> Void) {
-        guard let currentUid = auth.currentUser?.uid else { return }
+        guard let currentUid = Auth.auth().currentUser?.uid else { return }
 
         postLikesRef.document(postId).updateData([currentUid : FieldValue.delete()]) { error in
             guard error == nil else {
@@ -271,61 +186,37 @@ class PostManager {
 
     // MARK: - Private functions
 
-    private func fetchPost(_ postId: String, completion: @escaping (Post?) -> Void) {
-        postsRef.document(postId).getDocument { documentSnapshot, error in
-            guard let dictionary = documentSnapshot?.data(), error == nil else {
-                completion(nil)
-                return
-            }
-            guard let uid = dictionary[Firebase.Post.uid] as? String else {
-                completion(nil)
+    private func fetchPosts(forUser uid: String, completion: @escaping ([Post]) -> Void) {
+        let dispatchGroup = DispatchGroup()
+        var postsData: [Post] = []
+
+        userPostsRef.document(uid).collection("posts").getDocuments { [weak self] querySnapshot, error in
+            guard let self = self else { return }
+            guard let documents = querySnapshot?.documents, error == nil else {
+                completion([])
                 return
             }
 
-            UserManager.shared.fetchUser(withUid: uid) { user, error in
-                guard let user = user, error == nil else {
-                    completion(nil)
-                    return
-                }
-                var post = Post(user: user, dictionary: dictionary)
+            documents.forEach { document in
+                let postId = document.documentID
 
-                self.checkLikeStateForPost(postId) { likesCount, likedByCurrentUser in
-                    self.numberOfComments(forPost: postId) { commentsCount in
-                        post.likedByCurrentUser = likedByCurrentUser
-                        post.likesCount = likesCount
-                        post.commentsCount = commentsCount
-                        completion(post)
+                dispatchGroup.enter()
+                self.fetchPost(postId) { post in
+                    if let post = post {
+                        postsData.append(post)
                     }
+                    dispatchGroup.leave()
                 }
             }
-        }
-    }
 
-    private func fetchComment(_ commentId: String, completion: @escaping (Comment?) -> Void) {
-        commentsRef.document(commentId).getDocument { documentSnapshot, error in
-            guard let dictionary = documentSnapshot?.data(), error == nil else {
-                completion(nil)
-                return
-            }
-            guard let uid = dictionary[Firebase.Comment.uid] as? String else {
-                completion(nil)
-                return
-            }
-
-            UserManager.shared.fetchUser(withUid: uid) { user, error in
-                guard let user = user, error == nil else {
-                    completion(nil)
-                    return
-                }
-
-                let comment = Comment(user: user, dictionary: dictionary)
-                completion(comment)
+            dispatchGroup.notify(queue: .main) {
+                completion(postsData)
             }
         }
     }
 
     private func checkLikeStateForPost(_ postId: String, completion: @escaping (_ likesCount: Int, _ likedByCurrentUser: Bool) -> Void) {
-        guard let currentUid = auth.currentUser?.uid else { return }
+        guard let currentUid = Auth.auth().currentUser?.uid else { return }
 
         postLikesRef.document(postId).getDocument { documentSnapshot, error in
             guard let dictionary = documentSnapshot?.data(), error == nil else {
@@ -347,12 +238,14 @@ class PostManager {
     }
 
     private func numberOfComments(forPost postId: String, completion: @escaping (Int) -> Void) {
-        postCommentsRef.document(postId).getDocument { documentSnapshot, error in
-            guard let dictionary = documentSnapshot?.data(), error == nil else {
+        let countQuery = postCommentsRef.document(postId).collection(Firebase.Post.comments).count
+
+        countQuery.getAggregation(source: .server) { snapshot, error in
+            guard let count = snapshot?.count as? Int, error == nil else {
                 completion(0)
                 return
             }
-            completion(dictionary.count)
+            completion(count)
         }
     }
 

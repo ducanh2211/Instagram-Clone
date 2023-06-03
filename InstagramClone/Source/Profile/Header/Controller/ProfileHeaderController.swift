@@ -14,6 +14,8 @@ import FirebaseAuth
 protocol ProfileHeaderControllerDelegate: AnyObject {
     func didTapFollowOrEditButton()
     func didTapMessageOrShareButton()
+    func didTapFollowersLabel()
+    func didTapFollowingLabel()
 }
 
 class ProfileHeaderController: UIViewController {
@@ -30,8 +32,22 @@ class ProfileHeaderController: UIViewController {
     }()
 
     let postsLabel = UserStatLabel(type: .posts, value: 0)
-    let followerslabel = UserStatLabel(type: .followers, value: 0)
-    let followingLabel = UserStatLabel(type: .following, value: 0)
+
+    lazy var followerslabel: UserStatLabel = {
+        let label = UserStatLabel(type: .followers, value: 0)
+        let tap = UITapGestureRecognizer(target: self, action: #selector(didTapFollowersLabel))
+        label.addGestureRecognizer(tap)
+        label.isUserInteractionEnabled = true
+        return label
+    }()
+
+    lazy var followingLabel: UserStatLabel = {
+        let label = UserStatLabel(type: .following, value: 0)
+        let tap = UITapGestureRecognizer(target: self, action: #selector(didTapFollowingLabel))
+        label.addGestureRecognizer(tap)
+        label.isUserInteractionEnabled = true
+        return label
+    }()
 
     let fullNameLabel: UILabel = {
         let label = UILabel()
@@ -49,7 +65,7 @@ class ProfileHeaderController: UIViewController {
     }()
 
     lazy var followOrEditButton: ActionProfileButton = {
-        let button = ActionProfileButton(type: .system)
+        let button = ActionProfileButton()
         button.titleLabel?.font = .systemFont(ofSize: 13, weight: .semibold)
         button.translatesAutoresizingMaskIntoConstraints = false
         button.addTarget(self, action: #selector(didTapFollowOrEditButton), for: .touchUpInside)
@@ -57,7 +73,7 @@ class ProfileHeaderController: UIViewController {
     }()
 
     lazy var messageOrShareButton: ActionProfileButton = {
-        let button = ActionProfileButton(type: .system)
+        let button = ActionProfileButton()
         button.titleLabel?.font = .systemFont(ofSize: 13, weight: .semibold)
         button.translatesAutoresizingMaskIntoConstraints = false
         button.addTarget(self, action: #selector(didTapMessageOrShareButton), for: .touchUpInside)
@@ -101,6 +117,7 @@ class ProfileHeaderController: UIViewController {
     }
 
     deinit {
+        NotificationCenter.default.removeObserver(self, name: .reloadUserProfileFeed, object: nil)
         print("DEBUG: ProfileHeaderController deinit")
     }
 
@@ -108,11 +125,12 @@ class ProfileHeaderController: UIViewController {
         super.viewDidLoad()
         setupView()
         reloadData()
+        NotificationCenter.default.addObserver(self, selector: #selector(reloadData), name: .reloadUserProfileFeed, object: nil)
     }
 
     // MARK: - Functions
 
-    func reloadData() {
+    @objc private func reloadData() {
         let user = isLoggedInUser ? currentUser : otherUser!
         profileImageView.sd_setImage(with: URL(string: user.avatarUrl), placeholderImage: UIImage(named: "user"), context: nil)
         fullNameLabel.text = user.fullName
@@ -122,27 +140,27 @@ class ProfileHeaderController: UIViewController {
         configureSeeMoreButton()
     }
 
-    func reloadUserStat() {
+    private func reloadUserStat() {
         let user = isLoggedInUser ? currentUser : otherUser!
 
-        UserManager.shared.numberOfPost(forUser: user.uid) { count in
+        UserManager.shared.numberOfPost(forUser: user.uid) { [weak self] count in
             DispatchQueue.main.async {
-                self.postsLabel.setValue(count)
+                self?.postsLabel.setValue(count)
             }
         }
-        UserManager.shared.numberOfFollowing(forUser: user.uid) { count in
+        UserManager.shared.numberOfFollowing(forUser: user.uid) { [weak self] count in
             DispatchQueue.main.async {
-                self.followingLabel.setValue(count)
+                self?.followingLabel.setValue(count)
             }
         }
-        UserManager.shared.numberOfFollowers(forUser: user.uid) { count in
+        UserManager.shared.numberOfFollowers(forUser: user.uid) { [weak self] count in
             DispatchQueue.main.async {
-                self.followerslabel.setValue(count)
+                self?.followerslabel.setValue(count)
             }
         }
     }
 
-    func reloadActionButton() {
+    private func reloadActionButton() {
         if isLoggedInUser {
             followOrEditButton.setActionType(.edit)
             messageOrShareButton.setActionType(.share)
@@ -150,12 +168,12 @@ class ProfileHeaderController: UIViewController {
         } else {
             messageOrShareButton.setActionType(.message)
 
-            UserManager.shared.checkFollowState(withOtherUser: otherUser!.uid) { isFollow in
+            UserManager.shared.checkFollowState(withOtherUser: otherUser!.uid) { [weak self] isFollow in
                 DispatchQueue.main.async {
                     if isFollow {
-                        self.followOrEditButton.setActionType(.following)
+                        self?.followOrEditButton.setActionType(.following)
                     } else {
-                        self.followOrEditButton.setActionType(.follow)
+                        self?.followOrEditButton.setActionType(.follow)
                     }
                 }
             }
@@ -167,14 +185,14 @@ class ProfileHeaderController: UIViewController {
             delegate?.didTapFollowOrEditButton()
         } else {
             if followOrEditButton.actionType == .follow {
-                UserManager.shared.followUser(otherUid: otherUser!.uid) { _ in
-                    self.reloadUserStat()
+                UserManager.shared.followUser(otherUid: otherUser!.uid) { [weak self] _ in
+                    self?.reloadUserStat()
                 }
                 self.followOrEditButton.setActionType(.following)
             }
             else if followOrEditButton.actionType == .following {
-                UserManager.shared.unfollowUser(otherUid: otherUser!.uid) { _ in
-                    self.reloadUserStat()
+                UserManager.shared.unfollowUser(otherUid: otherUser!.uid) { [weak self] _ in
+                    self?.reloadUserStat()
                 }
                 self.followOrEditButton.setActionType(.follow)
             }
@@ -185,12 +203,20 @@ class ProfileHeaderController: UIViewController {
         delegate?.didTapMessageOrShareButton()
     }
 
+    @objc private func didTapFollowersLabel() {
+        delegate?.didTapFollowersLabel()
+    }
+
+    @objc private func didTapFollowingLabel() {
+        delegate?.didTapFollowingLabel()
+    }
+
     @objc private func seeMoreButtonTapped() {
         bioLabel.numberOfLines = 0
         seeMoreButton.isHidden = true
     }
 
-    func configureSeeMoreButton() {
+    private func configureSeeMoreButton() {
         DispatchQueue.main.async {
             let isTruncated = self.bioLabel.isTextTruncated()
             self.seeMoreButton.isHidden = isTruncated ? false : true
@@ -206,7 +232,8 @@ extension ProfileHeaderController: UICollectionViewDataSource {
     }
 
     func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
-        let cell = collectionView.dequeueReusableCell(withReuseIdentifier: ProfileStoryCell.identifier, for: indexPath) as! ProfileStoryCell
+        let cell = collectionView.dequeueReusableCell(
+            withReuseIdentifier: ProfileStoryCell.identifier, for: indexPath) as! ProfileStoryCell
         return cell
     }
 }

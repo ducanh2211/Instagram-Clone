@@ -22,7 +22,9 @@ class CustomNavigationBar: UIView {
 
     // MARK: - Properties
 
-    let title: String?
+    var title: String? {
+        didSet { titleLabel.text = title }
+    }
     let shouldShowSeparator: Bool
     let leftBarButtons: [AttributedButton]?
     let rightBarButtons: [AttributedButton]?

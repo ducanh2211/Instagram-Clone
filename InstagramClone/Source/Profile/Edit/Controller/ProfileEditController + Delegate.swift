@@ -12,11 +12,11 @@ import PhotosUI
 
 extension ProfileEditController: ProfileEditHeaderDelegate {
     func didTapEditAvatarButton() {
-        self.presentEditAvatarSheet()
+        presentEditAvatarSheet()
     }
 
     func didTapAvatarImage() {
-        self.presentEditAvatarSheet()
+        presentEditAvatarSheet()
     }
 
     private func presentEditAvatarSheet() {
@@ -114,7 +114,7 @@ extension ProfileEditController: UIImagePickerControllerDelegate, UINavigationCo
 
 extension ProfileEditController: ProfileEditDetailControllerDelegate {
     func userInfoDidChange(with newInfo: UserInfoData) {
-        self.shouldUpdateOtherInfo = true
+        shouldUpdateOtherInfo = true
 
         switch newInfo.type {
             case .name:
@@ -124,11 +124,9 @@ extension ProfileEditController: ProfileEditDetailControllerDelegate {
             case .bio:
                 user.bio = newInfo.data
         }
-
-        self.dataSource = [
-            .init(type: .name, data: user.fullName),
-            .init(type: .userName, data: user.userName),
-            .init(type: .bio, data: user.bio)
-        ]
+        
+        dataSource = [.init(type: .name, data: user.fullName),
+                      .init(type: .userName, data: user.userName),
+                      .init(type: .bio, data: user.bio)]
     }
 }

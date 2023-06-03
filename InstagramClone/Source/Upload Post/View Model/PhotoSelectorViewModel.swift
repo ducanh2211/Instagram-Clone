@@ -46,9 +46,9 @@ class PhotoSelectorViewModel {
     let option = PHFetchOptions()
     option.sortDescriptors = [NSSortDescriptor(key: "creationDate", ascending: false)]
     
-    self.allAssets = PHAsset.fetchAssets(with: .image, options: option)
-    self.selectedIndex = (allAssets.count == 0) ? nil : 0
-    self.receivedAssets?()
+    allAssets = PHAsset.fetchAssets(with: .image, options: option)
+    selectedIndex = (allAssets.count == 0) ? nil : 0
+    receivedAssets?()
   }
   
   func handlePhotoLibraryChange(_ changeInstance: PHChange) {

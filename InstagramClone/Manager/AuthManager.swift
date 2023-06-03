@@ -32,7 +32,7 @@ class AuthManager {
     private let auth: Auth = .auth()
 
     deinit {
-        print("AuthManager deinit")
+        print("DEBUG: AuthManager deinit")
     }
 
     func createUser(email: String, password: String,
@@ -54,7 +54,6 @@ class AuthManager {
                 completion(nil, .otherError(error))
                 return
             }
-
             let uid = auth!.user.uid
             let user = User(uid: uid, email: email, fullName: fullName, userName: userName)
 
@@ -69,15 +68,12 @@ class AuthManager {
         }
     }
 
-    func logInUser(email: String, password: String,
-                   completion: @escaping (User?, AuthError?) -> Void) {
-
+    func logInUser(email: String, password: String, completion: @escaping (User?, AuthError?) -> Void) {
         auth.signIn(withEmail: email, password: password) { auth, error in
             if let error = error {
                 completion(nil, .otherError(error))
                 return
             }
-
             let uid = auth!.user.uid
 
             // completion call on background thread

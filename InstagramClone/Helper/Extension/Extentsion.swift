@@ -22,8 +22,6 @@ extension UITextField {
   }
 }
 
-
-
 extension UILabel {
   func isTextTruncated() -> Bool {
     guard let text = text else { return false }
@@ -32,18 +30,8 @@ extension UILabel {
   }
 }
 
-
-extension UIColor {
-  convenience init(red: Int, green: Int, blue: Int, alpha: CGFloat) {
-    self.init(red: CGFloat(red/255),
-              green: CGFloat(green/255),
-              blue: CGFloat(blue/255),
-              alpha: alpha)
-  }
-}
-
 extension Notification.Name {
-  static let textViewTextDidChange = Notification.Name("textViewTextDidChange")
+  static let reloadUserProfileFeed = Notification.Name("reloadUserProfileFeed")
 }
 
 extension UIApplication {

@@ -16,7 +16,7 @@ extension HomeController {
 
 class HomeController: UIViewController, CustomizableNavigationBar {
 
-    // MARK: - Properties
+    // MARK: - UI components
 
     var fakeView: UIView = {
         let view = UIView()
@@ -28,12 +28,10 @@ class HomeController: UIViewController, CustomizableNavigationBar {
     var collectionView: UICollectionView!
     let refreshControl = UIRefreshControl()
 
+    // MARK: - Properties
+
     var user: User
-    var posts: [Post] = [] {
-        didSet {
-            collectionView.reloadData()
-        }
-    }
+    var posts: [Post] = []
     let navBarHeight: CGFloat = 44
     private var lastContentOffset: CGFloat = -44
     private var isFirstLoading: Bool = true
@@ -66,12 +64,12 @@ class HomeController: UIViewController, CustomizableNavigationBar {
         if isFirstLoading {
             ProgressHUD.show()
         }
-
-        PostManager.shared.fetchHomePosts(forCurrentUser: user.uid) { posts in
+        PostManager.shared.fetchHomePosts(forCurrentUser: user.uid) { [weak self] posts in
             DispatchQueue.main.async {
-                self.posts = posts
-                self.isFirstLoading = false
-                self.refreshControl.endRefreshing()
+                self?.posts = posts.shuffled()
+                self?.isFirstLoading = false
+                self?.refreshControl.endRefreshing()
+                self?.collectionView.reloadData()
                 ProgressHUD.remove()
             }
         }
@@ -103,6 +101,10 @@ extension HomeController: HomePostCellDelegate {
         pushToCommentController(cell)
     }
 
+    func didTapCaptionLabel(_ cell: HomePostCell) {
+        pushToCommentController(cell)
+    }
+
     private func pushToCommentController(_ cell: HomePostCell) {
         guard let post = cell.post else { return }
         let vc = CommentController(post: post, currentUser: user)
@@ -121,8 +123,9 @@ extension HomeController: HomePostCellDelegate {
         var post = posts[indexPath.item]
         
         if post.likedByCurrentUser {
-            PostManager.shared.unlikePost(post.postId) { error in
+            PostManager.shared.unlikePost(post.postId) { [weak self] error in
                 DispatchQueue.main.async {
+                    guard let self = self else { return }
                     if let error = error {
                         print("DEBUG: unlike post error: \(error)")
                         return
@@ -136,8 +139,9 @@ extension HomeController: HomePostCellDelegate {
                 }
             }
         } else {
-            PostManager.shared.likePost(post.postId) { error in
+            PostManager.shared.likePost(post.postId) { [weak self] error in
                 DispatchQueue.main.async {
+                    guard let self = self else { return }
                     if let error = error {
                         print("DEBUG: unlike post error: \(error)")
                         return

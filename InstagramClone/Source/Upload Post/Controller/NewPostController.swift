@@ -105,6 +105,7 @@ class NewPostController: UIViewController, CustomizableNavigationBar {
     private func bindViewModel() {
         viewModel.createPostSuccess = { [weak self] in
             DispatchQueue.main.async {
+                NotificationCenter.default.post(name: .reloadUserProfileFeed, object: nil)
                 self?.dismiss(animated: true)
             }
         }

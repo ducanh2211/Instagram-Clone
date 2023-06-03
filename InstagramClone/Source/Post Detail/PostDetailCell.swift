@@ -11,8 +11,10 @@ protocol PostDetailCellDelegate: AnyObject {
     func didTapProfileImageView(_ cell: PostDetailCell)
     func didTapUserNameLabel(_ cell: PostDetailCell)
     func didTapLikeButton(_ cell: PostDetailCell)
+    func didTapLikeCounterLabel(_ cell: PostDetailCell)
     func didTapCommentButton(_ cell: PostDetailCell)
     func didTapCommentCounterLabel(_ cell: PostDetailCell)
+    func didTapCaptionLabel(_ cell: PostDetailCell)
 }
 
 class PostDetailCell: UICollectionViewCell {
@@ -84,6 +86,9 @@ class PostDetailCell: UICollectionViewCell {
     private lazy var likeCounterLabel: UILabel = {
         let label = createLalbel(contentHugging: .defaultLow + 1, contentCompression: .defaultHigh + 1)
         label.font = .systemFont(ofSize: 13, weight: .bold)
+        let tap = UITapGestureRecognizer(target: self, action: #selector(didTapLikeCounterLabel))
+        label.addGestureRecognizer(tap)
+        label.isUserInteractionEnabled = true
         return label
     }()
 
@@ -91,6 +96,9 @@ class PostDetailCell: UICollectionViewCell {
         let label = createLalbel(contentHugging: .defaultHigh, contentCompression: .required - 1)
         label.numberOfLines = 0
         label.lineBreakMode = .byWordWrapping
+        let tap = UITapGestureRecognizer(target: self, action: #selector(didTapCaptionLabel))
+        label.addGestureRecognizer(tap)
+        label.isUserInteractionEnabled = true
         return label
     }()
 
@@ -222,12 +230,20 @@ class PostDetailCell: UICollectionViewCell {
         delegate?.didTapLikeButton(self)
     }
 
+    @objc private func didTapLikeCounterLabel() {
+        delegate?.didTapLikeCounterLabel(self)
+    }
+
     @objc private func didTapCommentButton() {
         delegate?.didTapCommentButton(self)
     }
 
     @objc private func didTapCommentCounterLabel() {
         delegate?.didTapCommentCounterLabel(self)
+    }
+
+    @objc private func didTapCaptionLabel() {
+        delegate?.didTapCaptionLabel(self)
     }
 
     // MARK: - Helper

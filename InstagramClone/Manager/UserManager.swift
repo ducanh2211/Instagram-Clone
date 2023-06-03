@@ -13,26 +13,23 @@ class UserManager {
 
     static let shared: UserManager = UserManager()
 
-    private let db: Firestore = .firestore()
-
     private lazy var usersRef: CollectionReference = {
-        db.collection(Firebase.RootCollection.users)
+        Firestore.firestore().collection(Firebase.RootCollection.users)
     }()
     private lazy var userFollowingRef: CollectionReference = {
-        db.collection(Firebase.RootCollection.userFollowing)
+        Firestore.firestore().collection(Firebase.RootCollection.userFollowing)
     }()
     private lazy var userFollowersRef: CollectionReference = {
-        db.collection(Firebase.RootCollection.userFollowers)
+        Firestore.firestore().collection(Firebase.RootCollection.userFollowers)
     }()
     private lazy var userPostsRef: CollectionReference = {
-        db.collection(Firebase.RootCollection.userPosts)
+        Firestore.firestore().collection(Firebase.RootCollection.userPosts)
     }()
 
     deinit {
-        print("UserManager deinit")
+        print("DEBUG: UserManager deinit")
     }
 
-    /// - Note: Completion  being invoked from background thread.
     func uploadUser(_ user: User, completion: @escaping (User?, Error?) -> Void) {
         usersRef.document(user.uid).setData(user.description) { error in
             guard error == nil else {
@@ -44,22 +41,20 @@ class UserManager {
         }
     }
 
-    /// - Note: Completion  being invoked from background thread.
+    func checkIfLoggedInUser(uid: String) -> Bool {
+        guard let currentUid = Auth.auth().currentUser?.uid else { return false }
+        return currentUid == uid
+    }
+
     func fetchUser(withUid uid: String, completion: @escaping (User?, Error?) -> Void) {
         usersRef.document(uid).getDocument { documentSnapshot, error in
             guard let dictionary = documentSnapshot?.data(), error == nil else {
                 completion(nil, error)
                 return
             }
-
             let user = User(dictionary: dictionary)
             completion(user, nil)
         }
-    }
-
-    func checkIfLoggedInUser(uid: String) -> Bool {
-        guard let currentUid = Auth.auth().currentUser?.uid else { return false }
-        return currentUid == uid
     }
 
     func updateUserInfo(_ user: User, image: UIImage?,
@@ -67,7 +62,8 @@ class UserManager {
         var newData: [String: Any] = [:]
 
         if let image = image, let avatarData = image.jpegData(compressionQuality: 0.3) {
-            StorageManager.shared.uploadUserAvatar(avatarData, folderName: user.uid) { imageUrl, error in
+            StorageManager.shared.uploadUserAvatar(avatarData, folderName: user.uid) { [weak self] imageUrl, error in
+                guard let self = self else { return }
                 guard let imageUrl = imageUrl, error == nil else {
                     completion(error)
                     return
@@ -102,7 +98,8 @@ class UserManager {
         var usersData: [User] = []
         let dispatchGroup = DispatchGroup()
 
-        usersRef.whereField(Firebase.User.uid, notIn: [currentUid]).getDocuments { querySnapshot, error in
+        usersRef.whereField(Firebase.User.uid, isNotEqualTo: currentUid).getDocuments { [weak self] querySnapshot, error in
+            guard let self = self else { return }
             guard let documents = querySnapshot?.documents, error == nil else {
                 completion([])
                 return
@@ -121,11 +118,63 @@ class UserManager {
                 }
 
                 self.fetchUser(withUid: uid) { user, error in
-                    guard let user = user, error == nil else {
-                        dispatchGroup.leave()
-                        return
+                    if let user = user {
+                        usersData.append(user)
                     }
-                    usersData.append(user)
+                    dispatchGroup.leave()
+                }
+            }
+
+            dispatchGroup.notify(queue: .main) {
+                completion(usersData)
+            }
+        }
+    }
+
+    func fetchFollowers(uid: String, completion: @escaping ([User]) -> Void) {
+        let dispatchGroup = DispatchGroup()
+        var usersData: [User] = []
+
+        userFollowersRef.document(uid).getDocument { [weak self] documentSnapshot, error in
+            guard let self = self else { return }
+            guard let dictionary = documentSnapshot?.data(), error == nil else {
+                completion([])
+                return
+            }
+
+            dictionary.forEach { (otherUid, _) in
+                dispatchGroup.enter()
+                self.fetchUser(withUid: otherUid) { user, error in
+                    if let user = user {
+                        usersData.append(user)
+                    }
+                    dispatchGroup.leave()
+                }
+            }
+
+            dispatchGroup.notify(queue: .main) {
+                completion(usersData)
+            }
+        }
+    }
+
+    func fetchFollowing(uid: String, completion: @escaping ([User]) -> Void) {
+        let dispatchGroup = DispatchGroup()
+        var usersData: [User] = []
+
+        userFollowingRef.document(uid).getDocument { [weak self] documentSnapshot, error in
+            guard let self = self else { return }
+            guard let dictionary = documentSnapshot?.data(), error == nil else {
+                completion([])
+                return
+            }
+
+            dictionary.forEach { (otherUid, _) in
+                dispatchGroup.enter()
+                self.fetchUser(withUid: otherUid) { user, error in
+                    if let user = user {
+                        usersData.append(user)
+                    }
                     dispatchGroup.leave()
                 }
             }
@@ -156,7 +205,8 @@ class UserManager {
     func followUser(otherUid: String, completion: @escaping (Error?) -> Void) {
         guard let currentUid = Auth.auth().currentUser?.uid else { return }
 
-        userFollowingRef.document(currentUid).setData([otherUid : 1], merge: true) { error in
+        userFollowingRef.document(currentUid).setData([otherUid : 1], merge: true) { [weak self] error in
+            guard let self = self else { return }
             guard error == nil else {
                 completion(error)
                 return
@@ -175,7 +225,8 @@ class UserManager {
     func unfollowUser(otherUid: String, completion: @escaping (Error?) -> Void) {
         guard let currentUid = Auth.auth().currentUser?.uid else { return }
 
-        userFollowingRef.document(currentUid).updateData([otherUid : FieldValue.delete()]) { error in
+        userFollowingRef.document(currentUid).updateData([otherUid : FieldValue.delete()]) { [weak self] error in
+            guard let self = self else { return }
             guard error == nil else {
                 completion(error)
                 return
@@ -192,12 +243,14 @@ class UserManager {
     }
 
     func numberOfPost(forUser uid: String, completion: @escaping (Int) -> Void) {
-        userPostsRef.document(uid).getDocument { documentSnapshot, error in
-            guard let dictionary = documentSnapshot?.data(), error == nil else {
+        let countQuery = userPostsRef.document(uid).collection("posts").count
+
+        countQuery.getAggregation(source: .server) { snapshot, error in
+            guard let count = snapshot?.count as? Int, error == nil else {
                 completion(0)
                 return
             }
-            completion(dictionary.count)
+            completion(count)
         }
     }
 

@@ -42,12 +42,11 @@ class PhotoSelectorController: UIViewController, CustomizableNavigationBar {
     }
 
     @objc func didTapCloseButton() {
-        self.dismiss(animated: true)
+        dismiss(animated: true)
     }
 
     @objc func didTapNextButton() {
         if let asset = viewModel.getAssetAtSelectedIndex() {
-            //      let viewModel = NewPostViewModel()
             let vc = NewPostController(asset: asset)
             navigationController?.pushViewController(vc, animated: true)
         }
@@ -60,7 +59,6 @@ class PhotoSelectorController: UIViewController, CustomizableNavigationBar {
     private func unregisterLibraryObserver() {
         PHPhotoLibrary.shared().unregisterChangeObserver(self)
     }
-
 }
 
 // MARK: - UICollectionViewDataSource
@@ -91,7 +89,7 @@ extension PhotoSelectorController: UICollectionViewDelegate {
         let index = indexPath.item
         viewModel.selectedIndex = index
         if let asset = viewModel.getAssetAtSelectedIndex() {
-            self.headerView?.configure(withAsset: asset)
+            headerView?.configure(withAsset: asset)
         }
     }
 
@@ -112,8 +110,8 @@ extension PhotoSelectorController: UICollectionViewDelegate {
             for: indexPath
         ) as! PhotoSelectorHeader
 
-        self.headerView = header
-        self.headerView?.delegate = self
+        headerView = header
+        headerView?.delegate = self
 
         if let asset = viewModel.getAssetAtSelectedIndex() {
             header.configure(withAsset: asset)

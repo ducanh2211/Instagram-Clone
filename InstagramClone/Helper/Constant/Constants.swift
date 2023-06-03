@@ -9,17 +9,6 @@ import Foundation
 import UIKit
 
 enum Constants {
-//    enum Firebase {
-//        static let USER_REF = "users"
-//        static let USER_POST_REF = "user-posts"
-//        static let USER_FOLLOWING_REF = "user-following"
-//        static let USER_FOLLOWERS_REF = "user-followers"
-//        static let POST_REF = "posts"
-//        static let POST_LIKES_REF = "post-likes"
-//        static let POST_COMMENTS_REF = "post-comments"
-//        static let AVATAR_REF = "profile-images"
-//        static let POST_IMAGES_REF = "post-images"
-//    }
 
     enum Color {
         static let royalBlue = UIColor(red: 5, green: 10, blue: 230, alpha: 1)
@@ -34,23 +23,6 @@ enum Constants {
         static let lightYellow = UIColor(red: 255, green: 220, blue: 128, alpha: 1)
     }
 
-//    enum Post {
-//        static let postId = "post_id"
-//        static let caption = "caption"
-//        static let imageUrl = "image_url"
-//        static let aspectRatio = "aspect_ratio"
-//        static let creationDate = "creation_date"
-//        static let uid = "uid"
-//    }
-//
-//    enum User {
-//        static let uid = "uid"
-//        static let fullName = "full_name"
-//        static let userName = "user_name"
-//        static let email = "email"
-//        static let bio = "bio"
-//        static let avatarUrl = "avatar_url"
-//    }
 }
 
 enum Firebase {
@@ -74,6 +46,7 @@ enum Firebase {
         static let aspectRatio = "aspect_ratio"
         static let creationDate = "creation_date"
         static let uid = "uid"
+        static let comments = "comments"
     }
 
     enum User {

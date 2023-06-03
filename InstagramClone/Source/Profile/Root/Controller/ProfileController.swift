@@ -31,6 +31,7 @@ class ProfileController: UIViewController, ContainerScrollViewDatasource, Custom
         didSet {
             headerVC.currentUser = currentUser
             bottomVC.currentUser = currentUser
+            navBar.leftBarButtonItems[0].setTitle(currentUser.userName, for: .normal)
         }
     }
     var otherUser: User?
@@ -97,14 +98,13 @@ class ProfileController: UIViewController, ContainerScrollViewDatasource, Custom
 
     private func logout() {
         try? Auth.auth().signOut()
-        let vc = LogInViewController()
-        vc.modalPresentationStyle = .fullScreen
-        vc.modalTransitionStyle = .crossDissolve
-        present(vc, animated: true)
+        let nav = UINavigationController(rootViewController: LogInViewController())
+        nav.modalPresentationStyle = .fullScreen
+        present(nav, animated: true)
     }
 }
 
-// MARK: - ProfileHeaderViewControllerDelegate
+// MARK: - ProfileHeaderControllerDelegate
 
 extension ProfileController: ProfileHeaderControllerDelegate {
     func didTapFollowOrEditButton() {
@@ -122,6 +122,18 @@ extension ProfileController: ProfileHeaderControllerDelegate {
     }
 
     func didTapMessageOrShareButton() { }
+
+    func didTapFollowersLabel() {
+        let user = isLoggedInUser ? currentUser : otherUser!
+        let vc = FollowersDetailController(user: user)
+        navigationController?.pushViewController(vc, animated: true)
+    }
+
+    func didTapFollowingLabel() {
+        let user = isLoggedInUser ? currentUser : otherUser!
+        let vc = FollowingDetailController(user: user)
+        navigationController?.pushViewController(vc, animated: true)
+    }
 }
 
 // MARK: - ProfileEditControllerDelegate
@@ -129,17 +141,17 @@ extension ProfileController: ProfileHeaderControllerDelegate {
 extension ProfileController: ProfileEditControllerDelegate {
 
     func userInfoDidChange() {
-        self.fetchUser()
+        fetchUser()
     }
 
     private func fetchUser() {
-        UserManager.shared.fetchUser(withUid: currentUser.uid) { user, error in
+        UserManager.shared.fetchUser(withUid: currentUser.uid) { [weak self] user, error in
             DispatchQueue.main.async {
                 guard let user = user, error == nil else {
                     print("DEBUG: fetchUserAgain error: \(error!)")
                     return
                 }
-                self.currentUser = user
+                self?.currentUser = user
             }
         }
     }
@@ -165,10 +177,13 @@ extension ProfileController {
                 self?.didTapTitleButton()
             }
 
-            let settingsButton = AttributedButton(image: UIImage(systemName: "line.3.horizontal", withConfiguration: weight)!) { [weak self] in
+            let settingsImage = UIImage(systemName: "line.3.horizontal", withConfiguration: weight)!
+            let settingsButton = AttributedButton(image: settingsImage) { [weak self] in
                 self?.didTapSettingsButton()
             }
-            let createButton = AttributedButton(image: UIImage(systemName: "plus.app", withConfiguration: weight)!) { [weak self] in
+
+            let createImage = UIImage(systemName: "plus.app", withConfiguration: weight)!
+            let createButton = AttributedButton(image: createImage) { [weak self] in
                 self?.didTapCreateButton()
             }
 
@@ -177,9 +192,11 @@ extension ProfileController {
                                          rightBarButtons: [settingsButton, createButton])
         }
         else {
-            let backButton = AttributedButton(image: UIImage(systemName: "chevron.backward", withConfiguration: weight)!) { [weak self] in
+            let backImage = UIImage(systemName: "chevron.backward", withConfiguration: weight)!
+            let backButton = AttributedButton(image: backImage) { [weak self] in
                 self?.didTapBackButton()
             }
+
             let rightButton = AttributedButton(image: UIImage(systemName: "ellipsis")!)
             navBar = CustomNavigationBar(title: otherUser!.userName, shouldShowSeparator: false,
                                          leftBarButtons: [backButton], rightBarButtons: [rightButton])

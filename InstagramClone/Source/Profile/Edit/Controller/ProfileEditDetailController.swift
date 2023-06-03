@@ -13,7 +13,7 @@ protocol ProfileEditDetailControllerDelegate: AnyObject {
 
 class ProfileEditDetailController: UIViewController, CustomizableNavigationBar {
 
-    // MARK: UI components
+    // MARK: - UI components
 
     var navBar: CustomNavigationBar!
 
@@ -50,13 +50,13 @@ class ProfileEditDetailController: UIViewController, CustomizableNavigationBar {
         return view
     }()
 
-    // MARK: Properties
+    // MARK: - Properties
 
     weak var delegate: ProfileEditDetailControllerDelegate?
     private let infoType: ProfileEditController.UserInfoType
     private let user: User
 
-    // MARK: Initialzer
+    // MARK: - Initialzer
 
     init(infoType: ProfileEditController.UserInfoType, user: User) {
         self.infoType = infoType
@@ -80,32 +80,28 @@ class ProfileEditDetailController: UIViewController, CustomizableNavigationBar {
         addNotification()
     }
 
-    // MARK: Functions
-
-    private func didTapDoneButton() {
-        if infoType == .name {
-            guard let newText = infoTextField.text, !newText.isEmpty, newText != user.fullName else { return }
-            delegate?.userInfoDidChange(with: .init(type: .name, data: newText))
+    override func viewWillAppear(_ animated: Bool) {
+        super.viewWillAppear(animated)
+        if infoType == .bio {
+            infoTextView.becomeFirstResponder()
+        } else {
+            infoTextField.becomeFirstResponder()
         }
-        else if infoType == .userName {
-            guard let newText = infoTextField.text, !newText.isEmpty, newText != user.userName else { return }
-            delegate?.userInfoDidChange(with: .init(type: .userName, data: newText))
-        }
-        else if infoType == .bio {
-            guard let newText = infoTextView.text, !newText.isEmpty, newText != user.bio else { return }
-            delegate?.userInfoDidChange(with: .init(type: .bio, data: newText))
-        }
-
-        navigationController?.popViewController(animated: true)
     }
 
-    private func didTapCancelButton() {
-        navigationController?.popViewController(animated: true)
+    override func viewWillDisappear(_ animated: Bool) {
+        super.viewWillDisappear(animated)
+        if infoType == .bio {
+            infoTextView.resignFirstResponder()
+        } else {
+            infoTextField.resignFirstResponder()
+        }
     }
+
+    // MARK: - Functions
 
     @objc private func textFieldDidChange(_ notification: Notification) {
-        guard let textField = notification.object as? UITextField,
-              textField == infoTextField else {
+        guard let textField = notification.object as? UITextField, textField == infoTextField else {
             return
         }
 
@@ -119,15 +115,35 @@ class ProfileEditDetailController: UIViewController, CustomizableNavigationBar {
     }
 
     @objc private func textViewDidChange(_ notification: Notification) {
-        guard let textView = notification.object as? UITextView,
-              textView == infoTextView else {
+        guard let textView = notification.object as? UITextView, textView == infoTextView else {
             return
         }
+
         let shouldEnable: Bool = !textView.text.isEmpty && textView.text != user.bio
         shouldEnable ? enableDoneButton() : disableDoneButton()
     }
 
-    // MARK: Helper
+    private func didTapDoneButton() {
+        switch infoType {
+            case .name:
+                guard let newText = infoTextField.text, !newText.isEmpty, newText != user.fullName else { return }
+                delegate?.userInfoDidChange(with: .init(type: .name, data: newText))
+            case .userName:
+                guard let newText = infoTextField.text, !newText.isEmpty, newText != user.userName else { return }
+                delegate?.userInfoDidChange(with: .init(type: .userName, data: newText))
+            case .bio:
+                guard let newText = infoTextView.text, !newText.isEmpty, newText != user.bio else { return }
+                delegate?.userInfoDidChange(with: .init(type: .bio, data: newText))
+        }
+
+        navigationController?.popViewController(animated: true)
+    }
+
+    private func didTapCancelButton() {
+        navigationController?.popViewController(animated: true)
+    }
+
+    // MARK: - Helper
 
     private func configure() {
         descriptionLabel.text = infoType.description
@@ -136,15 +152,12 @@ class ProfileEditDetailController: UIViewController, CustomizableNavigationBar {
             case .name:
                 infoTextField.text = user.fullName
                 infoTextView.isHidden = true
-                infoTextView.becomeFirstResponder()
             case .userName:
                 infoTextField.text = user.userName
                 infoTextView.isHidden = true
-                infoTextView.becomeFirstResponder()
             case .bio:
                 infoTextView.text = user.bio
                 infoTextField.isHidden = true
-                infoTextField.becomeFirstResponder()
         }
     }
 
@@ -157,15 +170,10 @@ class ProfileEditDetailController: UIViewController, CustomizableNavigationBar {
     }
 
     private func addNotification() {
-        NotificationCenter.default.addObserver(
-            self, selector: #selector(textFieldDidChange(_:)),
-            name: UITextField.textDidChangeNotification, object: infoTextField
-        )
-
-        NotificationCenter.default.addObserver(
-            self, selector: #selector(textViewDidChange(_:)),
-            name: UITextView.textDidChangeNotification, object: infoTextView
-        )
+        NotificationCenter.default.addObserver(self, selector: #selector(textFieldDidChange(_:)),
+                                               name: UITextField.textDidChangeNotification, object: infoTextField)
+        NotificationCenter.default.addObserver(self, selector: #selector(textViewDidChange(_:)),
+                                               name: UITextView.textDidChangeNotification, object: infoTextView)
     }
 
     private func removeNotification() {

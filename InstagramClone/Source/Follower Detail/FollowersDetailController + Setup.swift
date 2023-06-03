@@ -1,18 +1,16 @@
 //
-//  LikeDetailController + Setup.swift
+//  FollowersDetailController + Setup.swift
 //  InstagramClone
 //
-//  Created by Đức Anh Trần on 30/05/2023.
+//  Created by Đức Anh Trần on 02/06/2023.
 //
 
 import UIKit
 
-extension LikeDetailController {
-
+extension FollowersDetailController {
     func setupView() {
         view.backgroundColor = .systemBackground
         setupNavBar()
-        setupActivityIndicator()
         setupSearchBar()
         setupTableView()
         setupConstraints()
@@ -24,20 +22,15 @@ extension LikeDetailController {
         let backButton = AttributedButton(image: image) { [weak self] in
             self?.navigationController?.popViewController(animated: true)
         }
-        navBar = CustomNavigationBar(title: "Likes", shouldShowSeparator: true, leftBarButtons: [backButton])
+        navBar = CustomNavigationBar(title: "Followers", shouldShowSeparator: false, leftBarButtons: [backButton])
     }
 
     private func setupSearchBar() {
-        searchBar = UISearchBar(frame: CGRect(x: 0, y: 0, width: view.frame.width, height: 50))
+        searchBar = UISearchBar(frame: CGRect(x: 0, y: 0, width: view.frame.width, height: 36))
         searchBar.searchBarStyle = .minimal
         searchBar.placeholder = "Search"
         searchBar.showsCancelButton = false
         searchBar.delegate = self
-    }
-
-    private func setupActivityIndicator() {
-        activityIndicator = UIActivityIndicatorView()
-        activityIndicator.hidesWhenStopped = true
     }
 
     private func setupTableView() {
@@ -50,17 +43,17 @@ extension LikeDetailController {
         tableView.estimatedRowHeight = 60
         tableView.tableHeaderView = searchBar
         tableView.dataSource = self
-        tableView.register(LikeDetailCell.self, forCellReuseIdentifier: LikeDetailCell.identifier)
+        tableView.register(FollowersDetailCell.self, forCellReuseIdentifier: FollowersDetailCell.identifier)
     }
 
     private func setupConstraints() {
         navBar.translatesAutoresizingMaskIntoConstraints = false
-        activityIndicator.translatesAutoresizingMaskIntoConstraints = false
         tableView.translatesAutoresizingMaskIntoConstraints = false
 
         view.addSubview(navBar)
-        view.addSubview(activityIndicator)
+        view.addSubview(containerView)
         view.addSubview(tableView)
+        containerView.addSubview(statLalbel)
 
         NSLayoutConstraint.activate([
             navBar.leftAnchor.constraint(equalTo: view.leftAnchor),
@@ -68,13 +61,17 @@ extension LikeDetailController {
             navBar.rightAnchor.constraint(equalTo: view.rightAnchor),
             navBar.heightAnchor.constraint(equalToConstant: 44),
 
-            activityIndicator.rightAnchor.constraint(equalTo: navBar.rightAnchor, constant: -12),
-            activityIndicator.centerYAnchor.constraint(equalTo: navBar.centerYAnchor),
-            activityIndicator.widthAnchor.constraint(equalToConstant: 22),
-            activityIndicator.heightAnchor.constraint(equalToConstant: 22),
+            statLalbel.leftAnchor.constraint(equalTo: containerView.leftAnchor, constant: 15),
+            statLalbel.topAnchor.constraint(equalTo: containerView.topAnchor),
+            statLalbel.rightAnchor.constraint(equalTo: containerView.rightAnchor, constant: -15),
+            statLalbel.bottomAnchor.constraint(equalTo: containerView.bottomAnchor),
+
+            containerView.leftAnchor.constraint(equalTo: view.leftAnchor, constant: 12),
+            containerView.topAnchor.constraint(equalTo: navBar.bottomAnchor),
+            containerView.heightAnchor.constraint(equalToConstant: 40),
 
             tableView.leftAnchor.constraint(equalTo: view.leftAnchor),
-            tableView.topAnchor.constraint(equalTo: navBar.bottomAnchor),
+            tableView.topAnchor.constraint(equalTo: statLalbel.bottomAnchor, constant: 10),
             tableView.rightAnchor.constraint(equalTo: view.rightAnchor),
             tableView.bottomAnchor.constraint(equalTo: view.bottomAnchor)
         ])

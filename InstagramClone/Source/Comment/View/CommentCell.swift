@@ -19,7 +19,6 @@ class CommentCell: UICollectionViewCell {
         imageView.contentMode = .scaleAspectFill
         imageView.clipsToBounds = true
         imageView.layer.cornerRadius = 30/2
-        imageView.backgroundColor = .systemPink
         return imageView
     }()
 
@@ -29,7 +28,6 @@ class CommentCell: UICollectionViewCell {
         label.font = .systemFont(ofSize: 11, weight: .bold)
         label.numberOfLines = 1
         label.setContentHuggingPriority(.defaultLow + 1, for: .horizontal)
-        label.text = "duc3385"
         return label
     }()
 
@@ -39,7 +37,6 @@ class CommentCell: UICollectionViewCell {
         label.textColor = .lightGray
         label.font = .systemFont(ofSize: 11)
         label.numberOfLines = 1
-        label.text = "1w"
         return label
     }()
 
@@ -49,7 +46,6 @@ class CommentCell: UICollectionViewCell {
         label.font = .systemFont(ofSize: 13)
         label.numberOfLines = 0
         label.lineBreakMode = .byWordWrapping
-        label.text = "Congratulation! You're now.\nCongratulation! You're now .\nCongratulation! You're now."
         return label
     }()
 

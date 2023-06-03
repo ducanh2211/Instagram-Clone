@@ -15,15 +15,12 @@ class LikeDetailController: UIViewController, CustomizableNavigationBar {
     var searchBar: UISearchBar!
     var activityIndicator: UIActivityIndicatorView!
     var tableView: UITableView!
+    let refreshControl = UIRefreshControl()
 
     // MARK: - Properties
 
-    private var likedUsers: [User] = [] {
-        didSet { tableView.reloadData() }
-    }
-    private var filteredUsers: [User] = [] {
-        didSet { tableView.reloadData() }
-    }
+    private var likedUsers: [User] = []
+    private var filteredUsers: [User] = []
     private var post: Post
     private var isSearching: Bool = false
 
@@ -46,12 +43,21 @@ class LikeDetailController: UIViewController, CustomizableNavigationBar {
 
     // MARK: - Functions
 
+    @objc func handleRefresh() {
+        filteredUsers.removeAll()
+        isSearching = false
+        searchBar.text = ""
+        fetchLikedUser()
+    }
+
     private func fetchLikedUser() {
         activityIndicator.startAnimating()
-        PostManager.shared.fetchLikedUser(forPost: post.postId) { users in
+        PostManager.shared.fetchLikedUser(forPost: post.postId) { [weak self] users in
             DispatchQueue.main.async {
-                self.likedUsers = users
-                self.activityIndicator.stopAnimating()
+                self?.likedUsers = users
+                self?.activityIndicator.stopAnimating()
+                self?.refreshControl.endRefreshing()
+                self?.tableView.reloadData()
             }
         }
     }
@@ -61,16 +67,16 @@ class LikeDetailController: UIViewController, CustomizableNavigationBar {
 
 extension LikeDetailController: UISearchBarDelegate {
     func searchBar(_ searchBar: UISearchBar, textDidChange searchText: String) {
-        isSearching = true
         if searchText.isEmpty {
             isSearching = false
             fetchLikedUser()
             return
         }
-
+        isSearching = true
         filteredUsers = likedUsers.filter { likedUser in
             likedUser.userName.lowercased().contains(searchText.lowercased())
         }
+        tableView.reloadData()
     }
 }
 
