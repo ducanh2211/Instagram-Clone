@@ -75,11 +75,12 @@ class ProfilePhotoDisplayViewModel {
         getPosts()
     }
 
-    func removeData() {
+    func reloadData() {
         posts.removeAll()
         isFechingMore = false
         hasReachedTheEnd = false
         lastDocument = nil
         createQuery()
+        getPosts()
     }
 }

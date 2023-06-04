@@ -158,20 +158,16 @@ class UserManager {
         }
     }
 
-    func fetchFollowing(uid: String, completion: @escaping ([User]) -> Void) {
+    func fetchFollowingUser(forUid uid: String, completion: @escaping ([User]) -> Void) {
         let dispatchGroup = DispatchGroup()
         var usersData: [User] = []
 
-        userFollowingRef.document(uid).getDocument { [weak self] documentSnapshot, error in
+        fetchFollowingUid(forUser: uid) { [weak self] followingUid in
             guard let self = self else { return }
-            guard let dictionary = documentSnapshot?.data(), error == nil else {
-                completion([])
-                return
-            }
 
-            dictionary.forEach { (otherUid, _) in
+            followingUid.forEach { uid in
                 dispatchGroup.enter()
-                self.fetchUser(withUid: otherUid) { user, error in
+                self.fetchUser(withUid: uid) { user, error in
                     if let user = user {
                         usersData.append(user)
                     }
@@ -182,6 +178,41 @@ class UserManager {
             dispatchGroup.notify(queue: .main) {
                 completion(usersData)
             }
+        }
+
+//        userFollowingRef.document(uid).getDocument { [weak self] documentSnapshot, error in
+//            guard let self = self else { return }
+//            guard let dictionary = documentSnapshot?.data(), error == nil else {
+//                completion([])
+//                return
+//            }
+//
+//            dictionary.forEach { (otherUid, _) in
+//                dispatchGroup.enter()
+//                self.fetchUser(withUid: otherUid) { user, error in
+//                    if let user = user {
+//                        usersData.append(user)
+//                    }
+//                    dispatchGroup.leave()
+//                }
+//            }
+//
+//            dispatchGroup.notify(queue: .main) {
+//                completion(usersData)
+//            }
+//        }
+    }
+
+    func fetchFollowingUid(forUser uid: String, completion: @escaping (_ followingUid: [String]) -> Void) {
+        userFollowingRef.document(uid).getDocument { documentSnapshot, error in
+            guard let dictionary = documentSnapshot?.data(), error == nil else {
+                completion([])
+                return
+            }
+            let data: [String] = dictionary.map { (uid, _) in
+                return uid
+            }
+            completion(data)
         }
     }
 

@@ -58,8 +58,7 @@ class ProfilePhotoDisplayController: UICollectionViewController {
     // MARK: - Functions
 
     @objc private func reloadData() {
-        viewModel.removeData()
-        viewModel.getPosts()
+        viewModel.reloadData()
         shouldShowFooterView(true)
     }
 

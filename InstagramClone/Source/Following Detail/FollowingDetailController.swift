@@ -62,7 +62,7 @@ class FollowingDetailController: UIViewController {
     // MARK: - Functions
 
     private func fetchFollowing() {
-        UserManager.shared.fetchFollowing(uid: user.uid) { [weak self] followers in
+        UserManager.shared.fetchFollowingUser(forUid: user.uid) { [weak self] followers in
             DispatchQueue.main.async {
                 self?.following = followers
                 self?.refreshControl.endRefreshing()

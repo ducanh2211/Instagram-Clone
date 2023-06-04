@@ -186,7 +186,7 @@ class PostManager {
 
     // MARK: - Private functions
 
-    private func fetchPosts(forUser uid: String, completion: @escaping ([Post]) -> Void) {
+    func fetchPosts(forUser uid: String, completion: @escaping ([Post]) -> Void) {
         let dispatchGroup = DispatchGroup()
         var postsData: [Post] = []
 

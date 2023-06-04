@@ -7,31 +7,51 @@
 
 import Foundation
 import FirebaseFirestore
+import FirebaseAuth
 
 class ExploreViewModel {
 
+    var currentUser: User?
     var posts = [Post]()
     var updatePostsData: (() -> Void)?
     var isFechingMore: Bool = false
     var hasReachedTheEnd: Bool = false
-    private var currentUid: String
-    private var query: Query!
+    private var query: Query?
     private var lastDocument: DocumentSnapshot?
     private var pageSize: Int = 18
+    private var pageId: Int = 1
 
-    init(currentUid: String) {
-        self.currentUid = currentUid
+    init() {
+        fetchCurrentUser()
         createQuery()
     }
 
+    // MARK: - Private
+
+    private func fetchCurrentUser() {
+        guard let currentUid = Auth.auth().currentUser?.uid else { return }
+        UserManager.shared.fetchUser(withUid: currentUid) { [weak self] user, error in
+            if let user = user {
+                self?.currentUser = user
+            }
+        }
+    }
+
     private func createQuery() {
+        guard let currentUid = Auth.auth().currentUser?.uid else {
+            query = nil
+            return
+        }
         query = Firestore.firestore()
             .collection(Firebase.RootCollection.posts)
             .whereField(Firebase.Post.uid, isNotEqualTo: currentUid)
             .order(by: Firebase.Post.uid)
     }
 
+    // MARK: - Public
+
     func getPosts() {
+        guard let query = query else { return }
         let dispatchGroup = DispatchGroup()
         var postsData = [Post]()
 
@@ -63,6 +83,9 @@ class ExploreViewModel {
             }
 
             dispatchGroup.notify(queue: .main) {
+                if self.pageId == 1 {
+                    self.posts.removeAll()
+                }
                 self.isFechingMore = false
                 self.posts.append(contentsOf: postsData.shuffled())
                 self.updatePostsData?()
@@ -73,17 +96,19 @@ class ExploreViewModel {
     func getMorePosts() {
         guard let lastDocument = lastDocument else { return }
         isFechingMore = true
+        pageId += 1
         pageSize = 12
-        query = query.start(afterDocument: lastDocument)
+        query = query?.start(afterDocument: lastDocument)
         getPosts()
     }
 
-    func removeData() {
-        posts.removeAll()
+    func reloadData() {
+        pageId = 1
         lastDocument = nil
         isFechingMore = false
         hasReachedTheEnd = false
         pageSize = 18
         createQuery()
+        getPosts()
     }
 }

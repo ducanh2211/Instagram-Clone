@@ -73,7 +73,8 @@ extension MainTabBarController {
     }
 
     private func setupHome(user: User) -> UINavigationController {
-        let homeVC = HomeController(user: user)
+//        let homeVC = HomeController(user: user)
+        let homeVC = HomeController()
         let homeNav = createController(
             homeVC,
             selectedImage: UIImage(named: "home-selected"),
@@ -83,7 +84,8 @@ extension MainTabBarController {
     }
 
     private func setupExplore(user: User) -> UINavigationController {
-        let searchVC = ExploreController(currentUser: user)
+//        let searchVC = ExploreController(currentUser: user)
+        let searchVC = ExploreController()
         let searchNav = createController(
             searchVC,
             selectedImage: UIImage(named: "search-selected"),

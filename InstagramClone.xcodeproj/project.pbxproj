@@ -69,6 +69,7 @@
 		578574AF2A258D3000448BF4 /* LikeDetailCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 578574AE2A258D3000448BF4 /* LikeDetailCell.swift */; };
 		578574B12A26D7A400448BF4 /* ProfilePhotoDisplayViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 578574B02A26D7A400448BF4 /* ProfilePhotoDisplayViewModel.swift */; };
 		578574B42A27598200448BF4 /* ExploreViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 578574B32A27598200448BF4 /* ExploreViewModel.swift */; };
+		579BC7152A2C337200C81D91 /* HomeViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 579BC7142A2C337200C81D91 /* HomeViewModel.swift */; };
 		57AB72942A13309500FB5B09 /* ProfileHeaderController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 57AB72932A13309500FB5B09 /* ProfileHeaderController.swift */; };
 		57AB72962A13316900FB5B09 /* ProfileBottomController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 57AB72952A13316900FB5B09 /* ProfileBottomController.swift */; };
 		57AB729A2A13443000FB5B09 /* ProfilePhotoDisplayController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 57AB72992A13443000FB5B09 /* ProfilePhotoDisplayController.swift */; };
@@ -184,6 +185,7 @@
 		578574AE2A258D3000448BF4 /* LikeDetailCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LikeDetailCell.swift; sourceTree = "<group>"; };
 		578574B02A26D7A400448BF4 /* ProfilePhotoDisplayViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProfilePhotoDisplayViewModel.swift; sourceTree = "<group>"; };
 		578574B32A27598200448BF4 /* ExploreViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ExploreViewModel.swift; sourceTree = "<group>"; };
+		579BC7142A2C337200C81D91 /* HomeViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HomeViewModel.swift; sourceTree = "<group>"; };
 		57AB72932A13309500FB5B09 /* ProfileHeaderController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProfileHeaderController.swift; sourceTree = "<group>"; };
 		57AB72952A13316900FB5B09 /* ProfileBottomController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProfileBottomController.swift; sourceTree = "<group>"; };
 		57AB72992A13443000FB5B09 /* ProfilePhotoDisplayController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProfilePhotoDisplayController.swift; sourceTree = "<group>"; };
@@ -532,6 +534,14 @@
 			path = ViewModel;
 			sourceTree = "<group>";
 		};
+		579BC7132A2C336500C81D91 /* ViewModel */ = {
+			isa = PBXGroup;
+			children = (
+				579BC7142A2C337200C81D91 /* HomeViewModel.swift */,
+			);
+			path = ViewModel;
+			sourceTree = "<group>";
+		};
 		57A6FA012A2B48AB00D85A4D /* ViewModel */ = {
 			isa = PBXGroup;
 			children = (
@@ -634,6 +644,7 @@
 			isa = PBXGroup;
 			children = (
 				57DE12672A14BEE000FDF302 /* View */,
+				579BC7132A2C336500C81D91 /* ViewModel */,
 				576F57D229EB0EC3002F2A6E /* Controller */,
 			);
 			path = Home;
@@ -969,6 +980,7 @@
 				5733AE352A13263B00193A85 /* SwipeDirection.swift in Sources */,
 				57ABFC8529EA64EA00FF1BEB /* FirebaseModel.swift in Sources */,
 				57ABFC8C29EA7AB900FF1BEB /* SignUpViewModel.swift in Sources */,
+				579BC7152A2C337200C81D91 /* HomeViewModel.swift in Sources */,
 				57B4E75829F665E000F5B977 /* PhotoSelectorViewModel.swift in Sources */,
 				578574AF2A258D3000448BF4 /* LikeDetailCell.swift in Sources */,
 				5733AE5D2A13294000193A85 /* BottomControllerProviderDelegate.swift in Sources */,
