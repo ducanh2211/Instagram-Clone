@@ -95,14 +95,27 @@ class PostManager {
             }
             var post = Post(user: user, dictionary: dictionary)
 
-            self.checkLikeStateForPost(postId) { likesCount, likedByCurrentUser in
-                self.numberOfComments(forPost: postId) { commentsCount in
-                    post.likedByCurrentUser = likedByCurrentUser
-                    post.likesCount = likesCount
-                    post.commentsCount = commentsCount
-                    completion(post)
+            self.numberOfComments(forPost: postId) { commentsCount in
+                self.numberOfLikes(forPost: postId) { likesCount in
+                    self.checkIfUserLikePost(postId: postId) { isLiked in
+                        post.commentsCount = commentsCount
+                        post.likesCount = likesCount
+                        post.likedByCurrentUser = isLiked
+                        completion(post)
+                    }
                 }
             }
+//
+//            self.checkLikeStateForPost(postId) { likesCount, likedByCurrentUser in
+//                self.numberOfComments(forPost: postId) { commentsCount in
+//                    post.likedByCurrentUser = likedByCurrentUser
+//                    post.likesCount = likesCount
+//                    post.commentsCount = commentsCount
+//                    DispatchQueue.main.async {
+//                        completion(post)
+//                    }
+//                }
+//            }
         }
     }
 
@@ -215,7 +228,7 @@ class PostManager {
         }
     }
 
-    private func checkLikeStateForPost(_ postId: String, completion: @escaping (_ likesCount: Int, _ likedByCurrentUser: Bool) -> Void) {
+    func checkLikeStateForPost(_ postId: String, completion: @escaping (_ likesCount: Int, _ likedByCurrentUser: Bool) -> Void) {
         guard let currentUid = Auth.auth().currentUser?.uid else { return }
 
         postLikesRef.document(postId).getDocument { documentSnapshot, error in
@@ -237,7 +250,32 @@ class PostManager {
         }
     }
 
-    private func numberOfComments(forPost postId: String, completion: @escaping (Int) -> Void) {
+    func checkIfUserLikePost(postId: String, completion: @escaping (Bool) -> Void) {
+        guard let currentUid = Auth.auth().currentUser?.uid else { return }
+        postLikesRef.document(postId).getDocument { documentSnapshot, error in
+            guard let dictionary = documentSnapshot?.data(), error == nil else {
+                completion(false)
+                return
+            }
+            if dictionary[currentUid] == nil {
+                completion(false)
+            } else {
+                completion(true)
+            }
+        }
+    }
+
+    func numberOfLikes(forPost postId: String, completion: @escaping (Int) -> Void) {
+        postLikesRef.document(postId).getDocument { documentSnapshot, error in
+            guard let dictionary = documentSnapshot?.data(), error == nil else {
+                completion(0)
+                return
+            }
+            completion(dictionary.count)
+        }
+    }
+
+    func numberOfComments(forPost postId: String, completion: @escaping (Int) -> Void) {
         let countQuery = postCommentsRef.document(postId).collection(Firebase.Post.comments).count
 
         countQuery.getAggregation(source: .server) { snapshot, error in

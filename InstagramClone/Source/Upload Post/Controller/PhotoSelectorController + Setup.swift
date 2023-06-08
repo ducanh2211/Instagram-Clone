@@ -60,15 +60,11 @@ extension PhotoSelectorController {
         collectionView.showsVerticalScrollIndicator = false
         collectionView.dataSource = self
         collectionView.delegate = self
-        collectionView.register(
-            PhotoSelectorCell.self,
-            forCellWithReuseIdentifier: PhotoSelectorCell.identifier
-        )
-        collectionView.register(
-            PhotoSelectorHeader.self,
-            forSupplementaryViewOfKind: UICollectionView.elementKindSectionHeader,
-            withReuseIdentifier: PhotoSelectorHeader.identifier
-        )
+        collectionView.register(PhotoSelectorCell.self,
+                                forCellWithReuseIdentifier: PhotoSelectorCell.identifier)
+        collectionView.register(PhotoSelectorHeader.self,
+                                forSupplementaryViewOfKind: UICollectionView.elementKindSectionHeader,
+                                withReuseIdentifier: PhotoSelectorHeader.identifier)
     }
 
     private func createLayout() -> UICollectionViewCompositionalLayout {

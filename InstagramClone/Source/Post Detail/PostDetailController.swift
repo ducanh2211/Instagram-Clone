@@ -46,7 +46,8 @@ extension PostDetailController: PostDetailCellDelegate {
 
     private func pushToProfileController() {
         let otherUser = isLogInUser ? nil : post.user
-        let vc = ProfileController(currentUser: currentUser, otherUser: otherUser)
+        let profileViewModel = ProfileViewModel(type: .other(currentUser: currentUser, otherUser: otherUser))
+        let vc = ProfileController(viewModel: profileViewModel)
         navigationController?.pushViewController(vc, animated: true)
     }
 
@@ -63,19 +64,23 @@ extension PostDetailController: PostDetailCellDelegate {
     }
 
     private func pushToCommentController() {
-//        let vc = CommentController(post: post, currentUser: currentUser)
         let vc = CommentController(post: post, currentUser: currentUser)
         vc.hidesBottomBarWhenPushed = true
         navigationController?.pushViewController(vc, animated: true)
     }
 
     func didTapLikeCounterLabel(_ cell: PostDetailCell) {
-        guard let post = cell.post else { return }
+        guard let post = cell.viewModel?.post else { return }
         let vc = LikeDetailController(post: post)
         navigationController?.pushViewController(vc, animated: true)
     }
 
-    func didTapLikeButton(_ cell: PostDetailCell) { }
+    func cellWillChangeSize(_ cell: PostDetailCell) {
+        collectionView.performBatchUpdates { }
+    }
+
+    func didTapLikeButton(_ cell: PostDetailCell) {
+    }
 }
 
 // MARK: - UICollectionViewDataSource
@@ -89,7 +94,7 @@ extension PostDetailController: UICollectionViewDataSource {
         let cell = collectionView.dequeueReusableCell(
             withReuseIdentifier: PostDetailCell.identifier, for: indexPath) as! PostDetailCell
         cell.delegate = self
-        cell.post = post
+        cell.viewModel = PostDetailCellViewModel(post: post)
         return cell
     }
 }

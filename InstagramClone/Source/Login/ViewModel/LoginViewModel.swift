@@ -10,20 +10,20 @@ import Foundation
 class LoginViewModel {
 
     var user: User? {
-        didSet { success?() }
+        didSet { fetchUserSuccess?() }
     }
     var isLoading: Bool = false {
-        didSet { loadingIndicator?() }
+        didSet { handleLoadingIndicator?() }
     }
     var errorMessage: String = "" {
-        didSet { failure?() }
+        didSet { fetchUserFailure?() }
     }
-    var success: (() -> Void)?
-    var failure: (() -> Void)?
-    var loadingIndicator: (() -> Void)?
+    var fetchUserSuccess: (() -> Void)?
+    var fetchUserFailure: (() -> Void)?
+    var handleLoadingIndicator: (() -> Void)?
     
     deinit {
-        print("LoginViewModel deinit")
+        print("DEBUG: LoginViewModel deinit")
     }
 
     func logInUser(email: String, password: String) {
@@ -32,13 +32,15 @@ class LoginViewModel {
         // completion perhaps call on background thread
         AuthManager.shared.logInUser(email: email, password: password) { [weak self] user, error in
             guard let self = self else { return }
-            self.isLoading = false
+            DispatchQueue.main.async {
+                self.isLoading = false
 
-            if let error = error {
-                self.errorMessage = error.description
-                return
+                if let error = error {
+                    self.errorMessage = error.description
+                    return
+                }
+                self.user = user
             }
-            self.user = user
         }
     }
 }

@@ -212,7 +212,9 @@ class UserManager {
             let data: [String] = dictionary.map { (uid, _) in
                 return uid
             }
-            completion(data)
+            DispatchQueue.main.async {
+                completion(data)
+            }
         }
     }
 

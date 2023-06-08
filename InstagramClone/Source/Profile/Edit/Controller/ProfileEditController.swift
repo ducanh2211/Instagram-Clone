@@ -28,7 +28,7 @@ extension ProfileEditController {
 }
 
 protocol ProfileEditControllerDelegate: AnyObject {
-    func userInfoDidChange()
+    func userInfoDidChange(newUser: User)
 }
 
 // MARK: - ProfileEditController
@@ -104,7 +104,7 @@ class ProfileEditController: UIViewController, CustomizableNavigationBar {
                     print("DEBUG: updateProfileImage error: \(error)")
                     return
                 }
-                self.delegate?.userInfoDidChange()
+                self.delegate?.userInfoDidChange(newUser: self.user)
                 self.activityIndicator.stopAnimating()
                 self.dismiss(animated: true)
             }

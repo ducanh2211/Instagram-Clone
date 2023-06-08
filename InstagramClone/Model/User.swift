@@ -15,10 +15,6 @@ struct User {
     var userName: String
     var avatarUrl: String = ""
     var bio: String = ""
-
-    var isCurrentUser: Bool {
-        uid == Auth.auth().currentUser?.uid
-    }
 }
 
 extension User {

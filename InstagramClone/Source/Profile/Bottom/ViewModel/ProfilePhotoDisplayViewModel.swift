@@ -7,24 +7,30 @@
 
 import Foundation
 import FirebaseFirestore
+import FirebaseAuth
 
 class ProfilePhotoDisplayViewModel {
 
+    var currentUser: User
+    var otherUser: User?
     var posts = [Post]()
     var updatePostsData: (() -> Void)?
     var isFechingMore: Bool = false
     var hasReachedTheEnd: Bool = false
-    private var uid: String
-    private var query: Query!
+    private var query: Query?
     private var lastDocument: DocumentSnapshot?
     private let pageSize = 15
+    private var pageId: Int = 0
 
-    init(uid: String) {
-        self.uid = uid
+    init(currentUser: User, otherUser: User?) {
+        self.currentUser = currentUser
+        self.otherUser = otherUser
         createQuery()
     }
 
     private func createQuery() {
+        let uid = otherUser?.uid ?? currentUser.uid
+
         query = Firestore.firestore()
             .collection(Firebase.RootCollection.userPosts)
             .document(uid)
@@ -34,7 +40,8 @@ class ProfilePhotoDisplayViewModel {
     }
 
     func getPosts() {
-        let dispatchGroup = DispatchGroup()
+        guard let query = query else { return }
+        pageId += 1
 
         query.getDocuments { [weak self] querySnapshot, error in
             guard let self = self else { return }
@@ -48,39 +55,50 @@ class ProfilePhotoDisplayViewModel {
             } else {
                 self.lastDocument = documents.last
             }
-
-            documents.forEach { document in
-                let postId = document.documentID
-
-                dispatchGroup.enter()
-                PostManager.shared.fetchPost(postId) { post in
-                    if let post = post {
-                        self.posts.append(post)
-                    }
-                    dispatchGroup.leave()
-                }
-            }
-
-            dispatchGroup.notify(queue: .main) {
-                self.isFechingMore = false
-                self.updatePostsData?()
-            }
+            self.fetchPosts(documents: documents)
         }
     }
 
     func getMorePosts() {
         guard let lastDocument = lastDocument else { return }
         isFechingMore = true
-        query = query.start(afterDocument: lastDocument)
+        query = query?.start(afterDocument: lastDocument)
         getPosts()
     }
 
     func reloadData() {
-        posts.removeAll()
+        pageId = 0
         isFechingMore = false
         hasReachedTheEnd = false
         lastDocument = nil
         createQuery()
         getPosts()
+    }
+
+    private func fetchPosts(documents: [QueryDocumentSnapshot]) {
+        var postsData = [Post]()
+        let dispatchGroup = DispatchGroup()
+
+        documents.forEach { document in
+            let postId = document.documentID
+
+            dispatchGroup.enter()
+            PostManager.shared.fetchPost(postId) { post in
+                if let post = post {
+                    postsData.append(post)
+                }
+                dispatchGroup.leave()
+            }
+        }
+
+        dispatchGroup.notify(queue: .main) {
+            if self.pageId == 1 {
+                self.posts.removeAll()
+            }
+            self.isFechingMore = false
+            self.posts.append(contentsOf: postsData)
+            self.posts = self.posts.sorted { $0.creationDate > $1.creationDate }
+            self.updatePostsData?()
+        }
     }
 }

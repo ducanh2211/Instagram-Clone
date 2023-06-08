@@ -123,8 +123,11 @@ class HomePostCell: UICollectionViewCell {
 
     weak var delegate: HomePostCellDelegate?
     private var postPhotoImageViewHeightConstraint: NSLayoutConstraint!
-    var post: Post? {
-        didSet { configure() }
+    var viewModel: HomePostCellViewModel? {
+        didSet {
+            configure()
+            bindViewModel()
+        }
     }
 
     // MARK: - Initializer
@@ -140,80 +143,74 @@ class HomePostCell: UICollectionViewCell {
 
     // MARK: - Functions
 
-    private func configure() {
-        guard let post = post else { return }
-        profileImageView.sd_setImage(with: URL(string: post.user.avatarUrl), placeholderImage: UIImage(named: "user"), context: nil)
-        userNameLabel.text = post.user.userName
-        postPhotoImageView.sd_setImage(with: URL(string: post.imageUrl))
-        configurePostPhotoHeight()
-        configureCaptionLalbel()
-        configureTimeLineLalbel()
-        configureLikeButton()
-        setLikeCounter(post.likesCount)
-        setCommentCounter(post.commentsCount)
+    private func bindViewModel() {
+        guard let viewModel = viewModel else { return }
+
+        viewModel.getNumberOfCommentsSuccess = { [weak self] in
+            self?.commentCounterLabel.text = viewModel.commentsCounterText
+        }
+        viewModel.getNumberOfLikesSuccess = { [weak self] in
+            guard let self = self else { return }
+            self.likeCounterLabel.isHidden = viewModel.shouldHideCounterLabel
+            self.likeCounterLabel.text = viewModel.likeCounterText
+        }
+        viewModel.checkLikesStateSuccess = { [weak self] in
+            guard let self = self else { return }
+            self.configureLikeButton()
+        }
+        viewModel.getNumberOfComments()
+        viewModel.getNumberOfLikes()
+        viewModel.checkLikesState()
     }
 
-    private func configureCaptionLalbel() {
-        guard let post = post else { return }
-        let attributedText = NSMutableAttributedString()
-            .appendAttributedString(post.user.userName, font: .systemFont(ofSize: 14, weight: .bold), color: .label)
-            .appendAttributedString(" \(post.caption)", font: .systemFont(ofSize: 14), color: .label)
-        captionLabel.attributedText = attributedText
+    private func configure() {
+        guard let viewModel = viewModel else { return }
+        profileImageView.sd_setImage(with: URL(string: viewModel.userAvatarUrl),
+                                     placeholderImage: UIImage(named: "user"), context: nil)
+        userNameLabel.text = viewModel.userName
+        postPhotoImageView.sd_setImage(with: URL(string: viewModel.postImageUrl))
+        captionLabel.attributedText = viewModel.captionAttributedText
+        timeLineLabel.text = viewModel.timeLineText
+        commentCounterLabel.text = viewModel.commentsCounterText
+        configurePostPhotoHeight()
+        configureLikeButton()
+    }
+
+    private func configureLikeCounterLalbel() {
+        guard let viewModel = viewModel else { return }
+        likeCounterLabel.isHidden = viewModel.shouldHideCounterLabel
+        likeCounterLabel.text = viewModel.likeCounterText
     }
 
     private func configureLikeButton() {
-        guard let post = post else { return }
+        guard let viewModel = viewModel else { return }
         let font = UIImage.SymbolConfiguration(font: .systemFont(ofSize: 13))
         let weight = UIImage.SymbolConfiguration(weight: .medium)
         let config = font.applying(weight)
-        let image: UIImage? = post.likedByCurrentUser ?
+        let image: UIImage? = viewModel.likedByCurrentUser ?
         UIImage(systemName: "heart.fill", withConfiguration: config) :
         UIImage(systemName: "heart", withConfiguration: config)
-        let tintColor: UIColor = post.likedByCurrentUser ? .red : .label
+        let tintColor: UIColor = viewModel.likedByCurrentUser ? .red : .label
 
         likeButton.tintColor = tintColor
         likeButton.setImage(image, for: .normal)
     }
 
-    private func setLikeCounter(_ value: Int) {
-        if value <= 0 {
-            likeCounterLabel.isHidden = true
-        } else if value == 1 {
-            likeCounterLabel.text = "1 like"
-            likeCounterLabel.isHidden = false
-        } else {
-            likeCounterLabel.text = "\(value) likes"
-            likeCounterLabel.isHidden = false
-        }
-    }
-
-    private func setCommentCounter(_ value: Int) {
-        if value <= 0 {
-            commentCounterLabel.isHidden = true
-        } else if value == 1 {
-            commentCounterLabel.text = "View 1 comment"
-            commentCounterLabel.isHidden = false
-        } else {
-            commentCounterLabel.text = "View all \(value) comments"
-            commentCounterLabel.isHidden = false
-        }
-    }
-
     private func configurePostPhotoHeight() {
-        guard let post = post else { return }
+        guard let viewModel = viewModel else { return }
         NSLayoutConstraint.deactivate([postPhotoImageViewHeightConstraint])
-        postPhotoImageViewHeightConstraint = postPhotoImageView.heightAnchor.constraint(equalTo: postPhotoImageView.widthAnchor, multiplier: 1/post.aspectRatio)
+        postPhotoImageViewHeightConstraint = postPhotoImageView.heightAnchor.constraint(
+            equalTo: postPhotoImageView.widthAnchor, multiplier: 1/viewModel.postImageAspectRatio)
         NSLayoutConstraint.activate([postPhotoImageViewHeightConstraint])
     }
 
-    private func configureTimeLineLalbel() {
-        guard let post = post else { return }
-        let formatter = DateComponentsFormatter()
-        formatter.allowedUnits = [.weekOfMonth, .day, .hour, .minute, .second]
-        formatter.unitsStyle = .full
-        formatter.maximumUnitCount = 1
-        guard let duration = formatter.string(from: post.creationDate, to: Date()) else { return }
-        timeLineLabel.text = "\(duration) ago"
+    private func updateLikeButtonAndLabel() {
+        configureLikeButton()
+        configureLikeCounterLalbel()
+        likeButton.transform = CGAffineTransform(scaleX: 0.8, y: 0.8)
+        UIView.animate(withDuration: 0.2, delay: 0) {
+            self.likeButton.transform = .identity
+        }
     }
 
     // MARK: - Selectors
@@ -227,6 +224,21 @@ class HomePostCell: UICollectionViewCell {
     }
 
     @objc private func didTapLikeButton() {
+        guard let viewModel = viewModel else { return }
+
+        if viewModel.likedByCurrentUser {
+            viewModel.unlikePost()
+            viewModel.likesCount -= 1
+            viewModel.likedByCurrentUser = false
+            updateLikeButtonAndLabel()
+        } else {
+            let generator = UIImpactFeedbackGenerator(style: .rigid)
+            generator.impactOccurred()
+            viewModel.likePost()
+            viewModel.likesCount += 1
+            viewModel.likedByCurrentUser = true
+            updateLikeButtonAndLabel()
+        }
         delegate?.didTapLikeButton(self)
     }
 

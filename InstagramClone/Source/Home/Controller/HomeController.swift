@@ -30,31 +30,32 @@ class HomeController: UIViewController, CustomizableNavigationBar {
 
     // MARK: - Properties
 
-//    var user: User
-//    var posts: [Post] = []
     let navBarHeight: CGFloat = 44
     private var lastContentOffset: CGFloat = -44
     private var isFirstLoading: Bool = true
-    private let viewModel = HomeViewModel()
+    private let viewModel: HomeViewModel
 
     // MARK: - Life cycle
+
+    init(viewModel: HomeViewModel) {
+        self.viewModel = viewModel
+        super.init(nibName: nil, bundle: nil)
+    }
+
+    required init?(coder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
+    }
+
+    deinit {
+        print("DEBUG: HomeController deinit")
+    }
 
     override func viewDidLoad() {
         super.viewDidLoad()
         view.backgroundColor = .systemBackground
         setupView()
         bindViewModel()
-//        fetchPosts()
     }
-
-//    init(user: User) {
-//        self.user = user
-//        super.init(nibName: nil, bundle: nil)
-//    }
-//
-//    required init?(coder: NSCoder) {
-//        fatalError("init(coder:) has not been implemented")
-//    }
 
     // MARK: - Functions
 
@@ -69,7 +70,6 @@ class HomeController: UIViewController, CustomizableNavigationBar {
                 }
             }
         }
-
         viewModel.updatePostsData = { [weak self] in
             DispatchQueue.main.async {
                 guard let self = self else { return }
@@ -77,29 +77,12 @@ class HomeController: UIViewController, CustomizableNavigationBar {
                 self.refreshControl.endRefreshing()
             }
         }
-
         viewModel.getPosts()
     }
 
     @objc func handleRefresh() {
-//        fetchPosts()
         viewModel.reloadData()
     }
-
-//    func fetchPosts() {
-//        if isFirstLoading {
-//            ProgressHUD.show()
-//        }
-//        PostManager.shared.fetchHomePosts(forCurrentUser: user.uid) { [weak self] posts in
-//            DispatchQueue.main.async {
-//                self?.posts = posts.shuffled()
-//                self?.isFirstLoading = false
-//                self?.refreshControl.endRefreshing()
-//                self?.collectionView.reloadData()
-//                ProgressHUD.remove()
-//            }
-//        }
-//    }
 }
 
 // MARK: - HomePostCellDelegate
@@ -114,8 +97,10 @@ extension HomeController: HomePostCellDelegate {
     }
 
     private func pushToProfileController(_ cell: HomePostCell) {
-        guard let post = cell.post, let currentUser = viewModel.currentUser else { return }
-        let vc = ProfileController(currentUser: currentUser, otherUser: post.user)
+        guard let post = cell.viewModel?.post else { return }
+        let otherUser = viewModel.currentUser.uid == post.user.uid ? nil : post.user
+        let profileViewModel = ProfileViewModel(type: .other(currentUser: viewModel.currentUser, otherUser: otherUser))
+        let vc = ProfileController(viewModel: profileViewModel)
         navigationController?.pushViewController(vc, animated: true)
     }
 
@@ -132,58 +117,23 @@ extension HomeController: HomePostCellDelegate {
     }
 
     private func pushToCommentController(_ cell: HomePostCell) {
-        guard let post = cell.post, let currentUser = viewModel.currentUser else { return }
-        let vc = CommentController(post: post, currentUser: currentUser)
+        guard let post = cell.viewModel?.post else { return }
+        let vc = CommentController(post: post, currentUser: viewModel.currentUser)
         vc.hidesBottomBarWhenPushed = true
         navigationController?.pushViewController(vc, animated: true)
     }
 
     func didTapLikeCounterLabel(_ cell: HomePostCell) {
-        guard let post = cell.post else { return }
+        guard let post = cell.viewModel?.post else { return }
         let vc = LikeDetailController(post: post)
         navigationController?.pushViewController(vc, animated: true)
     }
 
     func didTapLikeButton(_ cell: HomePostCell) {
         guard let indexPath = collectionView.indexPath(for: cell) else { return }
-//        var post = posts[indexPath.item]
-        var post = viewModel.posts[indexPath.item]
-        
-        if post.likedByCurrentUser {
-            PostManager.shared.unlikePost(post.postId) { [weak self] error in
-                DispatchQueue.main.async {
-                    guard let self = self else { return }
-                    if let error = error {
-                        print("DEBUG: unlike post error: \(error)")
-                        return
-                    }
-                    post.likedByCurrentUser = false
-                    post.likesCount -= 1
-//                    self.posts[indexPath.item] = post
-                    self.viewModel.posts[indexPath.item] = post
-                    self.collectionView.performBatchUpdates {
-                        self.collectionView.reloadItems(at: [indexPath])
-                    }
-                }
-            }
-        } else {
-            PostManager.shared.likePost(post.postId) { [weak self] error in
-                DispatchQueue.main.async {
-                    guard let self = self else { return }
-                    if let error = error {
-                        print("DEBUG: unlike post error: \(error)")
-                        return
-                    }
-                    post.likedByCurrentUser = true
-                    post.likesCount += 1
-//                    self.posts[indexPath.item] = post
-                    self.viewModel.posts[indexPath.item] = post
-                    self.collectionView.performBatchUpdates {
-                        self.collectionView.reloadItems(at: [indexPath])
-                    }
-                }
-            }
-        }
+        guard let post = cell.viewModel?.post else { return }
+        self.viewModel.posts[indexPath.item] = post
+        collectionView.performBatchUpdates { }
     }
 }
 
@@ -196,7 +146,6 @@ extension HomeController: UICollectionViewDataSource {
 
     func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
         if HomeSection(rawValue: section) == .story { return 10 }
-//        return posts.count
         return viewModel.posts.count
     }
 
@@ -207,8 +156,9 @@ extension HomeController: UICollectionViewDataSource {
         } else {
             let cell = collectionView.dequeueReusableCell(withReuseIdentifier: HomePostCell.identifier, for: indexPath) as! HomePostCell
             cell.delegate = self
-//            cell.post = posts[indexPath.item]
-            cell.post = viewModel.posts[indexPath.item]
+            let post = viewModel.posts[indexPath.item]
+            let cellViewModel = HomePostCellViewModel(post: post)
+            cell.viewModel = cellViewModel
             return cell
         }
     }

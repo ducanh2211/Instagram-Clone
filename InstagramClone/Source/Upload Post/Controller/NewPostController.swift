@@ -27,7 +27,7 @@ class NewPostController: UIViewController, CustomizableNavigationBar {
         return imageView
     }()
 
-    lazy var captionTextView: PlaceholderTextView = {
+    lazy var captionTextView: PlaceholderTextView = { [weak self] in
         let textView = PlaceholderTextView()
         textView.translatesAutoresizingMaskIntoConstraints = false
         textView.placeHolderText = "Write a caption..."
@@ -89,7 +89,7 @@ class NewPostController: UIViewController, CustomizableNavigationBar {
     }
 
     deinit {
-        print("NewPostController deinit")
+        print("DEUBG: NewPostController deinit")
     }
 
     override func viewDidLoad() {
@@ -104,31 +104,25 @@ class NewPostController: UIViewController, CustomizableNavigationBar {
 
     private func bindViewModel() {
         viewModel.createPostSuccess = { [weak self] in
-            DispatchQueue.main.async {
-                NotificationCenter.default.post(name: .reloadUserProfileFeed, object: nil)
-                self?.dismiss(animated: true)
-            }
+            NotificationCenter.default.post(name: .userDidUploadNewPost, object: nil)
+            self?.dismiss(animated: true)
         }
 
         viewModel.createPostFailure = { [weak self] error in
-            DispatchQueue.main.async {
-                self?.dismiss(animated: true)
-            }
+            self?.dismiss(animated: true)
         }
 
         viewModel.loadingIndicator = { [weak self] in
-            DispatchQueue.main.async {
-                guard let self = self else { return }
-                let isLoading = self.viewModel.isLoading
-                if isLoading {
-                    self.hideShareButton()
-                    self.disableBackButton()
-                    self.activityIndicator.startAnimating()
-                } else {
-                    self.showShareButton()
-                    self.enableBackButton()
-                    self.activityIndicator.stopAnimating()
-                }
+            guard let self = self else { return }
+            let isLoading = self.viewModel.isLoading
+            if isLoading {
+                self.hideShareButton()
+                self.disableBackButton()
+                self.activityIndicator.startAnimating()
+            } else {
+                self.showShareButton()
+                self.enableBackButton()
+                self.activityIndicator.stopAnimating()
             }
         }
     }
@@ -152,9 +146,8 @@ class NewPostController: UIViewController, CustomizableNavigationBar {
         view.endEditing(true)
 
         guard let postImage = postImage,
-              let imageData = postImage.jpegData(compressionQuality: 1),
+              let imageData = postImage.jpegData(compressionQuality: 0.6),
               let caption = captionTextView.text else { return }
-
         viewModel.createPost(withImage: imageData, aspectRatio: idealPhotoAspectRatio, caption: caption)
     }
 

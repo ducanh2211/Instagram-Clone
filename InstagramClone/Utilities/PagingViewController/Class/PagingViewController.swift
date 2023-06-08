@@ -110,7 +110,6 @@ extension PagingViewController: UIScrollViewDelegate {
 //            swipeDirection = isSwipeRight ? .right : .left
 //        }
         swipeDirection = isSwipeRight ? .right : .left
-        print("DEBUG: direction before: \(swipeDirection)")
 
         var progress =  (currentOffset - lastContentOffset) / pageWidth
         if progress > 0 {
@@ -121,7 +120,9 @@ extension PagingViewController: UIScrollViewDelegate {
 
         if !isSelecting && isSwipeRight && progress != 1 {
             let fromIndex = Int(currentOffset/pageWidth)
-            addMorePageController(fromIndex: fromIndex, toIndex: fromIndex + 1)
+            if shouldAddChildController(at: fromIndex + 1) {
+                addMorePageController(fromIndex: fromIndex, toIndex: fromIndex + 1)
+            }
         }
 
         var indexJustChanged: Bool = false

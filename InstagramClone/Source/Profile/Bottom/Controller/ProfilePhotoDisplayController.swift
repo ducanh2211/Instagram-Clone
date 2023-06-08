@@ -15,26 +15,13 @@ class ProfilePhotoDisplayController: UICollectionViewController {
 
     // MARK: - Properties
 
-    var currentUser: User {
-        didSet {
-            if rootViewHasLoaded {
-                reloadData()
-            }
-        }
-    }
-    private let viewModel: ProfilePhotoDisplayViewModel
-    private var posts: [Post] = []
-    private var rootViewHasLoaded: Bool = false
+    private var rootViewDidLoad: Bool = false
+    var viewModel: ProfilePhotoDisplayViewModel 
 
     // MARK: - Initializer
-    
-    init(currentUser: User, otherUser: User?) {
-        self.currentUser = currentUser
-        if let otherUser = otherUser {
-            viewModel = ProfilePhotoDisplayViewModel(uid: otherUser.uid)
-        } else {
-            viewModel = ProfilePhotoDisplayViewModel(uid: currentUser.uid)
-        }
+
+    init(viewModel: ProfilePhotoDisplayViewModel) {
+        self.viewModel = viewModel
         super.init(collectionViewLayout: UICollectionViewFlowLayout())
     }
 
@@ -43,16 +30,16 @@ class ProfilePhotoDisplayController: UICollectionViewController {
     }
 
     deinit {
-        NotificationCenter.default.removeObserver(self, name: .reloadUserProfileFeed, object: nil)
+        removeNotification()
         print("DEBUG: ProfilePhotoDisplayController deinit")
     }
 
     override func viewDidLoad() {
         super.viewDidLoad()
-        rootViewHasLoaded = true
+        rootViewDidLoad = true
         setupCollecionView()
         bindViewModel()
-        NotificationCenter.default.addObserver(self, selector: #selector(reloadData), name: .reloadUserProfileFeed, object: nil)
+        addNotification()
     }
 
     // MARK: - Functions
@@ -62,14 +49,18 @@ class ProfilePhotoDisplayController: UICollectionViewController {
         shouldShowFooterView(true)
     }
 
+    @objc private func currentUserDidUpdateInfo(_ notification: Notification) {
+        if let currentUser = notification.userInfo?["currentUser"] as? User {
+            viewModel.currentUser = currentUser
+            if rootViewDidLoad {
+                reloadData()
+            }
+        }
+    }
+
     private func bindViewModel() {
         viewModel.updatePostsData = { [weak self] in
-            DispatchQueue.main.async {
-                guard let self = self else { return }
-                let sortedPosts = self.viewModel.posts.sorted { $0.creationDate > $1.creationDate }
-                self.posts = sortedPosts
-                self.collectionView.reloadData()
-            }
+            self?.collectionView.reloadData()
         }
         viewModel.getPosts()
     }
@@ -80,26 +71,38 @@ class ProfilePhotoDisplayController: UICollectionViewController {
             (self.collectionView.collectionViewLayout as? UICollectionViewCompositionalLayout)?.configuration = self.compositionalLayoutConfig
         }
     }
+
+    private func addNotification() {
+        NotificationCenter.default.addObserver(self, selector: #selector(reloadData),
+                                               name: .userDidUploadNewPost, object: nil)
+        NotificationCenter.default.addObserver(self, selector: #selector(currentUserDidUpdateInfo),
+                                               name: .currentUserDidUpdateInfo, object: nil)
+    }
+
+    private func removeNotification() {
+        NotificationCenter.default.removeObserver(self, name: .userDidUploadNewPost, object: nil)
+        NotificationCenter.default.removeObserver(self, name: .currentUserDidUpdateInfo, object: nil)
+    }
 }
 
 // MARK: - UICollectionViewDataSource, Delegate
 
 extension ProfilePhotoDisplayController {
     override func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
-        return posts.count
+        return viewModel.posts.count
     }
 
     override func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
         let cell = collectionView.dequeueReusableCell(
             withReuseIdentifier: PhotoCollectionViewCell.identifier, for: indexPath) as! PhotoCollectionViewCell
-        let post = posts[indexPath.item]
+        let post = viewModel.posts[indexPath.item]
         cell.configure(with: post.imageUrl)
         return cell
     }
 
     override func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
-        let post = posts[indexPath.item]
-        let vc = PostDetailController(post: post, currentUser: currentUser)
+        let post = viewModel.posts[indexPath.item]
+        let vc = PostDetailController(post: post, currentUser: viewModel.currentUser)
         navigationController?.pushViewController(vc, animated: true)
     }
 
@@ -133,6 +136,7 @@ extension ProfilePhotoDisplayController {
     override func scrollViewDidScroll(_ scrollView: UIScrollView) {
         let currentOffset = scrollView.contentOffset.y
         let maximumOffset = scrollView.contentSize.height - scrollView.bounds.height
+
         if maximumOffset - currentOffset <= 0 {
             if !viewModel.isFechingMore {
                 viewModel.getMorePosts()

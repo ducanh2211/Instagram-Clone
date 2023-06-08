@@ -76,18 +76,17 @@ extension HomeController {
 
     private func createLayout() -> UICollectionViewCompositionalLayout {
         let layout = UICollectionViewCompositionalLayout {
-            sectionIndex, layoutEnvironment -> NSCollectionLayoutSection? in
+            [weak self] sectionIndex, layoutEnvironment -> NSCollectionLayoutSection? in
 
             switch HomeSection(rawValue: sectionIndex) {
                 case .story:
-                    return self.createStorySection()
+                    return self?.createStorySection()
                 case .post:
-                    return self.createPostSection()
+                    return self?.createPostSection()
                 default:
                     return nil
             }
         }
-
         let configuration = UICollectionViewCompositionalLayoutConfiguration()
         layout.configuration = configuration
         return layout

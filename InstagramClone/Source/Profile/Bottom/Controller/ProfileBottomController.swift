@@ -19,31 +19,28 @@ class ProfileBottomController: UIViewController, BottomControllerProvider {
 
     // MARK: - Properties
 
-    var currentUser: User {
-        didSet {
-            viewControllers.forEach { $0.currentUser = currentUser }
-        }
-    }
     var currentIndex: Int = 0
     private var pagingVC: PagingViewController!
     private let viewControllers: [ProfilePhotoDisplayController]
-    private let menuItems: [DefaultMenuItem] = [
-        .init(normalImage: UIImage(named: "grid-unselected")!,
-              selectedImage: UIImage(named: "grid-selected")!),
-        .init(normalImage: UIImage(named: "reels-unselected")!,
-              selectedImage: UIImage(named: "reels-selected")!),
-        .init(normalImage: UIImage(named: "tagged-unselected")!,
-              selectedImage: UIImage(named: "tagged-selected")!),
-    ]
-    
+    private let menuItems: [DefaultMenuItem]
+    var viewModel: ProfileBottomViewModel
+
     // MARK: - Life cycle
 
-    init(currentUser: User, otherUser: User?) {
-        self.currentUser = currentUser
+    init(viewModel: ProfileBottomViewModel) {
+        self.viewModel = viewModel
         self.viewControllers = [
-            .init(currentUser: currentUser, otherUser: otherUser),
-            .init(currentUser: currentUser, otherUser: otherUser),
-            .init(currentUser: currentUser, otherUser: otherUser),
+            .init(viewModel: ProfilePhotoDisplayViewModel(currentUser: viewModel.currentUser, otherUser: viewModel.otherUser)),
+            .init(viewModel: ProfilePhotoDisplayViewModel(currentUser: viewModel.currentUser, otherUser: viewModel.otherUser)),
+            .init(viewModel: ProfilePhotoDisplayViewModel(currentUser: viewModel.currentUser, otherUser: viewModel.otherUser)),
+        ]
+        self.menuItems = [
+            .init(normalImage: UIImage(named: "grid-unselected")!,
+                  selectedImage: UIImage(named: "grid-selected")!),
+            .init(normalImage: UIImage(named: "reels-unselected")!,
+                  selectedImage: UIImage(named: "reels-selected")!),
+            .init(normalImage: UIImage(named: "tagged-unselected")!,
+                  selectedImage: UIImage(named: "tagged-selected")!),
         ]
         super.init(nibName: nil, bundle: nil)
     }
@@ -53,12 +50,28 @@ class ProfileBottomController: UIViewController, BottomControllerProvider {
     }
 
     deinit {
+        NotificationCenter.default.removeObserver(self, name: .currentUserDidUpdateInfo, object: nil)
         print("DEBUG: ProfileBottomController deinit")
     }
 
     override func viewDidLoad() {
         super.viewDidLoad()
         setupPagingVC()
+        NotificationCenter.default.addObserver(self, selector: #selector(currentUserDidUpdateInfo),
+                                               name: .currentUserDidUpdateInfo, object: nil)
+    }
+
+    private func reloadData() {
+        viewControllers.forEach { controller in
+            controller.viewModel = ProfilePhotoDisplayViewModel(currentUser: viewModel.currentUser,
+                                                                otherUser: viewModel.otherUser)
+        }
+    }
+
+    @objc private func currentUserDidUpdateInfo(_ notification: Notification) {
+        if let currentUser = notification.userInfo?["currentUser"] as? User {
+            viewModel.currentUser = currentUser
+        }
     }
 
     private func setupPagingVC() {
@@ -94,7 +107,8 @@ extension ProfileBottomController: PagingViewControllerDataSource {
 // MARK: - PagingViewControllerDelegate
 
 extension ProfileBottomController: PagingViewControllerDelegate {
-    func pagingViewController(_ pagingViewController: PagingViewController, didTrasitioningAt currentIndex: Int, progress: CGFloat, indexJustChanged: Bool) {
+    func pagingViewController(_ pagingViewController: PagingViewController,
+                              didTrasitioningAt currentIndex: Int, progress: CGFloat, indexJustChanged: Bool) {
         if indexJustChanged {
             self.currentIndex = currentIndex
             delegate?.bottomControllerProvider(self, currentViewController: currentViewController, currentIndex: currentIndex)

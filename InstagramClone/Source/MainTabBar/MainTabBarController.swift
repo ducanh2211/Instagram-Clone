@@ -9,7 +9,7 @@ import UIKit
 
 class MainTabBarController: UITabBarController {
 
-    private(set) var viewModel: TabBarViewModel
+    let viewModel: TabBarViewModel
 
     // MARK: - Life cycle
     
@@ -18,30 +18,32 @@ class MainTabBarController: UITabBarController {
         super.init(nibName: nil, bundle: nil)
     }
 
+    required init?(coder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
+    }
+
+    deinit {
+        print("DEBUG: MainTabBarController deinit")
+    }
+    var time: Date!
     override func viewDidLoad() {
         super.viewDidLoad()
         view.backgroundColor = .systemBackground
         tabBar.isTranslucent = false
         tabBar.tintColor = .label
         tabBar.backgroundColor = .systemBackground
+        tabBar.isHidden = true
         delegate = self
+        time = Date()
         bindViewModel()
         validateUser()
-    }
-
-    required init?(coder: NSCoder) {
-        fatalError("init(coder:) has not been implemented")
     }
 
     // MARK: - Functions
 
     private func bindViewModel() {
-        print("DEBUG: Bind VIew Model")
         viewModel.receivedUser = { [weak self] in
-            print("DEBUG: Bind view model completion")
-            DispatchQueue.main.async {
-                self?.setupController()
-            }
+            self?.setupController()
         }
     }
 
@@ -56,7 +58,6 @@ class MainTabBarController: UITabBarController {
             self.present(nav, animated: false)
         }
     }
-
 }
 
 // MARK: - Setup
@@ -64,17 +65,19 @@ class MainTabBarController: UITabBarController {
 extension MainTabBarController {
     private func setupController() {
         guard let user = self.viewModel.user else { return }
+        print("DEBUG: time \(Date().timeIntervalSince(time))")
         let homeNav = setupHome(user: user)
         let searchNav = setupExplore(user: user)
         let postNav = setupPost()
         let reelsNav = setupReels()
         let profileNav = setupProfile(user: user)
+        tabBar.isHidden = false
         setViewControllers([homeNav, searchNav, postNav, reelsNav, profileNav], animated: false)
     }
 
     private func setupHome(user: User) -> UINavigationController {
-//        let homeVC = HomeController(user: user)
-        let homeVC = HomeController()
+        let homeViewModel = HomeViewModel(currentUser: user)
+        let homeVC = HomeController(viewModel: homeViewModel)
         let homeNav = createController(
             homeVC,
             selectedImage: UIImage(named: "home-selected"),
@@ -84,8 +87,8 @@ extension MainTabBarController {
     }
 
     private func setupExplore(user: User) -> UINavigationController {
-//        let searchVC = ExploreController(currentUser: user)
-        let searchVC = ExploreController()
+        let searchViewModel = ExploreViewModel(currentUser: user)
+        let searchVC = ExploreController(viewModel: searchViewModel)
         let searchNav = createController(
             searchVC,
             selectedImage: UIImage(named: "search-selected"),
@@ -113,7 +116,8 @@ extension MainTabBarController {
     }
 
     private func setupProfile(user: User) -> UINavigationController {
-        let profileVC = ProfileController(currentUser: user, otherUser: nil)
+        let profileViewModel = ProfileViewModel(type: .mainTabBar(currentUser: user))
+        let profileVC = ProfileController(viewModel: profileViewModel)
         let profileNav = createController(
             profileVC,
             selectedImage: UIImage(systemName: "person.circle.fill"),

@@ -12,7 +12,7 @@ import FirebaseAuth
 // MARK: - Protocol
 
 protocol ProfileHeaderControllerDelegate: AnyObject {
-    func didTapFollowOrEditButton()
+    func didTapEditProfileButton()
     func didTapMessageOrShareButton()
     func didTapFollowersLabel()
     func didTapFollowingLabel()
@@ -83,7 +83,6 @@ class ProfileHeaderController: UIViewController {
     lazy var seeMoreButton: UIButton = {
         let button = UIButton(type: .system)
         button.translatesAutoresizingMaskIntoConstraints = false
-        button.isHidden = true
         button.setTitle("See more", for: .normal)
         button.setTitleColor(UIColor.lightGray, for: .normal)
         button.titleLabel?.font = .systemFont(ofSize: 13, weight: .semibold)
@@ -96,19 +95,12 @@ class ProfileHeaderController: UIViewController {
     // MARK: - Properties
 
     weak var delegate: ProfileHeaderControllerDelegate?
-    var otherUser: User?
-    var currentUser: User {
-        didSet { reloadData() }
-    }
-    private var isLoggedInUser: Bool {
-        return otherUser == nil
-    }
+    var viewModel: ProfileHeaderViewModel
 
     // MARK: - Intializer
 
-    init(currentUser: User, otherUser: User?) {
-        self.currentUser = currentUser
-        self.otherUser = otherUser
+    init(viewModel: ProfileHeaderViewModel) {
+        self.viewModel = viewModel
         super.init(nibName: nil, bundle: nil)
     }
 
@@ -117,7 +109,7 @@ class ProfileHeaderController: UIViewController {
     }
 
     deinit {
-        NotificationCenter.default.removeObserver(self, name: .reloadUserProfileFeed, object: nil)
+        removeNotification()
         print("DEBUG: ProfileHeaderController deinit")
     }
 
@@ -125,13 +117,29 @@ class ProfileHeaderController: UIViewController {
         super.viewDidLoad()
         setupView()
         reloadData()
-        NotificationCenter.default.addObserver(self, selector: #selector(reloadData), name: .reloadUserProfileFeed, object: nil)
+        addNotification()
     }
 
     // MARK: - Functions
 
+    @objc private func didUploadNewPost() {
+        reloadUserStat()
+    }
+
+    @objc private func currentUserDidUpdateInfo(_ notification: Notification) {
+        if let currentUser = notification.userInfo?["currentUser"] as? User {
+            viewModel.user = currentUser
+            reloadData()
+        }
+    }
+
+    @objc private func seeMoreButtonTapped() {
+        bioLabel.numberOfLines = 0
+        seeMoreButton.isHidden = true
+    }
+
     @objc private func reloadData() {
-        let user = isLoggedInUser ? currentUser : otherUser!
+        let user = viewModel.user
         profileImageView.sd_setImage(with: URL(string: user.avatarUrl), placeholderImage: UIImage(named: "user"), context: nil)
         fullNameLabel.text = user.fullName
         bioLabel.text = user.bio
@@ -141,60 +149,47 @@ class ProfileHeaderController: UIViewController {
     }
 
     private func reloadUserStat() {
-        let user = isLoggedInUser ? currentUser : otherUser!
+        viewModel.getUserStatSuccess = { [weak self] in
+            guard let self = self else { return }
+            self.postsLabel.setValue(self.viewModel.numberOfPosts)
+            self.followingLabel.setValue(self.viewModel.numberOfFollowing)
+            self.followerslabel.setValue(self.viewModel.numberOfFollowers)
+        }
+        viewModel.getUserStat()
+    }
 
-        UserManager.shared.numberOfPost(forUser: user.uid) { [weak self] count in
-            DispatchQueue.main.async {
-                self?.postsLabel.setValue(count)
-            }
-        }
-        UserManager.shared.numberOfFollowing(forUser: user.uid) { [weak self] count in
-            DispatchQueue.main.async {
-                self?.followingLabel.setValue(count)
-            }
-        }
-        UserManager.shared.numberOfFollowers(forUser: user.uid) { [weak self] count in
-            DispatchQueue.main.async {
-                self?.followerslabel.setValue(count)
+    private func reloadActionButton() {
+        if viewModel.isCurrentUser {
+            followOrEditButton.setActionType(.edit)
+            messageOrShareButton.setActionType(.share)
+        } else {
+            messageOrShareButton.setActionType(.message)
+            viewModel.getFollowState()
+            viewModel.getFollowingStateSuccess = { [weak self] in
+                guard let self = self else { return }
+                let type: ActionProfileButton.ActionProfileButtonType = self.viewModel.isFollowing ? .following : .follow
+                self.followOrEditButton.setActionType(type)
             }
         }
     }
 
-    private func reloadActionButton() {
-        if isLoggedInUser {
-            followOrEditButton.setActionType(.edit)
-            messageOrShareButton.setActionType(.share)
-
-        } else {
-            messageOrShareButton.setActionType(.message)
-
-            UserManager.shared.checkFollowState(withOtherUser: otherUser!.uid) { [weak self] isFollow in
-                DispatchQueue.main.async {
-                    if isFollow {
-                        self?.followOrEditButton.setActionType(.following)
-                    } else {
-                        self?.followOrEditButton.setActionType(.follow)
-                    }
-                }
-            }
+    private func configureSeeMoreButton() {
+        DispatchQueue.main.async {
+            let isTruncated = self.bioLabel.isTextTruncated()
+            self.seeMoreButton.isHidden = isTruncated ? false : true
         }
     }
 
     @objc private func didTapFollowOrEditButton() {
-        if isLoggedInUser {
-            delegate?.didTapFollowOrEditButton()
+        if viewModel.isCurrentUser {
+            delegate?.didTapEditProfileButton()
         } else {
-            if followOrEditButton.actionType == .follow {
-                UserManager.shared.followUser(otherUid: otherUser!.uid) { [weak self] _ in
-                    self?.reloadUserStat()
-                }
-                self.followOrEditButton.setActionType(.following)
-            }
-            else if followOrEditButton.actionType == .following {
-                UserManager.shared.unfollowUser(otherUid: otherUser!.uid) { [weak self] _ in
-                    self?.reloadUserStat()
-                }
-                self.followOrEditButton.setActionType(.follow)
+            if viewModel.isFollowing {
+                viewModel.unfollowUser()
+                followOrEditButton.setActionType(.follow)
+            } else {
+                viewModel.followUser()
+                followOrEditButton.setActionType(.following)
             }
         }
     }
@@ -211,16 +206,16 @@ class ProfileHeaderController: UIViewController {
         delegate?.didTapFollowingLabel()
     }
 
-    @objc private func seeMoreButtonTapped() {
-        bioLabel.numberOfLines = 0
-        seeMoreButton.isHidden = true
+    private func addNotification() {
+        NotificationCenter.default.addObserver(self, selector: #selector(didUploadNewPost),
+                                               name: .userDidUploadNewPost, object: nil)
+        NotificationCenter.default.addObserver(self, selector: #selector(currentUserDidUpdateInfo),
+                                               name: .currentUserDidUpdateInfo, object: nil)
     }
 
-    private func configureSeeMoreButton() {
-        DispatchQueue.main.async {
-            let isTruncated = self.bioLabel.isTextTruncated()
-            self.seeMoreButton.isHidden = isTruncated ? false : true
-        }
+    private func removeNotification() {
+        NotificationCenter.default.removeObserver(self, name: .userDidUploadNewPost, object: nil)
+        NotificationCenter.default.removeObserver(self, name: .currentUserDidUpdateInfo, object: nil)
     }
 }
 

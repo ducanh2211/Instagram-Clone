@@ -26,12 +26,12 @@ class TabBarViewModel {
         guard userAlreadyLogIn else { return }
         let uid = auth.currentUser!.uid
 
-        // completion call on background thread
         UserManager.shared.fetchUser(withUid: uid) { [weak self] user , error in
-            print("DEBUG: fetch user da den")
             guard error == nil else { return }
             self?.user = user
-            self?.receivedUser?()
+            DispatchQueue.main.async {
+                self?.receivedUser?()
+            }
         }
     }
 }

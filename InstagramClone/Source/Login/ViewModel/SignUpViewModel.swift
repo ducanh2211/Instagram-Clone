@@ -10,20 +10,20 @@ import Foundation
 class SignUpViewModel {
 
     var user: User? {
-        didSet { success?() }
+        didSet { fetchUserSuccess?() }
     }
     var isLoading: Bool = false {
-        didSet { loadingIndicator?() }
+        didSet { handleLoadingIndicator?() }
     }
     var errorMessage: String = "" {
-        didSet { failure?() }
+        didSet { fetchUserFailure?() }
     }
-    var success: (() -> Void)?
-    var failure: (() -> Void)?
-    var loadingIndicator: (() -> Void)?
+    var fetchUserSuccess: (() -> Void)?
+    var fetchUserFailure: (() -> Void)?
+    var handleLoadingIndicator: (() -> Void)?
 
     deinit {
-        print("SignupViewModel deinit")
+        print("DEBUG: SignupViewModel deinit")
     }
 
     func signUpUser(email: String, password: String,
@@ -34,12 +34,14 @@ class SignUpViewModel {
         AuthManager.shared.createUser(email: email, password: password,
                                       fullName: fullName, userName: username) { [weak self] user, error in
             guard let self = self else { return }
-            self.isLoading = false
-            if let error = error {
-                self.errorMessage = error.description
-                return
+            DispatchQueue.main.async {
+                self.isLoading = false
+                if let error = error {
+                    self.errorMessage = error.description
+                    return
+                }
+                self.user = user
             }
-            self.user = user
         }
     }
 }

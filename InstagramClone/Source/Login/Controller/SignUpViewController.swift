@@ -83,38 +83,32 @@ class SignUpViewController: UIViewController, CustomizableNavigationBar {
     }
 
     deinit {
-        print("SignUpViewController deinit")
+        print("DEUBG: SignUpViewController deinit")
     }
 
     // MARK: - Functions
 
     private func bindViewModel() {
-        viewModel.loadingIndicator = { [weak self] in
-            DispatchQueue.main.async {
-                guard let self = self else { return }
-                let isLoading = self.viewModel.isLoading
-                isLoading ? ProgressHUD.show() : ProgressHUD.dismiss()
-            }
+        viewModel.handleLoadingIndicator = { [weak self] in
+            guard let self = self else { return }
+            let isLoading = self.viewModel.isLoading
+            isLoading ? ProgressHUD.show() : ProgressHUD.dismiss()
         }
 
-        viewModel.failure = { [weak self] in
-            DispatchQueue.main.async {
-                guard let self = self else { return }
-                self.errorLabel.isHidden = false
-                self.errorLabel.text = self.viewModel.errorMessage
-            }
+        viewModel.fetchUserFailure = { [weak self] in
+            guard let self = self else { return }
+            self.errorLabel.isHidden = false
+            self.errorLabel.text = self.viewModel.errorMessage
         }
 
-        viewModel.success = { [weak self] in
-            DispatchQueue.main.async {
-                guard let self = self else { return }
-                guard let tabBarController = UIApplication.shared.keyWindow?.rootViewController as? MainTabBarController else { return }
-                tabBarController.viewModel.user = self.viewModel.user
-                tabBarController.validateUser()
-                tabBarController.selectedIndex = 0
-                self.errorLabel.isHidden = true
-                self.dismiss(animated: true)
-            }
+        viewModel.fetchUserSuccess = { [weak self] in
+            guard let self = self else { return }
+            guard let tabBarController = UIApplication.shared.keyWindow?.rootViewController as? MainTabBarController else { return }
+            tabBarController.viewModel.user = self.viewModel.user
+            tabBarController.validateUser()
+            tabBarController.selectedIndex = 0
+            self.errorLabel.isHidden = true
+            self.dismiss(animated: true)
         }
     }
 
@@ -123,7 +117,6 @@ class SignUpViewController: UIViewController, CustomizableNavigationBar {
               let password = passwordTextField.text,
               let fullName = fullNameTextField.text,
               let userName = userNameTextField.text else { return }
-
         viewModel.signUpUser(email: email, password: password, fullName: fullName, username: userName)
     }
 

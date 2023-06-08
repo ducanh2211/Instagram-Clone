@@ -25,18 +25,7 @@ class CommentViewModel {
         createQuery()
     }
 
-    private func createQuery() {
-        query = Firestore.firestore()
-            .collection(Firebase.RootCollection.postComments)
-            .document(postId)
-            .collection(Firebase.Post.comments)
-            .order(by: Firebase.Post.creationDate, descending: true)
-            .limit(to: pageSize)
-    }
-
     func getComments() {
-        let dispatchGroup = DispatchGroup()
-
         query.getDocuments { [weak self] querySnapshot, error in
             guard let self = self else { return }
             guard let documents = querySnapshot?.documents, error == nil else {
@@ -48,24 +37,7 @@ class CommentViewModel {
             } else {
                 self.lastDocument = documents.last
             }
-
-            documents.forEach { document in
-                let commentId = document.documentID
-
-                dispatchGroup.enter()
-                CommentManager.shared.fetchComment(commentId) { comment in
-                    if let comment = comment {
-                        self.comments.append(comment)
-                    }
-                    dispatchGroup.leave()
-                }
-            }
-
-            dispatchGroup.notify(queue: .main) {
-                self.comments = self.comments.sorted { $0.creationDate > $1.creationDate }
-                self.isFetchingMore = false
-                self.updateCommentsData?()
-            }
+            self.fetchComments(documents: documents)
         }
     }
 
@@ -85,6 +57,37 @@ class CommentViewModel {
                     self.updateCommentsData?()
                 }
             }
+        }
+    }
+
+    private func createQuery() {
+        query = Firestore.firestore()
+            .collection(Firebase.RootCollection.postComments)
+            .document(postId)
+            .collection(Firebase.Post.comments)
+            .order(by: Firebase.Post.creationDate, descending: true)
+            .limit(to: pageSize)
+    }
+
+    private func fetchComments(documents: [QueryDocumentSnapshot]) {
+        let dispatchGroup = DispatchGroup()
+
+        documents.forEach { document in
+            let commentId = document.documentID
+
+            dispatchGroup.enter()
+            CommentManager.shared.fetchComment(commentId) { comment in
+                if let comment = comment {
+                    self.comments.append(comment)
+                }
+                dispatchGroup.leave()
+            }
+        }
+
+        dispatchGroup.notify(queue: .main) {
+            self.comments = self.comments.sorted { $0.creationDate > $1.creationDate }
+            self.isFetchingMore = false
+            self.updateCommentsData?()
         }
     }
 }

@@ -34,9 +34,7 @@ class PhotoSelectorController: UIViewController, CustomizableNavigationBar {
     // MARK: - Functions
     private func bindViewModel() {
         viewModel.receivedAssets = { [weak self] in
-            DispatchQueue.main.async {
-                self?.collectionView.reloadData()
-            }
+            self?.collectionView.reloadData()
         }
         viewModel.getPermissionIfNeed()
     }
@@ -62,30 +60,21 @@ class PhotoSelectorController: UIViewController, CustomizableNavigationBar {
 }
 
 // MARK: - UICollectionViewDataSource
-extension PhotoSelectorController: UICollectionViewDataSource {
-    func collectionView(_ collectionView: UICollectionView,
-                        numberOfItemsInSection section: Int) -> Int {
+
+extension PhotoSelectorController: UICollectionViewDataSource, UICollectionViewDelegate {
+    func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
         return viewModel.numberOfItems
     }
 
-    func collectionView(_ collectionView: UICollectionView,
-                        cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
+    func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
         let cell = collectionView.dequeueReusableCell(
-            withReuseIdentifier: PhotoSelectorCell.identifier,
-            for: indexPath
-        ) as! PhotoSelectorCell
-        
+            withReuseIdentifier: PhotoSelectorCell.identifier, for: indexPath) as! PhotoSelectorCell
         let asset = viewModel.getAssetAtIndex(indexPath.item)
         cell.configure(withAsset: asset)
         return cell
     }
-}
 
-// MARK: - UICollectionViewDelegate
-extension PhotoSelectorController: UICollectionViewDelegate {
-
-    func collectionView(_ collectionView: UICollectionView,
-                        didSelectItemAt indexPath: IndexPath) {
+    func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
         let index = indexPath.item
         viewModel.selectedIndex = index
         if let asset = viewModel.getAssetAtSelectedIndex() {
@@ -97,31 +86,25 @@ extension PhotoSelectorController: UICollectionViewDelegate {
                         viewForSupplementaryElementOfKind kind: String,
                         at indexPath: IndexPath) -> UICollectionReusableView {
 
-        guard
-            kind == UICollectionView.elementKindSectionHeader,
-            indexPath.section == 0
-        else {
+        guard kind == UICollectionView.elementKindSectionHeader, indexPath.section == 0 else {
             return UICollectionReusableView()
         }
 
         let header = collectionView.dequeueReusableSupplementaryView(
-            ofKind: kind,
-            withReuseIdentifier: PhotoSelectorHeader.identifier,
-            for: indexPath
-        ) as! PhotoSelectorHeader
-
+            ofKind: kind, withReuseIdentifier: PhotoSelectorHeader.identifier,
+            for: indexPath) as! PhotoSelectorHeader
         headerView = header
         headerView?.delegate = self
 
         if let asset = viewModel.getAssetAtSelectedIndex() {
             header.configure(withAsset: asset)
         }
-
         return header
     }
 }
 
 // MARK: - UIImagePickerControllerDelegate
+
 extension PhotoSelectorController: PhotoSelectorHeaderDelegate, UIImagePickerControllerDelegate, UINavigationControllerDelegate {
 
     func didTapCameraButton() {

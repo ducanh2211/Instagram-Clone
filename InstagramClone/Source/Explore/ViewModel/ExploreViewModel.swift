@@ -11,7 +11,7 @@ import FirebaseAuth
 
 class ExploreViewModel {
 
-    var currentUser: User?
+    var currentUser: User
     var posts = [Post]()
     var updatePostsData: (() -> Void)?
     var isFechingMore: Bool = false
@@ -19,23 +19,18 @@ class ExploreViewModel {
     private var query: Query?
     private var lastDocument: DocumentSnapshot?
     private var pageSize: Int = 18
-    private var pageId: Int = 1
+    private var pageId: Int = 0
 
-    init() {
-        fetchCurrentUser()
+    init(currentUser: User) {
+        self.currentUser = currentUser
         createQuery()
     }
 
-    // MARK: - Private
-
-    private func fetchCurrentUser() {
-        guard let currentUid = Auth.auth().currentUser?.uid else { return }
-        UserManager.shared.fetchUser(withUid: currentUid) { [weak self] user, error in
-            if let user = user {
-                self?.currentUser = user
-            }
-        }
+    deinit {
+        print("DEBUG: ExploreViewModel deinit")
     }
+
+    // MARK: - Private
 
     private func createQuery() {
         guard let currentUid = Auth.auth().currentUser?.uid else {
@@ -52,8 +47,7 @@ class ExploreViewModel {
 
     func getPosts() {
         guard let query = query else { return }
-        let dispatchGroup = DispatchGroup()
-        var postsData = [Post]()
+        pageId += 1
 
         query.limit(to: pageSize).getDocuments { [weak self] querySnapshot, error in
             guard let self = self else { return }
@@ -67,19 +61,43 @@ class ExploreViewModel {
             } else {
                 self.lastDocument = documents.last
             }
+            self.fetchPosts(documents: documents)
+        }
+    }
 
-            documents.forEach { document in
-                let dictionary = document.data()
-                let postId = document.documentID
-                guard let uid = dictionary[Firebase.User.uid] as? String else { return }
+    func getMorePosts() {
+        guard let lastDocument = lastDocument else { return }
+        isFechingMore = true
+        pageSize = 12
+        query = query?.start(afterDocument: lastDocument)
+        getPosts()
+    }
 
-                dispatchGroup.enter()
-                PostManager.shared.fetchDataForPost(postId, uid: uid, dictionary: dictionary) { post in
-                    if let post = post {
-                        postsData.append(post)
-                    }
-                    dispatchGroup.leave()
+    func reloadData() {
+        pageId = 0
+        lastDocument = nil
+        isFechingMore = false
+        hasReachedTheEnd = false
+        pageSize = 18
+        createQuery()
+        getPosts()
+    }
+
+    private func fetchPosts(documents: [QueryDocumentSnapshot]) {
+        var postsData = [Post]()
+        let dispatchGroup = DispatchGroup()
+
+        documents.forEach { document in
+            let dictionary = document.data()
+            let postId = document.documentID
+            guard let uid = dictionary[Firebase.User.uid] as? String else { return }
+
+            dispatchGroup.enter()
+            PostManager.shared.fetchDataForPost(postId, uid: uid, dictionary: dictionary) { post in
+                if let post = post {
+                    postsData.append(post)
                 }
+                dispatchGroup.leave()
             }
 
             dispatchGroup.notify(queue: .main) {
@@ -91,24 +109,5 @@ class ExploreViewModel {
                 self.updatePostsData?()
             }
         }
-    }
-
-    func getMorePosts() {
-        guard let lastDocument = lastDocument else { return }
-        isFechingMore = true
-        pageId += 1
-        pageSize = 12
-        query = query?.start(afterDocument: lastDocument)
-        getPosts()
-    }
-
-    func reloadData() {
-        pageId = 1
-        lastDocument = nil
-        isFechingMore = false
-        hasReachedTheEnd = false
-        pageSize = 18
-        createQuery()
-        getPosts()
     }
 }

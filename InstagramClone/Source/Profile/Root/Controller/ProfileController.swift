@@ -6,6 +6,7 @@
 //
 
 import UIKit
+import SDWebImage
 import FirebaseAuth
 
 class ProfileController: UIViewController, ContainerScrollViewDatasource, CustomizableNavigationBar {
@@ -26,26 +27,19 @@ class ProfileController: UIViewController, ContainerScrollViewDatasource, Custom
     private var bottomVC: ProfileBottomController {
         return bottomViewController as! ProfileBottomController
     }
+    var viewModel: ProfileViewModel
 
-    var currentUser: User {
-        didSet {
-            headerVC.currentUser = currentUser
-            bottomVC.currentUser = currentUser
-            navBar.leftBarButtonItems[0].setTitle(currentUser.userName, for: .normal)
-        }
-    }
-    var otherUser: User?
-    var isLoggedInUser: Bool {
-        return otherUser == nil
-    }
 
     // MARK: - Initializer
 
-    init(currentUser: User, otherUser: User?) {
-        self.currentUser = currentUser
-        self.otherUser = otherUser
-        headerViewController = ProfileHeaderController(currentUser: currentUser, otherUser: otherUser)
-        bottomViewController =  ProfileBottomController(currentUser: currentUser, otherUser: otherUser)
+    init(viewModel: ProfileViewModel) {
+        self.viewModel = viewModel
+        let headerViewModel = ProfileHeaderViewModel(user: viewModel.otherUser ?? viewModel.currentUser,
+                                                     isCurrentUser: viewModel.isCurrentUser)
+        let bottomViewModel = ProfileBottomViewModel(currentUser: viewModel.currentUser,
+                                                     otherUser: viewModel.otherUser)
+        self.headerViewController = ProfileHeaderController(viewModel: headerViewModel)
+        self.bottomViewController = ProfileBottomController(viewModel: bottomViewModel)
         super.init(nibName: nil, bundle: nil)
     }
 
@@ -59,11 +53,21 @@ class ProfileController: UIViewController, ContainerScrollViewDatasource, Custom
 
     override func viewDidLoad() {
         super.viewDidLoad()
-        headerVC.delegate = self
         setupView()
+        bindViewModel()
+        headerVC.delegate = self
     }
 
     // MARK: - Functions
+
+    private func bindViewModel() {
+        viewModel.fetchCurrentUserSuccess = { [weak self] in
+            guard let self = self else { return }
+            self.navBar.leftBarButtonItems[0].setTitle(self.viewModel.currentUser.userName, for: .normal)
+            NotificationCenter.default.post(name: .currentUserDidUpdateInfo, object: nil,
+                                            userInfo: ["currentUser": self.viewModel.currentUser])
+        }
+    }
 
     private func didTapSettingsButton() {
         let vc = ProfileSettingsSheetController()
@@ -98,6 +102,7 @@ class ProfileController: UIViewController, ContainerScrollViewDatasource, Custom
 
     private func logout() {
         try? Auth.auth().signOut()
+        SDImageCache.shared.clearMemory()
         let nav = UINavigationController(rootViewController: LogInViewController())
         nav.modalPresentationStyle = .fullScreen
         present(nav, animated: true)
@@ -107,53 +112,40 @@ class ProfileController: UIViewController, ContainerScrollViewDatasource, Custom
 // MARK: - ProfileHeaderControllerDelegate
 
 extension ProfileController: ProfileHeaderControllerDelegate {
-    func didTapFollowOrEditButton() {
-        if isLoggedInUser {
+    func didTapEditProfileButton() {
+        if viewModel.isCurrentUser {
             editButtonTapped()
         }
     }
 
     private func editButtonTapped() {
-        let vc = ProfileEditController(user: currentUser)
+        let vc = ProfileEditController(user: viewModel.currentUser)
         vc.delegate = self
         let nav = UINavigationController(rootViewController: vc)
         nav.modalPresentationStyle = .fullScreen
         present(nav, animated: true)
     }
 
-    func didTapMessageOrShareButton() { }
-
     func didTapFollowersLabel() {
-        let user = isLoggedInUser ? currentUser : otherUser!
+        let user = viewModel.otherUser ?? viewModel.currentUser
         let vc = FollowersDetailController(user: user)
         navigationController?.pushViewController(vc, animated: true)
     }
 
     func didTapFollowingLabel() {
-        let user = isLoggedInUser ? currentUser : otherUser!
+        let user = viewModel.otherUser ?? viewModel.currentUser
         let vc = FollowingDetailController(user: user)
         navigationController?.pushViewController(vc, animated: true)
     }
+
+    func didTapMessageOrShareButton() { }
 }
 
 // MARK: - ProfileEditControllerDelegate
 
 extension ProfileController: ProfileEditControllerDelegate {
-
-    func userInfoDidChange() {
-        fetchUser()
-    }
-
-    private func fetchUser() {
-        UserManager.shared.fetchUser(withUid: currentUser.uid) { [weak self] user, error in
-            DispatchQueue.main.async {
-                guard let user = user, error == nil else {
-                    print("DEBUG: fetchUserAgain error: \(error!)")
-                    return
-                }
-                self?.currentUser = user
-            }
-        }
+    func userInfoDidChange(newUser: User) {
+        viewModel.fetchCurrentUser()
     }
 }
 
@@ -171,35 +163,37 @@ extension ProfileController {
     private func setupNavBar() {
         let weight = UIImage.SymbolConfiguration(weight: .medium)
 
-        if isLoggedInUser {
-            let titleButton = AttributedButton(title: currentUser.userName,
-                                               font: .systemFont(ofSize: 24, weight: .bold), color: .label) { [weak self] in
-                self?.didTapTitleButton()
-            }
+        switch viewModel.type {
+            case .mainTabBar:
+                let titleButton = AttributedButton(title: viewModel.currentUser.userName, font: .systemFont(ofSize: 24, weight: .bold), color: .label) { [weak self] in
+                    self?.didTapTitleButton()
+                }
 
-            let settingsImage = UIImage(systemName: "line.3.horizontal", withConfiguration: weight)!
-            let settingsButton = AttributedButton(image: settingsImage) { [weak self] in
-                self?.didTapSettingsButton()
-            }
+                let settingsImage = UIImage(systemName: "line.3.horizontal", withConfiguration: weight)!
+                let settingsButton = AttributedButton(image: settingsImage) { [weak self] in
+                    self?.didTapSettingsButton()
+                }
 
-            let createImage = UIImage(systemName: "plus.app", withConfiguration: weight)!
-            let createButton = AttributedButton(image: createImage) { [weak self] in
-                self?.didTapCreateButton()
-            }
+                let createImage = UIImage(systemName: "plus.app", withConfiguration: weight)!
+                let createButton = AttributedButton(image: createImage) { [weak self] in
+                    self?.didTapCreateButton()
+                }
 
-            navBar = CustomNavigationBar(shouldShowSeparator: false,
-                                         leftBarButtons: [titleButton],
-                                         rightBarButtons: [settingsButton, createButton])
-        }
-        else {
-            let backImage = UIImage(systemName: "chevron.backward", withConfiguration: weight)!
-            let backButton = AttributedButton(image: backImage) { [weak self] in
-                self?.didTapBackButton()
-            }
+                navBar = CustomNavigationBar(shouldShowSeparator: false,
+                                             leftBarButtons: [titleButton],
+                                             rightBarButtons: [settingsButton, createButton])
 
-            let rightButton = AttributedButton(image: UIImage(systemName: "ellipsis")!)
-            navBar = CustomNavigationBar(title: otherUser!.userName, shouldShowSeparator: false,
-                                         leftBarButtons: [backButton], rightBarButtons: [rightButton])
+            case .other(let currentUser, let otherUser):
+                let backImage = UIImage(systemName: "chevron.backward", withConfiguration: weight)!
+                let backButton = AttributedButton(image: backImage) { [weak self] in
+                    self?.didTapBackButton()
+                }
+
+                let rightButton = AttributedButton(image: UIImage(systemName: "ellipsis")!)
+                let title = otherUser?.userName ?? currentUser.userName
+
+                navBar = CustomNavigationBar(title: title, shouldShowSeparator: false,
+                                             leftBarButtons: [backButton], rightBarButtons: [rightButton])
         }
     }
 

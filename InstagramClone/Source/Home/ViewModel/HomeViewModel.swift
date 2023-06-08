@@ -11,7 +11,7 @@ import FirebaseFirestore
 
 class HomeViewModel {
 
-    var currentUser: User?
+    var currentUser: User
     var posts = [Post]()
     var isFirstLoading: Bool = true
     var isLoading: Bool = false {
@@ -21,23 +21,16 @@ class HomeViewModel {
     var handleLoadingIndicator: (() -> Void)?
     private let userFollowingRef = Firestore.firestore().collection(Firebase.RootCollection.userFollowing)
 
-    init() {
-        fetchCurrentUser()
+    init(currentUser: User) {
+        self.currentUser = currentUser
     }
 
-    private func fetchCurrentUser() {
-        guard let currentUid = Auth.auth().currentUser?.uid else { return }
-        UserManager.shared.fetchUser(withUid: currentUid) { [weak self] user, error in
-            if let user = user {
-                self?.currentUser = user
-            }
-        }
+    deinit {
+        print("DEBUG: HomeViewModel deinit")
     }
 
     func getPosts() {
         guard let currentUid = Auth.auth().currentUser?.uid else { return }
-        var postsData = [Post]()
-        var numberOfUsers: Int = 0
         isLoading = true
 
         UserManager.shared.fetchFollowingUid(forUser: currentUid) { [weak self] followingUid in
@@ -46,25 +39,31 @@ class HomeViewModel {
                 self.isLoading = false
                 return
             }
-
-            followingUid.forEach { uid in
-                PostManager.shared.fetchPosts(forUser: uid) { posts in
-                    numberOfUsers += 1
-                    postsData.append(contentsOf: posts)
-
-                    if numberOfUsers == followingUid.count {
-                        self.posts.removeAll()
-                        self.posts = postsData.shuffled()
-                        self.isLoading = false
-                        self.isFirstLoading = false
-                        self.updatePostsData?()
-                    }
-                }
-            }
+            self.fetchPostsForFollowUser(followingUid: followingUid)
         }
     }
 
     func reloadData() {
         getPosts()
+    }
+
+    private func fetchPostsForFollowUser(followingUid: [String]) {
+        var postsData = [Post]()
+        var numberOfUsers: Int = 0
+
+        followingUid.forEach { uid in
+            PostManager.shared.fetchPosts(forUser: uid) { [weak self] posts in
+                guard let self = self else { return }
+                numberOfUsers += 1
+                postsData.append(contentsOf: posts)
+
+                if numberOfUsers == followingUid.count {
+                    self.posts = postsData.shuffled()
+                    self.isLoading = false
+                    self.isFirstLoading = false
+                    self.updatePostsData?()
+                }
+            }
+        }
     }
 }

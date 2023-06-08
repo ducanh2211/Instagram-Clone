@@ -15,7 +15,7 @@ extension String {
                                             options: .usesLineFragmentOrigin,
                                             attributes: [.font: font],
                                             context: nil)
-        return ceil(boundingBox.height)
+        return floor(boundingBox.height)
     }
 }
 

@@ -21,18 +21,19 @@ class NewPostViewModel {
         print("DEBUG: NewPostViewModel deinit")
     }
 
-    func createPost(withImage imageData: Data,
-                    aspectRatio: Double, caption: String) {
+    func createPost(withImage imageData: Data, aspectRatio: Double, caption: String) {
         isLoading = true
 
         PostManager.shared.createPost(withImage: imageData, imageAspectRatio: aspectRatio, caption: caption) { [weak self] error in
             guard let self = self else { return }
-            self.isLoading = false
-            if let error = error {
-                self.createPostFailure?(error)
-                return
+            DispatchQueue.main.async {
+                self.isLoading = false
+                if let error = error {
+                    self.createPostFailure?(error)
+                    return
+                }
+                self.createPostSuccess?()
             }
-            self.createPostSuccess?()
         }
     }
 

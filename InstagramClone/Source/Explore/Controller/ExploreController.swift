@@ -22,20 +22,22 @@ class ExploreController: UIViewController {
     // MARK: - Properties
 
     let searchViewHeight: CGFloat = 56
-    private let viewModel = ExploreViewModel()
-//    private var currentUser: User
-//    private var posts = [Post]()
+    private let viewModel: ExploreViewModel
 
     // MARK: - Life cycle
 
-//    init(currentUser: User) {
-//        self.currentUser = currentUser
-//        super.init(nibName: nil, bundle: nil)
-//    }
-//
-//    required init?(coder: NSCoder) {
-//        fatalError("init(coder:) has not been implemented")
-//    }
+    init(viewModel: ExploreViewModel) {
+        self.viewModel = viewModel
+        super.init(nibName: nil, bundle: nil)
+    }
+
+    required init?(coder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
+    }
+
+    deinit {
+        print("DEBUG: ExploreController deinit")
+    }
 
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -61,7 +63,6 @@ class ExploreController: UIViewController {
         viewModel.updatePostsData = { [weak self] in
             guard let self = self else { return }
             self.refreshControl.endRefreshing()
-//            self.posts = self.viewModel.posts
             self.collectionView.reloadData()
         }
         viewModel.getPosts()
@@ -69,7 +70,6 @@ class ExploreController: UIViewController {
 
     @objc func handleRefresh() {
         viewModel.reloadData()
-//        viewModel.getPosts()
         shouldShowFooterView(true)
     }
 
@@ -83,9 +83,10 @@ class ExploreController: UIViewController {
 
 extension ExploreController: UserSearchViewDelegate {
     func didSelectUser(_ user: User) {
-        guard let currentUser = viewModel.currentUser else { return }
+        let currentUser = viewModel.currentUser
         let otherUser = currentUser.uid == user.uid ? nil : user
-        let vc = ProfileController(currentUser: currentUser, otherUser: otherUser)
+        let profileViewModel = ProfileViewModel(type: .other(currentUser: currentUser, otherUser: otherUser))
+        let vc = ProfileController(viewModel: profileViewModel)
         navigationController?.pushViewController(vc, animated: true)
     }
 
@@ -102,25 +103,20 @@ extension ExploreController: UserSearchViewDelegate {
 
 extension ExploreController: UICollectionViewDataSource, UICollectionViewDelegate {
     func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
-//        return posts.count
         return viewModel.posts.count
     }
 
     func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
         let cell = collectionView.dequeueReusableCell(
             withReuseIdentifier: PhotoCollectionViewCell.identifier, for: indexPath) as! PhotoCollectionViewCell
-//        let post = posts[indexPath.item]
-        print("DEBUG: post count \(viewModel.posts.count)")
         let post = viewModel.posts[indexPath.item]
         cell.configure(with: post.imageUrl)
         return cell
     }
 
     func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
-//        let post = posts[indexPath.item]
-        guard let currentUser = viewModel.currentUser else { return }
         let post = viewModel.posts[indexPath.item]
-        let vc = PostDetailController(post: post, currentUser: currentUser)
+        let vc = PostDetailController(post: post, currentUser: viewModel.currentUser)
         navigationController?.pushViewController(vc, animated: true)
     }
 
