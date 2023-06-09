@@ -99,15 +99,15 @@ class ExploreViewModel {
                 }
                 dispatchGroup.leave()
             }
+        }
 
-            dispatchGroup.notify(queue: .main) {
-                if self.pageId == 1 {
-                    self.posts.removeAll()
-                }
-                self.isFechingMore = false
-                self.posts.append(contentsOf: postsData.shuffled())
-                self.updatePostsData?()
+        dispatchGroup.notify(queue: .main) {
+            if self.pageId == 1 {
+                self.posts.removeAll()
             }
+            self.isFechingMore = false
+            self.posts.append(contentsOf: postsData.shuffled())
+            self.updatePostsData?()
         }
     }
 }
