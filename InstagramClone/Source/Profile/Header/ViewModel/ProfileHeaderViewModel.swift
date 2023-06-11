@@ -18,6 +18,12 @@ class ProfileHeaderViewModel {
     var getUserStatSuccess: (() -> Void)?
     var getFollowingStateSuccess: (() -> Void)?
 
+    var storyPhotos: [String] = [
+        "story-photo-1", "story-photo-2", "story-photo-3",
+        "story-photo-4", "story-photo-5", "story-photo-6",
+        "story-photo-7", "story-photo-8", "story-photo-9"
+    ]
+
     init(user: User, isCurrentUser: Bool) {
         self.user = user
         self.isCurrentUser = isCurrentUser

@@ -25,7 +25,7 @@ class MainTabBarController: UITabBarController {
     deinit {
         print("DEBUG: MainTabBarController deinit")
     }
-    var time: Date!
+
     override func viewDidLoad() {
         super.viewDidLoad()
         view.backgroundColor = .systemBackground
@@ -34,7 +34,6 @@ class MainTabBarController: UITabBarController {
         tabBar.backgroundColor = .systemBackground
         tabBar.isHidden = true
         delegate = self
-        time = Date()
         bindViewModel()
         validateUser()
     }
@@ -65,7 +64,6 @@ class MainTabBarController: UITabBarController {
 extension MainTabBarController {
     private func setupController() {
         guard let user = self.viewModel.user else { return }
-        print("DEBUG: time \(Date().timeIntervalSince(time))")
         let homeNav = setupHome(user: user)
         let searchNav = setupExplore(user: user)
         let postNav = setupPost()
@@ -109,8 +107,8 @@ extension MainTabBarController {
     private func setupReels() -> UINavigationController {
         let reelsNav = createController(
             UIViewController(),
-            selectedImage: UIImage(named: "reels-selected"),
-            unselectedImage: UIImage(named: "reels-selected")
+            selectedImage: UIImage(named: "ic-reels_selected"),
+            unselectedImage: UIImage(named: "ic-reels")
         )
         return reelsNav
     }
@@ -134,7 +132,6 @@ extension MainTabBarController {
         nav.navigationBar.isTranslucent = true
         nav.tabBarItem.selectedImage = selectedImage
         nav.tabBarItem.image = unselectedImage
-
         return nav
     }
 }

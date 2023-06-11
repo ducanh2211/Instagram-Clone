@@ -28,6 +28,7 @@ class LogInViewController: UIViewController {
     private lazy var passwordTextField: UITextField = {
         let textField = createTextField(placeHolder: "Password")
         textField.returnKeyType = .done
+        textField.isSecureTextEntry = true
         return textField
     }()
 

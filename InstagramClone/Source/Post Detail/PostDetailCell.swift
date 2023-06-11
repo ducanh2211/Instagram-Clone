@@ -152,8 +152,7 @@ class PostDetailCell: UICollectionViewCell {
         }
         viewModel.getNumberOfLikesSuccess = { [weak self] in
             guard let self = self else { return }
-            self.likeCounterLabel.isHidden = viewModel.shouldHideCounterLabel
-            self.likeCounterLabel.text = viewModel.likeCounterText
+            self.configureLikeCounterLalbel()
             self.delegate?.cellWillChangeSize(self)
         }
         viewModel.checkLikesStateSuccess = { [weak self] in
@@ -176,6 +175,7 @@ class PostDetailCell: UICollectionViewCell {
         commentCounterLabel.text = viewModel.commentsCounterText
         configurePostPhotoHeight()
         configureLikeButton()
+        configureLikeCounterLalbel()
     }
 
     private func configureLikeCounterLalbel() {

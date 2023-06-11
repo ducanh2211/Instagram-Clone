@@ -17,19 +17,19 @@
                         <rect key="frame" x="0.0" y="0.0" width="375" height="812"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <subviews>
-                            <imageView clipsSubviews="YES" userInteractionEnabled="NO" contentMode="scaleAspectFit" horizontalHuggingPriority="251" verticalHuggingPriority="251" image="instagram-logo" translatesAutoresizingMaskIntoConstraints="NO" id="cjy-nd-XzR">
-                                <rect key="frame" x="107.66666666666669" y="326" width="160" height="160"/>
+                            <imageView clipsSubviews="YES" userInteractionEnabled="NO" contentMode="scaleAspectFit" horizontalHuggingPriority="251" verticalHuggingPriority="251" image="instagram-logo" translatesAutoresizingMaskIntoConstraints="NO" id="nLC-GC-yA5">
+                                <rect key="frame" x="113" y="331.66666666666669" width="149" height="149"/>
                                 <constraints>
-                                    <constraint firstAttribute="height" constant="160" id="nTg-bh-G3a"/>
-                                    <constraint firstAttribute="width" constant="160" id="osn-gd-tsk"/>
+                                    <constraint firstAttribute="height" constant="149" id="BuP-Um-Bml"/>
+                                    <constraint firstAttribute="width" constant="149" id="plh-Lc-UVl"/>
                                 </constraints>
                             </imageView>
                         </subviews>
                         <viewLayoutGuide key="safeArea" id="6Tk-OE-BBY"/>
                         <color key="backgroundColor" systemColor="systemBackgroundColor"/>
                         <constraints>
-                            <constraint firstItem="cjy-nd-XzR" firstAttribute="centerY" secondItem="Ze5-6b-2t3" secondAttribute="centerY" id="5ak-IR-MDM"/>
-                            <constraint firstItem="cjy-nd-XzR" firstAttribute="centerX" secondItem="Ze5-6b-2t3" secondAttribute="centerX" id="8is-3B-WIb"/>
+                            <constraint firstItem="nLC-GC-yA5" firstAttribute="centerY" secondItem="Ze5-6b-2t3" secondAttribute="centerY" id="JEY-gJ-MsS"/>
+                            <constraint firstItem="nLC-GC-yA5" firstAttribute="centerX" secondItem="Ze5-6b-2t3" secondAttribute="centerX" id="S9e-bP-heb"/>
                         </constraints>
                     </view>
                 </viewController>

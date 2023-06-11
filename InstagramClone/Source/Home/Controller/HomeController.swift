@@ -145,13 +145,17 @@ extension HomeController: UICollectionViewDataSource {
     }
 
     func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
-        if HomeSection(rawValue: section) == .story { return 10 }
-        return viewModel.posts.count
+        if HomeSection(rawValue: section) == .story {
+            return viewModel.storyPhotos.count
+        } else {
+            return viewModel.posts.count
+        }
     }
 
     func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
         if HomeSection(rawValue: indexPath.section) == .story {
             let cell = collectionView.dequeueReusableCell(withReuseIdentifier: HomeStoryCell.identifier, for: indexPath) as! HomeStoryCell
+            cell.photoString = viewModel.storyPhotos[indexPath.item]
             return cell
         } else {
             let cell = collectionView.dequeueReusableCell(withReuseIdentifier: HomePostCell.identifier, for: indexPath) as! HomePostCell

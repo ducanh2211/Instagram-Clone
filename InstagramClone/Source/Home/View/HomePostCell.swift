@@ -126,7 +126,7 @@ class HomePostCell: UICollectionViewCell {
     var viewModel: HomePostCellViewModel? {
         didSet {
             configure()
-            bindViewModel()
+//            bindViewModel()
         }
     }
 
@@ -151,16 +151,12 @@ class HomePostCell: UICollectionViewCell {
         }
         viewModel.getNumberOfLikesSuccess = { [weak self] in
             guard let self = self else { return }
-            self.likeCounterLabel.isHidden = viewModel.shouldHideCounterLabel
-            self.likeCounterLabel.text = viewModel.likeCounterText
+            self.configureLikeCounterLalbel()
         }
         viewModel.checkLikesStateSuccess = { [weak self] in
             guard let self = self else { return }
             self.configureLikeButton()
         }
-        viewModel.getNumberOfComments()
-        viewModel.getNumberOfLikes()
-        viewModel.checkLikesState()
     }
 
     private func configure() {
@@ -174,6 +170,7 @@ class HomePostCell: UICollectionViewCell {
         commentCounterLabel.text = viewModel.commentsCounterText
         configurePostPhotoHeight()
         configureLikeButton()
+        configureLikeCounterLalbel()
     }
 
     private func configureLikeCounterLalbel() {

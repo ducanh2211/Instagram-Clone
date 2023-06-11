@@ -34,6 +34,7 @@ class SignUpViewController: UIViewController, CustomizableNavigationBar {
     private lazy var passwordTextField: UITextField = {
         let textField = createTextField(placeHolder: "Password", tag: 3)
         textField.returnKeyType = .done
+        textField.isSecureTextEntry = true
         return textField
     }()
 

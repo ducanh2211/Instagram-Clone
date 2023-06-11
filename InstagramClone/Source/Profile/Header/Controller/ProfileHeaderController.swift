@@ -223,12 +223,13 @@ class ProfileHeaderController: UIViewController {
 
 extension ProfileHeaderController: UICollectionViewDataSource {
     func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
-        return 20
+        return viewModel.storyPhotos.count
     }
 
     func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
         let cell = collectionView.dequeueReusableCell(
             withReuseIdentifier: ProfileStoryCell.identifier, for: indexPath) as! ProfileStoryCell
+        cell.photoString = viewModel.storyPhotos[indexPath.item]
         return cell
     }
 }
