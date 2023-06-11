@@ -41,6 +41,8 @@
 <!-- ABOUT THE PROJECT -->
 ## About The Project
 
+![](images/about-project.png)
+
 This project is being developed for educational purpose and is still under development, I will continue to add more feartures to it.  
 
 In this repository, I try my best to mimic the key features of the Instagram. I have utilized serveral frameworks and classes in order to create a complex UI and ehanced UX, which include:
