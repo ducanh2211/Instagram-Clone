@@ -83,6 +83,8 @@ In this repository, I try my best to mimic the key features of the Instagram. I 
   - Be able to change user's info such as: fullname, username, bio and avatar.
 - Support dark mode.
 
+<p align="right">(<a href="#readme-top">back to top</a>)</p>
+
 ## Preview
 
 - Login Screen
@@ -123,6 +125,8 @@ Be able to load more comments.
 | Dark Mode |
 | :---------: |
 | ![](images/dark-mode.gif) |
+
+<p align="right">(<a href="#readme-top">back to top</a>)</p>
 
 ## Installation
 
